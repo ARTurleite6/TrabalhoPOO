@@ -86,5 +86,6 @@ public abstract class SmartDevice {
         return result;
     }
 
+    public abstract SmartDevice clone();
     public abstract double comsumption();
 }
