@@ -1,4 +1,4 @@
-public class SmartDevice {
+public abstract class SmartDevice {
 
     private static int next_id = 1;
 
@@ -9,9 +9,11 @@ public class SmartDevice {
     public SmartDevice(){
         this.on = false;
         this.id = SmartDevice.next_id++;
+        this.instalationCost = 0;
     }
 
     public SmartDevice(boolean on, double instalationCost){
+        this.id = SmartDevice.next_id++;
         this.on = on;
         this.instalationCost = instalationCost;
     }
@@ -84,7 +86,5 @@ public class SmartDevice {
         return result;
     }
 
-    public SmartDevice clone(){
-        return new SmartDevice(this);
-    }
+    public abstract double comsumption();
 }
