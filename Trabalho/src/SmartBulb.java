@@ -1,6 +1,16 @@
 public class SmartBulb extends SmartDevice{
     public static enum Tones{
-        NEUTRAL, WARM, COLD;
+        NEUTRAL(2), WARM(1), COLD(3);
+
+        private double consume;
+
+        Tones(double consume){
+            this.consume = consume;
+        }
+
+        public double getConsume(){
+            return this.consume;
+        }
     }
 
     private Tones tone;
@@ -10,16 +20,22 @@ public class SmartBulb extends SmartDevice{
     public SmartBulb(){
         super();
         this.tone = Tones.NEUTRAL;
-        this.dimension = 0;
-        this.baseConsume = 0;
+        this.dimension = 20;
+        this.baseConsume = 10;
     }
 
     public SmartBulb(boolean on, double instalationCost, Tones tone, int dimension, double baseConsume){
         super(on, instalationCost);
+        this.tone = tone;
+        this.dimension = dimension;
+        this.baseConsume = baseConsume;
     }
 
     public SmartBulb(int id, boolean on, double instalationCost, Tones tone, int dimension, double baseConsume){
         super(on, id, instalationCost);
+        this.tone = tone;
+        this.dimension = dimension;
+        this.baseConsume = baseConsume;
     }
 
     public SmartBulb(SmartBulb device){
@@ -54,11 +70,7 @@ public class SmartBulb extends SmartDevice{
     }
 
     public double comsumption(){
-        double tone_comsumption = 0;
-        if(this.tone == Tones.WARM) tone_comsumption = 0;
-        else if(this.tone == Tones.NEUTRAL) tone_comsumption = 0;
-        else tone_comsumption = 0;
-        return this.baseConsume + tone_comsumption;
+        return this.baseConsume + tone.getConsume();
     }
 
     public SmartBulb clone(){
