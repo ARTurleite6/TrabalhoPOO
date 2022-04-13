@@ -1,6 +1,6 @@
 public class SmartBulb extends SmartDevice{
-    public enum Tones{
-        NEUTRAL, WARM, COLD
+    public static enum Tones{
+        NEUTRAL, WARM, COLD;
     }
 
     private Tones tone;
