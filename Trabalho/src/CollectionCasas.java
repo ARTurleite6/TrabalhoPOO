@@ -42,7 +42,11 @@ public class CollectionCasas {
     }
 
     public void addDeviceToCasa(String nif, SmartDevice device){
-        this.houses.get(nif).addDevice(device);
+        this.houses.get(nif).addDevice(device.clone());
+    }
+
+    public void addDeviceToCasaOnRoom(String nif, String room, int id){
+        this.houses.get(nif).addDeviceOnRoom(room, id);
     }
 
     @Override

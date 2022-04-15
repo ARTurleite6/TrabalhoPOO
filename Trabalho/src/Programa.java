@@ -19,15 +19,7 @@ public class Programa {
                     break;
                 }
                 case 2 : {
-                    Optional<SmartDevice> dispositivo = Menu.criacaoSmartDevice();
-                    dispositivo.ifPresent(d -> {
-                        System.out.println("Insira o nif da casa em que quer inserir o dispostivo");
-                        String nif = scan.next();
-                        if(colections.getCasas().existCasa(nif)){
-                            colections.getCasas().addDeviceToCasa(nif, d);
-                        }
-                        else System.out.println("Esta casa nao existe");
-                    });
+                    Menu.criacaoSmartDevice(colections.getCasas());
                 }
                 case 3 : {
                     System.out.println(colections.getCasas().toString());

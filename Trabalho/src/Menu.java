@@ -20,7 +20,7 @@ public class Menu {
         return Optional.of(new SmartBulb(false, custoInstalacao, SmartBulb.Tones.NEUTRAL, dimensao, 10));
     }
 
-    public static Optional<SmartDevice> criacaoSmartDevice(){
+    public static void criacaoSmartDevice(CollectionCasas casas){
        System.out.println("Que tipo de Dispositivo pretende criar: \n1 : SmartBulb;\n2 : SmartCamera;\n3 : SmartSpeaker");
        Scanner scan = new Scanner(System.in);
        int tipoDispositivo = scan.nextInt();
@@ -37,13 +37,27 @@ public class Menu {
        else{
            System.out.println("Tipo invalido de dispositivo");
        }
-       return dispositivo;
+       dispositivo.ifPresent(d -> {
+           System.out.println("Insira o nif do proprietario da casa a instalar");
+           String nif = scan.next();
+           if(casas.existCasa(nif)){
+              casas.addDeviceToCasa(nif, d);
+              System.out.println("Deseja inserir em uma divisao da casa? S(1)/N(0)");
+              int choice = scan.nextInt();
+              if(choice == 1){
+                  System.out.println("Insira o nome da divisao a inserir");
+                  String room = scan.next();
+                  if(casas.getCasa(nif).existRoom(room)) casas.addDeviceToCasaOnRoom(nif, room, d.getId());
+              }
+           }
+           else System.out.println("A casa nao existe");
+       });
     }
 
     public static Casa criacaoCasa(){
         Scanner scan = new Scanner(System.in);
         System.out.println("Insira o nome do proprietario:");
-        String nome = scan.next();
+        String nome = scan.nextLine();
         System.out.println("Insira o nif do proprietario:");
         String nif = scan.next();
 
