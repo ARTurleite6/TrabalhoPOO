@@ -25,6 +25,18 @@ public class Casa {
         this.rooms = new HashMap<>();
     }
 
+    public Casa(String nome, String nif, Set<String> rooms){
+        this.nome = nome;
+        this.devices = new HashMap<>();
+        this.setRooms(rooms);
+    }
+
+    public Casa(String nome, String nif, Map<String, Set<Integer>> rooms){
+        this.nome = nome;
+        this.devices = new HashMap<>();
+        this.setRooms(rooms);
+    }
+
     public Casa(String nome, String nif, Map<Integer, SmartDevice> devices, Map<String, Set<Integer>> rooms){
         this.nome = nome;
         this.nif = nif;
@@ -69,6 +81,10 @@ public class Casa {
 
     public void setRooms(Map<String, Set<Integer>> rooms) {
         this.rooms = rooms;
+    }
+
+    public void setRooms(Set<String> rooms) {
+        this.rooms = rooms.stream().collect(Collectors.toMap(r -> r, r -> new TreeSet<>()));
     }
 
     @Override

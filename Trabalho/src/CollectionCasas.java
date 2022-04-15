@@ -37,6 +37,14 @@ public class CollectionCasas {
         this.houses.remove(nif);
     }
 
+    public boolean existCasa(String nif){
+        return this.houses.containsKey(nif);
+    }
+
+    public void addDeviceToCasa(String nif, SmartDevice device){
+        this.houses.get(nif).addDevice(device);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
