@@ -25,6 +25,14 @@ public class Fornecedores {
         this.fornecedores = fornecedores.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
     }
 
+    public void addFornecedor(Fornecedor f){
+        this.fornecedores.put(f.getName(), f.clone());
+    }
+
+    public boolean existeFornecedor(String nome){
+        return this.fornecedores.containsKey(nome);
+    }
+
     @Override
     public String toString() {
         return "Fornecedores{" +
