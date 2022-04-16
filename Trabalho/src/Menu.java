@@ -10,14 +10,53 @@ public class Menu {
         Scanner input = new Scanner(System.in);
         return input.nextInt();
     }
+    public static Optional<SmartDevice> criacaoSmartSpeaker(){
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Pretende ligar o dispositivo? True/False");
+        boolean ligado = scan.nextBoolean();
+        System.out.println("Insira a marca do speaker");
+        String brand = scan.next();
+        System.out.println("Insira o volume do speaker");
+        int volume = scan.nextInt();
+        System.out.println("Insira a estacao de radio a ligar");
+        String estacao = scan.next();
+        System.out.println("Insira o consumo base do dispositivo");
+        double baseConsumption = scan.nextDouble();
+        System.out.println("Insira o custo de instalacao do dispositivo");
+        double instalacao = scan.nextDouble();
+        return Optional.of(new SmartSpeaker(ligado, instalacao, volume, estacao, brand, baseConsumption));
+    }
+
+    public static Optional<SmartDevice> criacaoSmartCamera(){
+        Scanner scan = new Scanner(System.in);
+        System.out.println("Pretende ligar o dispositivo? True/False");
+        boolean ligado = scan.nextBoolean();
+        System.out.println("Insira o custo de instalacao do dispostivo");
+        double custoInstalacao = scan.nextDouble();
+        System.out.println("Insira a dimensao dos ficheiros em bytes");
+        int dimensao = scan.nextInt();
+        System.out.println("Insira a resolucao da camera");
+        int resolucao = scan.nextInt();
+        return Optional.of(new SmartCamera(ligado, custoInstalacao, resolucao, dimensao));
+    }
 
     public static Optional<SmartDevice> criacaoSmartBulb(){
-        System.out.println("Insira o custo de instalacao do dispostivo");
         Scanner scan = new Scanner(System.in);
+        System.out.println("Pretende ligar o dispositivo? True/False");
+        boolean ligado = scan.nextBoolean();
+        System.out.println("Insira o custo de instalacao do dispostivo");
         double custoInstalacao = scan.nextDouble();
+        System.out.println("Insira o custo base da lampada");
+        double custoBase = scan.nextDouble();
         System.out.println("Insira a dimensao do dispositivo em centimetros");
         int dimensao = scan.nextInt();
-        return Optional.of(new SmartBulb(false, custoInstalacao, SmartBulb.Tones.NEUTRAL, dimensao, 10));
+        System.out.println("Insira a tonalidade do dispositivo(Neutral(0), Warm(1) ou Cold(2)");
+        int tonalidade = scan.nextInt();
+        SmartBulb.Tones tone = SmartBulb.Tones.NEUTRAL;
+        if(tonalidade == 0) tone = SmartBulb.Tones.NEUTRAL;
+        else if(tonalidade == 1) tone = SmartBulb.Tones.WARM;
+        else if(tonalidade == 2) tone = SmartBulb.Tones.COLD;
+        return Optional.of(new SmartBulb(ligado, custoInstalacao, tone, dimensao, custoBase));
     }
 
     public static void criacaoSmartDevice(CollectionCasas casas){
@@ -29,7 +68,7 @@ public class Menu {
            dispositivo = criacaoSmartBulb();
        }
        else if(tipoDispositivo == 2){
-
+            dispositivo = criacaoSmartCamera();
        }
        else if(tipoDispositivo == 3){
 

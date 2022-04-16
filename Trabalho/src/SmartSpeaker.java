@@ -2,7 +2,7 @@ import java.util.Objects;
 
 public class SmartSpeaker extends SmartDevice{
 
-    private static int MAX = 100;
+    private static final int MAX = 100;
 
     private int volume;
     private String radioStation;

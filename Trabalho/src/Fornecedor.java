@@ -1,6 +1,7 @@
 import java.util.Objects;
 
 public class Fornecedor {
+
     private double basePrice;
     private String name;
     private double tax;
