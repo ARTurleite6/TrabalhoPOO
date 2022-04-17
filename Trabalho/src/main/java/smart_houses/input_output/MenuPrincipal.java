@@ -10,7 +10,7 @@ public class MenuPrincipal {
         EstadoPrograma collections = new EstadoPrograma();
         int choice = 0;
 
-        while(choice != 5){
+        while(choice != 6){
             choice = MenuPrincipal.initialMenu();
             switch (choice){
                 case 1 : {
@@ -26,13 +26,41 @@ public class MenuPrincipal {
                     break;
                 }
                 case 4 : {
-                    System.out.println(collections.getCasas().toString());
+                    System.out.println(collections.toString());
                     break;
+                }
+                case 5 : {
+                    MenuPrincipal.alteraDia(collections);
                 }
             }
         }
 
         System.out.println("Saindo...");
+    }
+
+    private static void alteraDia(EstadoPrograma e){
+        System.out.println("""
+                Alterar Dia:
+                1: Avancar um dia
+                2: Avancar X dias 
+                3: Avancar para determinada data
+                4: Sair
+                """);
+        Scanner scan = new Scanner(System.in);
+        int choice = scan.nextInt();
+        switch (choice) {
+            case 1 -> {
+                e.avancaData();
+                System.out.println("Avancando, Gerando Faturas...");
+                break;
+            }
+            case 2 -> {
+                break;
+            }
+            case 3 -> {
+                break;
+            }
+        }
     }
 
     private static int initialMenu(){
@@ -41,8 +69,9 @@ public class MenuPrincipal {
                 1: Gerir Casas
                 2: Gerir Dispositivos
                 3: Gerir Fornecedores
-                4: Listar casas
-                5: Sair do Programa""");
+                4: Estado programa
+                5: Alterar dia
+                6: Sair do Programa""");
         Scanner input = new Scanner(System.in);
         return input.nextInt();
     }

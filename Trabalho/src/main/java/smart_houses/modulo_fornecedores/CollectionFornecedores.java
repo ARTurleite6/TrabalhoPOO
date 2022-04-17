@@ -1,7 +1,11 @@
 package smart_houses.modulo_fornecedores;
 
+import smart_houses.smart_devices.SmartDevice;
+
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CollectionFornecedores {
@@ -25,6 +29,10 @@ public class CollectionFornecedores {
 
     public void setFornecedores(Map<String, Fornecedor> fornecedores) {
         this.fornecedores = fornecedores.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
+    }
+
+    public void geraFaturaFornecedor(String nifCliente, Set<SmartDevice> devices, String fornecedor, LocalDate inicio, LocalDate fim){
+        this.fornecedores.get(fornecedor).criaFatura(nifCliente, devices, inicio, fim);
     }
 
     public void addFornecedor(Fornecedor f){
