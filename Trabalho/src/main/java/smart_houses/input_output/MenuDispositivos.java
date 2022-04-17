@@ -1,7 +1,6 @@
 package smart_houses.input_output;
 
 import smart_houses.EstadoPrograma;
-import smart_houses.modulo_casas.Casa;
 import smart_houses.modulo_casas.CollectionCasas;
 import smart_houses.smart_devices.SmartBulb;
 import smart_houses.smart_devices.SmartCamera;

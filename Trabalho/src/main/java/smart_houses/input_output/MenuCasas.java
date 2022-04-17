@@ -37,7 +37,7 @@ public class MenuCasas {
             if (rooms.contains(room)) {
                 System.out.println("Esta divisao ja existe");
             } else rooms.add(room);
-            System.out.println("Pretende continuar a adicionar? S(1)/N(2)");
+            System.out.println("Pretende continuar a adicionar? S(1)/N(0)");
             keep = scan.nextInt();
         }
         System.out.println("Insira o nome do Fornecedor da casa");
