@@ -55,9 +55,14 @@ public class MenuPrincipal {
                 break;
             }
             case 2 -> {
+                System.out.println("Insira o numero de dias a avancar");
+                int days = scan.nextInt();
+                e.avancaData(days);
                 break;
             }
             case 3 -> {
+                System.out.println("Insira a data para onde quer avancar");
+                
                 break;
             }
         }

@@ -39,7 +39,7 @@ public class EstadoPrograma {
     }
 
     private void geraFaturas(LocalDate fim){
-
+        this.casas.getHouses().values().forEach(casa -> this.fornecedores.geraFaturaFornecedor(casa.getNif(), casa.getSetDevices(), casa.getFornecedor(), this.data, fim));
     }
 
     public void avancaData(){
@@ -48,10 +48,12 @@ public class EstadoPrograma {
     }
 
     public void avancaData(int days){
+        this.geraFaturas(days);
         this.data = this.data.plusDays(days);
     }
 
     public void avancaData(LocalDate date){
+        this.geraFaturas(date);
         this.data = date;
     }
 
