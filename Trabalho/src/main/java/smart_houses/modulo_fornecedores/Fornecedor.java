@@ -4,7 +4,7 @@ import smart_houses.EstadoPrograma;
 import smart_houses.Fatura;
 import smart_houses.smart_devices.SmartDevice;
 
-import java.time.Duration;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
-public class Fornecedor {
+public class Fornecedor implements Serializable {
 
     private String name;
     private Map<String, Set<Fatura>> faturas;

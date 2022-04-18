@@ -2,13 +2,14 @@ package smart_houses.modulo_fornecedores;
 
 import smart_houses.smart_devices.SmartDevice;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class CollectionFornecedores {
+public class CollectionFornecedores implements Serializable {
     private Map<String, Fornecedor> fornecedores;
 
     public CollectionFornecedores(){

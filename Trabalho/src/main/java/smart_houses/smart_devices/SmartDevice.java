@@ -1,5 +1,8 @@
 package smart_houses.smart_devices;
-public abstract class SmartDevice {
+
+import java.io.Serializable;
+
+public abstract class SmartDevice implements Serializable {
 
     private static int next_id = 1;
 

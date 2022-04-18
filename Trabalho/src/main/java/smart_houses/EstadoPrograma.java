@@ -3,9 +3,10 @@ package smart_houses;
 import smart_houses.modulo_casas.CollectionCasas;
 import smart_houses.modulo_fornecedores.CollectionFornecedores;
 
+import java.io.*;
 import java.time.LocalDate;
 
-public class EstadoPrograma {
+public class EstadoPrograma implements Serializable{
     private final CollectionCasas casas;
     private final CollectionFornecedores fornecedores;
     private LocalDate data;
@@ -57,6 +58,16 @@ public class EstadoPrograma {
         this.data = date;
     }
 
+    public EstadoPrograma carregaDados(){
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./src/main/resources/teste.txt"));
+            return (EstadoPrograma) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public CollectionCasas getCasas() {
         return casas;
     }
@@ -97,5 +108,18 @@ public class EstadoPrograma {
 
     public EstadoPrograma clone(){
         return new EstadoPrograma(this);
+    }
+
+    public void guardaDados(){
+        try {
+            FileOutputStream file = new FileOutputStream("./src/main/resources/teste.txt");
+            ObjectOutputStream oos = new ObjectOutputStream(file);
+            oos.writeObject(this);
+            oos.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("Este ficheiro nao existe");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

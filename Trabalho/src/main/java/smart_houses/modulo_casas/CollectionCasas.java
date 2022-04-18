@@ -1,14 +1,16 @@
 package smart_houses.modulo_casas;
 
+import smart_houses.exceptions.ExisteCasaException;
 import smart_houses.smart_devices.SmartDevice;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class CollectionCasas {
+public class CollectionCasas implements Serializable {
     private Map<String, Casa> houses;
 
     public CollectionCasas(){
@@ -31,8 +33,10 @@ public class CollectionCasas {
         this.houses = houses.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
     }
 
-    public Casa getCasa(String nif){
-        return this.houses.get(nif).clone();
+    public Casa getCasa(String nif) throws ExisteCasaException {
+        Casa casa = this.houses.get(nif);
+        if(casa == null) throw new ExisteCasaException("A pessoa com o nif de " + nif + " nao possui nenhuma casa");
+        return casa.clone();
     }
 
     public void addCasa(Casa casa){

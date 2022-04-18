@@ -1,8 +1,9 @@
 package smart_houses;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
-public class Fatura implements Comparable<Fatura>{
+public class Fatura implements Comparable<Fatura>, Serializable {
     private String fornecedor;
     private String nifCliente;
     private double custo;

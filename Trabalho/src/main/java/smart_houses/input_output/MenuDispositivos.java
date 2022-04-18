@@ -84,7 +84,8 @@ public class MenuDispositivos {
                 if (choice == 1) {
                     System.out.println("Insira o nome da divisao a inserir");
                     String room = scan.next();
-                    if (casas.getCasa(nif).existRoom(room)) casas.addDeviceToCasaOnRoom(nif, room, d.getId());
+                    //if (casas.getCasa(nif).existRoom(room))
+                     casas.addDeviceToCasaOnRoom(nif, room, d.getId());
                 }
             } else System.out.println("A casa nao existe");
         });

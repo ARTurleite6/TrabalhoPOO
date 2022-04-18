@@ -2,6 +2,7 @@ package smart_houses.modulo_casas;
 
 import smart_houses.smart_devices.SmartDevice;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,7 +12,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-public class Casa {
+public class Casa implements Serializable {
     private String nome;
     private String nif;
     private Map<Integer, SmartDevice> devices;
