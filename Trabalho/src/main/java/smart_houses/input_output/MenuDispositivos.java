@@ -1,7 +1,6 @@
 package smart_houses.input_output;
 
 import smart_houses.EstadoPrograma;
-import smart_houses.modulo_casas.CollectionCasas;
 import smart_houses.smart_devices.SmartBulb;
 import smart_houses.smart_devices.SmartCamera;
 import smart_houses.smart_devices.SmartDevice;
@@ -60,7 +59,7 @@ public class MenuDispositivos {
         return Optional.of(new SmartBulb(ligado, custoInstalacao, tone, dimensao, custoBase));
     }
 
-    private static void criacaoSmartDevice(CollectionCasas casas) {
+    private static void criacaoSmartDevice(EstadoPrograma e) {
         System.out.println("Que tipo de Dispositivo pretende criar: \n1 : SmartBulb;\n2 : SmartCamera;\n3 : SmartSpeaker");
         Scanner scan = new Scanner(System.in);
         int tipoDispositivo = scan.nextInt();
@@ -77,40 +76,40 @@ public class MenuDispositivos {
         dispositivo.ifPresent(d -> {
             System.out.println("Insira o nif do proprietario da casa a instalar");
             String nif = scan.next();
-            if (casas.existCasa(nif)) {
-                casas.addDeviceToCasa(nif, d);
+            if (e.existeCasa(nif)) {
+                e.addDeviceToCasa(nif, d);
                 System.out.println("Deseja inserir em uma divisao da casa? S(1)/N(0)");
                 int choice = scan.nextInt();
                 if (choice == 1) {
                     System.out.println("Insira o nome da divisao a inserir");
                     String room = scan.next();
                     //if (casas.getCasa(nif).existRoom(room))
-                     casas.addDeviceToCasaOnRoom(nif, room, d.getId());
+                     e.addDeviceToCasaOnRoom(nif, room, d.getId());
                 }
             } else System.out.println("A casa nao existe");
         });
     }
 
-        private static void ligarDesligarDispositivos(CollectionCasas casas){
+        private static void ligarDesligarDispositivos(EstadoPrograma e){
             Scanner s = new Scanner(System.in);
             System.out.println("Qual a casa que pretender ligar/desligar os dipositivos(Insira o nif)");
             String nif = s.nextLine();
-            if(casas.existCasa(nif)){
+            if(e.existeCasa(nif)){
                 System.out.println("Pretende ligar ou desligar: Ligar(True)/Desligar(False)");
                 boolean ligar = s.nextBoolean();
                 System.out.println("Pretende Ligar/Desligar os dispositivos de uma divisao ou um dispositivo em especifio: Divisao(1)/Especifico(2)");
                 int divisao = s.nextInt();
                 if(divisao == 1){
-                    System.out.println("Lista de divisoes da casa: " + casas.getRoomsHouse(nif));
+                    System.out.println("Lista de divisoes da casa: " + e.getRoomsHouse(nif));
                     System.out.println("Diga qual divisao : ");
                     String room = s.next();
-                    casas.setAllDevicesHouseOn(nif, ligar);
+                    e.setAllDevicesHouseOn(nif, ligar);
                 }
                 else{
-                    System.out.println("Lista de devices da casa: " + casas.getSetDevicesHouse(nif));
+                    System.out.println("Lista de devices da casa: " + e.getSetDevicesHouse(nif));
                     System.out.println("Diga qual o dispostivo(id) : ");
                     int id = s.nextInt();
-                    casas.setDeviceHouseOn(nif, id, ligar);
+                    e.setDeviceHouseOn(nif, id, ligar);
                 }
             }
             else System.out.println("A casa nao existe");
@@ -122,10 +121,10 @@ public class MenuDispositivos {
             choice = MenuDispositivos.gestaoDispositivos();
 
             if (choice == 1) {
-                MenuDispositivos.criacaoSmartDevice(collections.getCasas());
+                MenuDispositivos.criacaoSmartDevice(collections);
             }
             else if(choice == 2) {
-                MenuDispositivos.ligarDesligarDispositivos(collections.getCasas());
+                MenuDispositivos.ligarDesligarDispositivos(collections);
             }
         }
     }

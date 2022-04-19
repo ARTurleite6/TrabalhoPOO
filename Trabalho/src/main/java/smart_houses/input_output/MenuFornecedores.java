@@ -22,7 +22,7 @@ public class MenuFornecedores {
             choice = MenuFornecedores.gestaoFornecedores();
             if (choice == 1) {
                 Fornecedor f = MenuFornecedores.criarFornecedor();
-                c.getFornecedores().addFornecedor(f);
+                c.addFornecedor(f);
             }
         }
     }

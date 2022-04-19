@@ -2,7 +2,6 @@ package smart_houses.input_output;
 
 import smart_houses.EstadoPrograma;
 import smart_houses.modulo_casas.Casa;
-import smart_houses.modulo_fornecedores.CollectionFornecedores;
 
 import java.util.Scanner;
 import java.util.Set;
@@ -21,7 +20,7 @@ public class MenuCasas {
     }
 
 
-    private static Casa criacaoCasa(CollectionFornecedores f) {
+    private static Casa criacaoCasa(EstadoPrograma e) {
         Scanner scan = new Scanner(System.in);
         System.out.println("Insira o nome do proprietario:");
         String nome = scan.nextLine();
@@ -43,7 +42,7 @@ public class MenuCasas {
         System.out.println("Insira o nome do Fornecedor da casa");
         String empresa = scan.next();
         Casa casa = null;
-        if (f.existeFornecedor(empresa)) {
+        if (e.existeFornecedor(empresa)) {
             casa = new Casa(nome, nif, rooms, empresa);
         } else {
             System.out.println("Este Fornecedor nao existe tente novamente");
@@ -52,13 +51,13 @@ public class MenuCasas {
         return casa;
     }
 
-    protected static void run(EstadoPrograma c) {
+    protected static void run(EstadoPrograma e) {
         int choice = 0;
         while (choice != 2) {
             choice = MenuCasas.gestaoCasas();
             if (choice == 1) {
-                Casa casa = MenuCasas.criacaoCasa(c.getFornecedores());
-                if (casa != null) c.getCasas().addCasa(casa);
+                Casa casa = MenuCasas.criacaoCasa(e);
+                if (casa != null) e.adicionaCasa(casa);
             }
         }
     }

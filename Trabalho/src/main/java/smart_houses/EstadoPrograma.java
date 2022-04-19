@@ -1,14 +1,26 @@
 package smart_houses;
 
-import smart_houses.modulo_casas.CollectionCasas;
-import smart_houses.modulo_fornecedores.CollectionFornecedores;
+import smart_houses.modulo_casas.Casa;
+import smart_houses.modulo_fornecedores.Fornecedor;
+import smart_houses.smart_devices.SmartDevice;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class EstadoPrograma implements Serializable{
-    private final CollectionCasas casas;
-    private final CollectionFornecedores fornecedores;
+    private final Map<String, Casa> casas;
+    private final Map<String, Fornecedor> fornecedores;
     private LocalDate data;
 
     public static final double custoEnergia = 4.8;
@@ -16,8 +28,8 @@ public class EstadoPrograma implements Serializable{
 
 
     public EstadoPrograma(){
-        this.casas = new CollectionCasas();
-        this.fornecedores = new CollectionFornecedores();
+        this.casas = new HashMap<>();
+        this.fornecedores = new HashMap<>();
         this.data = LocalDate.now();
     }
 
@@ -36,11 +48,25 @@ public class EstadoPrograma implements Serializable{
     }
 
     private void geraFaturas(int days){
-        this.casas.getHouses().values().forEach(casa -> this.fornecedores.geraFaturaFornecedor(casa.getNif(), casa.getSetDevices(), casa.getFornecedor(), this.data, this.data.plusDays(days)));
+        this.casas.values().forEach(casa -> {
+            Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getNif(), casa.getSetDevices(), this.data, this.data.plusDays(days));
+            casa.adicionaFatura(f);
+        });
     }
 
     private void geraFaturas(LocalDate fim){
-        this.casas.getHouses().values().forEach(casa -> this.fornecedores.geraFaturaFornecedor(casa.getNif(), casa.getSetDevices(), casa.getFornecedor(), this.data, fim));
+        this.casas.values().forEach(casa -> {
+            Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getNif(), casa.getSetDevices(), this.data, fim);
+            casa.adicionaFatura(f);
+        });
+    }
+
+    public List<Fatura> getFaturasFornecedor(String nome){
+        return this.casas.values().stream().
+                flatMap(c -> c.getFaturas().stream()).
+                filter(f -> f.getFornecedor().equals(nome)).
+                map(Fatura::clone).
+                collect(Collectors.toList());
     }
 
     public void avancaData(){
@@ -56,24 +82,6 @@ public class EstadoPrograma implements Serializable{
     public void avancaData(LocalDate date){
         this.geraFaturas(date);
         this.data = date;
-    }
-
-    public EstadoPrograma carregaDados(){
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./src/main/resources/teste.txt"));
-            return (EstadoPrograma) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public CollectionCasas getCasas() {
-        return casas;
-    }
-
-    public CollectionFornecedores getFornecedores() {
-        return fornecedores;
     }
 
     @Override
@@ -95,6 +103,40 @@ public class EstadoPrograma implements Serializable{
         result = 31 * result + (getFornecedores() != null ? getFornecedores().hashCode() : 0);
         result = 31 * result + (getData() != null ? getData().hashCode() : 0);
         return result;
+    }
+
+    public EstadoPrograma carregaDados(){
+        try {
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./src/main/resources/teste.txt"));
+            return (EstadoPrograma) ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    public Map<String, Casa> getCasas() {
+        return this.casas.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
+    }
+
+    public Map<String, Fornecedor> getFornecedores() {
+        return this.fornecedores.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
+    }
+
+    public void adicionaCasa(Casa c){
+        this.casas.put(c.getNif(), c.clone());
+    }
+
+    public boolean existeFornecedor(String nome){
+        return this.fornecedores.containsKey(nome);
+    }
+
+    public boolean existeCasa(String nif){
+        return this.casas.containsKey(nif);
+    }
+
+    public void addDeviceToCasa(String nif, SmartDevice device){
+        this.casas.get(nif).addDevice(device);
     }
 
     @Override
@@ -121,5 +163,29 @@ public class EstadoPrograma implements Serializable{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void addDeviceToCasaOnRoom(String nif, String room, int id) {
+        this.casas.get(nif).addDeviceOnRoom(room, id);
+    }
+
+    public List<String> getRoomsHouse(String nif) {
+        return this.casas.get(nif).getListRooms();
+    }
+
+    public void setAllDevicesHouseOn(String nif, boolean ligar) {
+        this.casas.get(nif).setAllDevicesState(ligar);
+    }
+
+    public Set<SmartDevice> getSetDevicesHouse(String nif) {
+        return this.casas.get(nif).getSetDevices();
+    }
+
+    public void setDeviceHouseOn(String nif, int id, boolean ligar) {
+        this.casas.get(nif).setDeviceState(id, ligar);
+    }
+
+    public void addFornecedor(Fornecedor f) {
+        this.fornecedores.put(f.getName(), f.clone());
     }
 }
