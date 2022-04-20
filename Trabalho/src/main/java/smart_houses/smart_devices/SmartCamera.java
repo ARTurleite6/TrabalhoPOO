@@ -16,12 +16,6 @@ public class SmartCamera extends SmartDevice{
         this.fileDim = fileDim;
     }
 
-    public SmartCamera(int id, boolean ligado, double instalationPrice, int resolution, int fileDim){
-        super(ligado, id, instalationPrice);
-        this.resolution = resolution;
-        this.fileDim = fileDim;
-    }
-
     public SmartCamera(SmartCamera camera){
         super(camera);
         this.resolution = camera.getResolution();

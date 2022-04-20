@@ -1,6 +1,7 @@
 package smart_houses.input_output;
 
 import smart_houses.EstadoPrograma;
+import smart_houses.exceptions.ExisteCasaException;
 import smart_houses.modulo_casas.Casa;
 
 import java.util.Scanner;
@@ -8,7 +9,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 public class MenuCasas {
-
 
     private static int gestaoCasas(){
         System.out.println("""
@@ -18,7 +18,6 @@ public class MenuCasas {
         Scanner scanner = new Scanner(System.in);
         return scanner.nextInt();
     }
-
 
     private static Casa criacaoCasa(EstadoPrograma e) {
         Scanner scan = new Scanner(System.in);
@@ -42,8 +41,10 @@ public class MenuCasas {
         System.out.println("Insira o nome do Fornecedor da casa");
         String empresa = scan.next();
         Casa casa = null;
+        System.out.println("Insira o codigo da casa a criar");
+        String code = scan.next();
         if (e.existeFornecedor(empresa)) {
-            casa = new Casa(nome, nif, rooms, empresa);
+            casa = new Casa(code, nome, nif, rooms, empresa);
         } else {
             System.out.println("Este Fornecedor nao existe tente novamente");
         }
@@ -57,7 +58,14 @@ public class MenuCasas {
             choice = MenuCasas.gestaoCasas();
             if (choice == 1) {
                 Casa casa = MenuCasas.criacaoCasa(e);
-                if (casa != null) e.adicionaCasa(casa);
+                if (casa != null) {
+                    try{
+                        e.adicionaCasa(casa);
+                    }
+                    catch(ExisteCasaException exc){
+                        System.out.println(exc.getMessage());
+                    }
+                }
             }
         }
     }

@@ -33,13 +33,6 @@ public class SmartBulb extends SmartDevice{
         this.baseConsume = baseConsume;
     }
 
-    public SmartBulb(int id, boolean on, double instalationCost, Tones tone, int dimension, double baseConsume){
-        super(on, id, instalationCost);
-        this.tone = tone;
-        this.dimension = dimension;
-        this.baseConsume = baseConsume;
-    }
-
     public SmartBulb(SmartBulb device){
         super(device);
         this.tone = device.getTone();

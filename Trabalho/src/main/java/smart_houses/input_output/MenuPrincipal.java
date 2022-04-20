@@ -11,7 +11,7 @@ public class MenuPrincipal {
     protected static void run(EstadoPrograma c){
         int choice = 0;
 
-        while(choice != 6){
+        while(choice != 7){
             choice = MenuPrincipal.initialMenu();
             switch (choice) {
                 case 1 -> MenuCasas.run(c);
@@ -19,6 +19,7 @@ public class MenuPrincipal {
                 case 3 -> MenuFornecedores.run(c);
                 case 4 -> System.out.println(c.toString());
                 case 5 -> MenuPrincipal.alteraDia(c);
+                case 6 -> MenuEstadoPrograma.run(c);
             }
         }
 
@@ -43,17 +44,23 @@ public class MenuPrincipal {
             case 2 -> {
                 System.out.println("Insira o numero de dias a avancar");
                 int days = scan.nextInt();
-                e.avancaData(days);
+                if(days > 0) {
+                    e.avancaData(days);
+                }
+                else System.out.println("Numero de dias invalido");
             }
             case 3 -> {
                 System.out.println("Insira a data para onde quer avancar(Dia/Mes/Ano)");
                 String dataStr = scan.nextLine();
                 try {
                     LocalDate data = LocalDate.parse(dataStr);
-                    e.avancaData(data);
+                    if(data.isAfter(e.getDataAtual())){
+                        e.avancaData(data);
+                    }
+                    else System.out.println("Data invalida");
                 }
                 catch (DateTimeException exception){
-                    System.out.println(exception.getMessage());
+                    System.out.println("Data foi inserida de forma invalida, tente com (Dia/Mes/Ano)");
                 }
             }
         }
@@ -67,7 +74,8 @@ public class MenuPrincipal {
                 3: Gerir Fornecedores
                 4: Estado programa
                 5: Alterar dia
-                6: Sair do Programa""");
+                6: Estatisticas do Programa
+                7: Sair do Programa""");
         Scanner input = new Scanner(System.in);
         return input.nextInt();
     }

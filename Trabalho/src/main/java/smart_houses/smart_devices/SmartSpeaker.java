@@ -27,14 +27,6 @@ public class SmartSpeaker extends SmartDevice{
         this.baseComsumption=baseComsumption;
     }
 
-    public SmartSpeaker(int id, boolean on, double instalationCost, int volume, String radioStation, String brand, double baseComsumption){
-        super(on, id, instalationCost);
-        this.volume=volume;
-        this.radioStation= radioStation;
-        this.brand=brand;
-        this.baseComsumption=baseComsumption;
-    }
-
     public SmartSpeaker(SmartSpeaker device){
         super(device);
         this.volume= device.getVolume();

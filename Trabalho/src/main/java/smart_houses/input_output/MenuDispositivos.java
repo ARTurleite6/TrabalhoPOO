@@ -74,17 +74,16 @@ public class MenuDispositivos {
             System.out.println("Tipo invalido de dispositivo");
         }
         dispositivo.ifPresent(d -> {
-            System.out.println("Insira o nif do proprietario da casa a instalar");
-            String nif = scan.next();
-            if (e.existeCasa(nif)) {
-                e.addDeviceToCasa(nif, d);
+            System.out.println("Insira o codigo da casa a instalar");
+            String code = scan.next();
+            if (e.existeCasa(code)) {
+                e.addDeviceToCasa(code, d);
                 System.out.println("Deseja inserir em uma divisao da casa? S(1)/N(0)");
                 int choice = scan.nextInt();
                 if (choice == 1) {
                     System.out.println("Insira o nome da divisao a inserir");
                     String room = scan.next();
-                    //if (casas.getCasa(nif).existRoom(room))
-                     e.addDeviceToCasaOnRoom(nif, room, d.getId());
+                     e.addDeviceToCasaOnRoom(code, room, d.getId());
                 }
             } else System.out.println("A casa nao existe");
         });

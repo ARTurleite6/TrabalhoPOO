@@ -22,12 +22,6 @@ public abstract class SmartDevice implements Serializable {
         this.instalationCost = instalationCost;
     }
 
-    public SmartDevice(boolean on, int id, double instalationCost){
-        this.on = on;
-        this.id = id;
-        this.instalationCost = instalationCost;
-    }
-
     public SmartDevice(SmartDevice device){
         this.on = device.isOn();
         this.id = device.getId();
