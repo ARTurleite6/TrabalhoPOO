@@ -7,6 +7,8 @@ import smart_houses.smart_devices.SmartDevice;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -14,28 +16,39 @@ public class Fornecedor implements Serializable {
 
     private String name;
 
+    private Set<Integer> faturas;
+
 
     public Fornecedor() {
         this.name = "n/a";
+        this.faturas = new TreeSet<>();
     }
 
     public Fornecedor(String name){
         this.name = name;
+        this.faturas = new TreeSet<>();
     }
 
     public Fornecedor(Fornecedor fornecedor){
         this.name=fornecedor.getName();
+        this.faturas = fornecedor.getFaturas();
     }
 
     public Fatura criaFatura(String codCasa, String nif, List<SmartDevice> devices, LocalDate inicio, LocalDate fim){
         long days = DAYS.between(inicio, fim);
         double consumo = devices.stream().mapToDouble(SmartDevice::comsumption).sum() * days;
         double preco = this.precoDiaDispositivos(devices) * days;
-        return new Fatura(codCasa, this.name, nif, preco, consumo, inicio, fim);
+        Fatura fatura = new Fatura(codCasa, this.name, nif, preco, consumo, inicio, fim);
+        this.faturas.add(fatura.getCodigoFatura());
+        return fatura.clone();
     }
 
     public String getName() {
         return name;
+    }
+
+    public Set<Integer> getFaturas(){
+        return new TreeSet<>(this.faturas);
     }
 
     public void setName(String name) {
@@ -46,6 +59,7 @@ public class Fornecedor implements Serializable {
     public String toString() {
         return "Fornecedor{" +
                 "name='" + name + '\'' +
+                ", faturas=" + faturas +
                 '}';
     }
 
@@ -56,12 +70,15 @@ public class Fornecedor implements Serializable {
 
         Fornecedor that = (Fornecedor) o;
 
-        return getName() != null ? getName().equals(that.getName()) : that.getName() == null;
+        if (!getName().equals(that.getName())) return false;
+        return getFaturas().equals(that.getFaturas());
     }
 
     @Override
     public int hashCode() {
-        return getName() != null ? getName().hashCode() : 0;
+        int result = getName().hashCode();
+        result = 31 * result + getFaturas().hashCode();
+        return result;
     }
 
     public double precoDiaDispositivos(List<SmartDevice> devices){

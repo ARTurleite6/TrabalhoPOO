@@ -13,6 +13,7 @@ public class Casa implements Serializable {
     private String nif;
     private Map<Integer, SmartDevice> devices;
     private Map<String, Set<Integer>> rooms;
+    private Set<Integer> faturas;
     private String fornecedor;
 
     public Casa(){
@@ -22,6 +23,7 @@ public class Casa implements Serializable {
         this.devices = new HashMap<>();
         this.rooms = new HashMap<>();
         this.fornecedor = "";
+        this.faturas = new TreeSet<>();
     }
 
     public Casa(String code, String nome, String nif, String fornecedor){
@@ -31,6 +33,7 @@ public class Casa implements Serializable {
         this.devices = new HashMap<>();
         this.rooms = new HashMap<>();
         this.fornecedor = fornecedor;
+        this.faturas = new TreeSet<>();
     }
 
     public Casa(String code, String nome, String nif, Set<String> rooms, String fornecedor){
@@ -40,6 +43,7 @@ public class Casa implements Serializable {
         this.devices = new HashMap<>();
         this.setRooms(rooms);
         this.fornecedor = fornecedor;
+        this.faturas = new TreeSet<>();
     }
 
     public Casa(String code, String nome, String nif, Map<String, Set<Integer>> rooms, String fornecedor){
@@ -49,6 +53,7 @@ public class Casa implements Serializable {
         this.devices = new HashMap<>();
         this.setRooms(rooms);
         this.fornecedor = fornecedor;
+        this.faturas = new TreeSet<>();
     }
 
     public Casa(String code, String nome, String nif, Map<Integer, SmartDevice> devices, Map<String, Set<Integer>> rooms, String fornecedor){
@@ -58,6 +63,7 @@ public class Casa implements Serializable {
         this.setDevices(devices);
         this.setRooms(rooms);
         this.fornecedor = fornecedor;
+        this.faturas = new TreeSet<>();
     }
 
     public Casa(Casa casa){
@@ -67,6 +73,19 @@ public class Casa implements Serializable {
         this.devices = casa.getMapDevices();
         this.rooms = casa.getRooms();
         this.fornecedor = casa.getFornecedor();
+        this.faturas = casa.getFaturas();
+    }
+
+    public void setFaturas(Set<Integer> faturas){
+        this.faturas = new TreeSet<>(faturas);
+    }
+
+    public Set<Integer> getFaturas() {
+        return new TreeSet<>(this.faturas);
+    }
+
+    public TreeSet<Integer> getTreeSetFaturas(){
+        return new TreeSet<>(this.faturas);
     }
 
     public String getCode() {
@@ -104,22 +123,24 @@ public class Casa implements Serializable {
 
         Casa casa = (Casa) o;
 
-        if (getCode() != null ? !getCode().equals(casa.getCode()) : casa.getCode() != null) return false;
-        if (getNome() != null ? !getNome().equals(casa.getNome()) : casa.getNome() != null) return false;
-        if (getNif() != null ? !getNif().equals(casa.getNif()) : casa.getNif() != null) return false;
-        if (!Objects.equals(devices, casa.devices)) return false;
-        if (getRooms() != null ? !getRooms().equals(casa.getRooms()) : casa.getRooms() != null) return false;
-        return getFornecedor() != null ? getFornecedor().equals(casa.getFornecedor()) : casa.getFornecedor() == null;
+        if (!getCode().equals(casa.getCode())) return false;
+        if (!getNome().equals(casa.getNome())) return false;
+        if (!getNif().equals(casa.getNif())) return false;
+        if (!devices.equals(casa.devices)) return false;
+        if (!getRooms().equals(casa.getRooms())) return false;
+        if (!getFaturas().equals(casa.getFaturas())) return false;
+        return getFornecedor().equals(casa.getFornecedor());
     }
 
     @Override
     public int hashCode() {
-        int result = getCode() != null ? getCode().hashCode() : 0;
-        result = 31 * result + (getNome() != null ? getNome().hashCode() : 0);
-        result = 31 * result + (getNif() != null ? getNif().hashCode() : 0);
-        result = 31 * result + (devices != null ? devices.hashCode() : 0);
-        result = 31 * result + (getRooms() != null ? getRooms().hashCode() : 0);
-        result = 31 * result + (getFornecedor() != null ? getFornecedor().hashCode() : 0);
+        int result = getCode().hashCode();
+        result = 31 * result + getNome().hashCode();
+        result = 31 * result + getNif().hashCode();
+        result = 31 * result + devices.hashCode();
+        result = 31 * result + getRooms().hashCode();
+        result = 31 * result + getFaturas().hashCode();
+        result = 31 * result + getFornecedor().hashCode();
         return result;
     }
 
@@ -131,6 +152,7 @@ public class Casa implements Serializable {
                 ", nif='" + nif + '\'' +
                 ", devices=" + devices +
                 ", rooms=" + rooms +
+                ", faturas=" + faturas +
                 ", fornecedor='" + fornecedor + '\'' +
                 '}';
     }

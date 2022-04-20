@@ -68,7 +68,7 @@ public class EstadoPrograma implements Serializable{
     }
 
     public List<Fatura> getFaturasFornecedor(String nome){
-        return this.faturas.values().stream().filter(f -> f.getFornecedor().equals(nome)).collect(Collectors.toList());
+        return this.fornecedores.get(nome).getFaturas().stream().map(codigo -> this.faturas.get(codigo).clone()).toList();
     }
 
     public void avancaData(){
@@ -77,14 +77,15 @@ public class EstadoPrograma implements Serializable{
     }
 
     public Casa getCasaMaisGastadora() {
-        Fatura fatura = this.faturas.
+        Map.Entry<String, Fatura> maior = this.casas.
                 values().
                 stream().
-                collect(Collectors.groupingBy(Fatura::getCodCasa, Collectors.toCollection(TreeSet::new))).
-                values().stream().map(TreeSet::last).max(new CompareFaturaConsumo()).orElse(null);
-
+                filter(c -> !c.getFaturas().isEmpty()).
+                collect(Collectors.
+                        toMap(Casa::getCode, c -> this.faturas.get(c.getTreeSetFaturas().last()))).
+                entrySet().stream().max(Comparator.comparingDouble(entry -> entry.getValue().getConsumo())).orElse(null);
         Casa casa = null;
-        if(fatura != null) casa = this.casas.get(fatura.getCodCasa());
+        if(maior != null) casa = this.casas.get(maior.getKey());
         return casa;
     }
 
@@ -121,17 +122,15 @@ public class EstadoPrograma implements Serializable{
     }
 
     public Fornecedor getFornecedorMaiorFaturacao(){
-        Map.Entry<String, Double> maior = this.faturas.values().
+        Map<String, Double> faturasFornecedor = this.fornecedores.
+                values().
                 stream().
-                collect(Collectors.groupingBy(Fatura::getFornecedor)).
-                entrySet().
-                stream().
-                collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().
-                        stream().
-                        mapToDouble(Fatura::getCusto).sum())).
-                entrySet().
-                stream().
-                max(Comparator.comparingDouble(Map.Entry::getValue)).orElse(null);
+                collect(Collectors.
+                        toMap(Fornecedor::getName, f -> f.
+                                getFaturas().
+                                stream().
+                                mapToDouble(cod -> this.faturas.get(cod).getConsumo()).sum()));
+        Map.Entry<String, Double> maior = faturasFornecedor.entrySet().stream().max(Comparator.comparingDouble(e -> e.getValue())).orElse(null);
         Fornecedor f = null;
         if(maior != null) f = this.fornecedores.get(maior.getKey());
         return f;
