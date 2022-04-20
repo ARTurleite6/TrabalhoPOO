@@ -38,9 +38,11 @@ public class Fornecedor implements Serializable {
         long days = DAYS.between(inicio, fim);
         double consumo = devices.stream().mapToDouble(SmartDevice::comsumption).sum() * days;
         double preco = this.precoDiaDispositivos(devices) * days;
-        Fatura fatura = new Fatura(codCasa, this.name, nif, preco, consumo, inicio, fim);
-        this.faturas.add(fatura.getCodigoFatura());
-        return fatura.clone();
+        return new Fatura(codCasa, this.name, nif, preco, consumo, inicio, fim);
+    }
+
+    public void adicionaFatura(int codigo){
+        this.faturas.add(codigo);
     }
 
     public String getName() {

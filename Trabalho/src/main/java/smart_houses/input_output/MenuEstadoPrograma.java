@@ -19,12 +19,7 @@ public class MenuEstadoPrograma {
                     """);
             choice = scan.nextInt();
             if(choice == 1){
-                try{
-                    System.out.println(e.getCasaMaisGastadora());
-                }
-                catch (ExisteCasaException exc){
-                    System.out.println(exc.getMessage());
-                }
+                System.out.println(e.getCasaMaisGastadora());
             }
             else if(choice == 2){
                 System.out.println(e.getFornecedorMaiorFaturacao());

@@ -56,19 +56,30 @@ public class EstadoPrograma implements Serializable{
     private void geraFaturas(int days){
         this.casas.values().forEach(casa -> {
             Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getCode(), casa.getNif(), casa.getListDevices(), this.data_atual, this.data_atual.plusDays(days));
-            this.faturas.put(f.getCodigoFatura(), f.clone());
+            this.guardaFatura(f);
         });
     }
 
     private void geraFaturas(LocalDate fim){
         this.casas.values().forEach(casa -> {
             Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getCode(), casa.getNif(), casa.getListDevices(), this.data_atual, fim);
-            this.faturas.put(f.getCodigoFatura(), f.clone());
+            this.guardaFatura(f);
         });
     }
 
+    private void guardaFatura(Fatura f){
+        this.faturas.put(f.getCodigoFatura(), f.clone());
+        this.casas.get(f.getCodCasa()).adicionaFatura(f.getCodigoFatura());
+        this.fornecedores.get(f.getFornecedor()).adicionaFatura(f.getCodigoFatura());
+    }
+
+
     public List<Fatura> getFaturasFornecedor(String nome){
-        return this.fornecedores.get(nome).getFaturas().stream().map(codigo -> this.faturas.get(codigo).clone()).toList();
+        return this.fornecedores.get(nome).
+                getFaturas().
+                stream().
+                map(codigo -> this.faturas.get(codigo).clone()).
+                toList();
     }
 
     public void avancaData(){

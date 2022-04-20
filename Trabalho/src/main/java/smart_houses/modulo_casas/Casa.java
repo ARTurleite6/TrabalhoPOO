@@ -80,6 +80,10 @@ public class Casa implements Serializable {
         this.faturas = new TreeSet<>(faturas);
     }
 
+    public void adicionaFatura(int codigo){
+        this.faturas.add(codigo);
+    }
+
     public Set<Integer> getFaturas() {
         return new TreeSet<>(this.faturas);
     }

@@ -17,6 +17,7 @@ public class Teste {
         EstadoPrograma e = new EstadoPrograma();
         e.addFornecedor(fornecedor);
         e.addFornecedor(fornecedor2);
+        c1.adicionaFatura(f.getCodigoFatura());
         try {
             e.adicionaCasa(c1);
         }
@@ -29,6 +30,7 @@ public class Teste {
         catch (ExisteCasaException exc){
             System.out.println(exc.getMessage());
         }
-            System.out.println(e.getFornecedorMaiorFaturacao());
+        e.avancaData(1);
+            System.out.println(e);
     }
 }
