@@ -14,11 +14,13 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class EstadoPrograma implements Serializable{
     private final Map<String, Casa> casas;
     private final Map<String, Fornecedor> fornecedores;
+    private final Map<Integer, Fatura> faturas;
     private LocalDate data_atual;
 
     public static final double custoEnergia = 4.8;
@@ -29,12 +31,18 @@ public class EstadoPrograma implements Serializable{
         this.casas = new HashMap<>();
         this.fornecedores = new HashMap<>();
         this.data_atual = LocalDate.now();
+        this.faturas = new HashMap<>();
     }
 
     public EstadoPrograma(EstadoPrograma c){
         this.casas = c.getCasas();
         this.fornecedores = c.getFornecedores();
         this.data_atual = c.getDataAtual();
+        this.faturas = c.getFaturas();
+    }
+
+    public Map<Integer, Fatura> getFaturas() {
+        return faturas;
     }
 
     public LocalDate getDataAtual() {
@@ -48,23 +56,19 @@ public class EstadoPrograma implements Serializable{
     private void geraFaturas(int days){
         this.casas.values().forEach(casa -> {
             Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getCode(), casa.getNif(), casa.getListDevices(), this.data_atual, this.data_atual.plusDays(days));
-            casa.adicionaFatura(f);
+            this.faturas.put(f.getCodigoFatura(), f.clone());
         });
     }
 
     private void geraFaturas(LocalDate fim){
         this.casas.values().forEach(casa -> {
             Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getCode(), casa.getNif(), casa.getListDevices(), this.data_atual, fim);
-            casa.adicionaFatura(f);
+            this.faturas.put(f.getCodigoFatura(), f.clone());
         });
     }
 
     public List<Fatura> getFaturasFornecedor(String nome){
-        return this.casas.values().stream().
-                flatMap(c -> c.getFaturas().values().stream()).
-                filter(f -> f.getFornecedor().equals(nome)).
-                map(Fatura::clone).
-                collect(Collectors.toList());
+        return this.faturas.values().stream().filter(f -> f.getFornecedor().equals(nome)).collect(Collectors.toList());
     }
 
     public void avancaData(){
@@ -72,17 +76,65 @@ public class EstadoPrograma implements Serializable{
         this.data_atual = this.data_atual.plusDays(1);
     }
 
-    public Casa getCasaMaisGastadora() throws ExisteCasaException {
-        Casa casa = this.casas.values().stream().max(Comparator.comparingDouble(c -> c.getLastFatura().getConsumo())).orElse(null);
-        if(casa == null) throw new ExisteCasaException("Nao existe nenhuma casa");
-        return casa.clone();
+    public Casa getCasaMaisGastadora() {
+        Fatura fatura = this.faturas.
+                values().
+                stream().
+                collect(Collectors.groupingBy(Fatura::getCodCasa, Collectors.toCollection(TreeSet::new))).
+                values().stream().map(TreeSet::last).max(new CompareFaturaConsumo()).orElse(null);
+
+        Casa casa = null;
+        if(fatura != null) casa = this.casas.get(fatura.getCodCasa());
+        return casa;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EstadoPrograma that = (EstadoPrograma) o;
+
+        if (!getCasas().equals(that.getCasas())) return false;
+        if (!getFornecedores().equals(that.getFornecedores())) return false;
+        if (!getFaturas().equals(that.getFaturas())) return false;
+        return data_atual.equals(that.data_atual);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getCasas().hashCode();
+        result = 31 * result + getFornecedores().hashCode();
+        result = 31 * result + getFaturas().hashCode();
+        result = 31 * result + data_atual.hashCode();
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "EstadoPrograma{" +
+                "casas=" + casas +
+                ", fornecedores=" + fornecedores +
+                ", faturas=" + faturas +
+                ", data_atual=" + data_atual +
+                '}';
     }
 
     public Fornecedor getFornecedorMaiorFaturacao(){
-        List<Fatura> faturas = this.casas.values().stream().flatMap(c -> c.getFaturas().values().stream()).toList();
-        Fatura maiorFatura = faturas.stream().max((f1, f2) -> Double.compare(f1.getCusto(), f2.getCusto())).orElse(null);
-        if(maiorFatura == null) return null;
-        return this.fornecedores.get(maiorFatura.getFornecedor());
+        Map.Entry<String, Double> maior = this.faturas.values().
+                stream().
+                collect(Collectors.groupingBy(Fatura::getFornecedor)).
+                entrySet().
+                stream().
+                collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().
+                        stream().
+                        mapToDouble(Fatura::getCusto).sum())).
+                entrySet().
+                stream().
+                max(Comparator.comparingDouble(Map.Entry::getValue)).orElse(null);
+        Fornecedor f = null;
+        if(maior != null) f = this.fornecedores.get(maior.getKey());
+        return f;
     }
 
     public void avancaData(int days){
@@ -93,36 +145,6 @@ public class EstadoPrograma implements Serializable{
     public void avancaData(LocalDate date){
         this.geraFaturas(date);
         this.data_atual = date;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        EstadoPrograma that = (EstadoPrograma) o;
-
-        if (getCasas() != null ? !getCasas().equals(that.getCasas()) : that.getCasas() != null) return false;
-        if (getFornecedores() != null ? !getFornecedores().equals(that.getFornecedores()) : that.getFornecedores() != null)
-            return false;
-        return Objects.equals(data_atual, that.data_atual);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = getCasas() != null ? getCasas().hashCode() : 0;
-        result = 31 * result + (getFornecedores() != null ? getFornecedores().hashCode() : 0);
-        result = 31 * result + (data_atual != null ? data_atual.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return "EstadoPrograma{" +
-                "casas=" + casas +
-                ", fornecedores=" + fornecedores +
-                ", data_atual=" + data_atual +
-                '}';
     }
 
     public EstadoPrograma carregaDados(){

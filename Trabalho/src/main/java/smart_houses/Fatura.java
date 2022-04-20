@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 public class Fatura implements Comparable<Fatura>, Serializable {
+
+    private static int next_codigoFatura = 1;
+
+    private int codigoFatura;
     private String codCasa;
     private String fornecedor;
     private String nifCliente;
@@ -14,6 +18,7 @@ public class Fatura implements Comparable<Fatura>, Serializable {
 
 
     public Fatura(){
+        this.codigoFatura = Fatura.next_codigoFatura++;
         this.codCasa = "";
         this.fornecedor = "";
         this.nifCliente = "";
@@ -24,6 +29,8 @@ public class Fatura implements Comparable<Fatura>, Serializable {
     }
 
     public Fatura(String codCasa, String fornecedor, String nifCliente, double custo, double consumo, LocalDate inicioPeriodo, LocalDate fimPeriodo) {
+        this.codigoFatura = Fatura.next_codigoFatura++;
+        this.codCasa = codCasa;
         this.fornecedor = fornecedor;
         this.nifCliente = nifCliente;
         this.custo = custo;
@@ -33,6 +40,7 @@ public class Fatura implements Comparable<Fatura>, Serializable {
     }
 
     public Fatura(Fatura f){
+        this.codigoFatura = f.getCodigoFatura();
         this.codCasa = f.getCodCasa();
         this.fornecedor = f.getFornecedor();
         this.nifCliente = f.getNifCliente();
@@ -40,6 +48,10 @@ public class Fatura implements Comparable<Fatura>, Serializable {
         this.consumo = f.getConsumo();
         this.inicioPeriodo = f.getInicioPeriodo();
         this.fimPeriodo = f.getFimPeriodo();
+    }
+
+    public int getCodigoFatura() {
+        return codigoFatura;
     }
 
     public String getCodCasa() {
@@ -101,7 +113,8 @@ public class Fatura implements Comparable<Fatura>, Serializable {
     @Override
     public String toString() {
         return "Fatura{" +
-                "codCasa='" + codCasa + '\'' +
+                "codigoFatura=" + codigoFatura +
+                ", codCasa='" + codCasa + '\'' +
                 ", fornecedor='" + fornecedor + '\'' +
                 ", nifCliente='" + nifCliente + '\'' +
                 ", custo=" + custo +
@@ -118,32 +131,30 @@ public class Fatura implements Comparable<Fatura>, Serializable {
 
         Fatura fatura = (Fatura) o;
 
+        if (getCodigoFatura() != fatura.getCodigoFatura()) return false;
         if (Double.compare(fatura.getCusto(), getCusto()) != 0) return false;
         if (Double.compare(fatura.getConsumo(), getConsumo()) != 0) return false;
-        if (getCodCasa() != null ? !getCodCasa().equals(fatura.getCodCasa()) : fatura.getCodCasa() != null)
-            return false;
-        if (getFornecedor() != null ? !getFornecedor().equals(fatura.getFornecedor()) : fatura.getFornecedor() != null)
-            return false;
-        if (getNifCliente() != null ? !getNifCliente().equals(fatura.getNifCliente()) : fatura.getNifCliente() != null)
-            return false;
-        if (getInicioPeriodo() != null ? !getInicioPeriodo().equals(fatura.getInicioPeriodo()) : fatura.getInicioPeriodo() != null)
-            return false;
-        return getFimPeriodo() != null ? getFimPeriodo().equals(fatura.getFimPeriodo()) : fatura.getFimPeriodo() == null;
+        if (!getCodCasa().equals(fatura.getCodCasa())) return false;
+        if (!getFornecedor().equals(fatura.getFornecedor())) return false;
+        if (!getNifCliente().equals(fatura.getNifCliente())) return false;
+        if (!getInicioPeriodo().equals(fatura.getInicioPeriodo())) return false;
+        return getFimPeriodo().equals(fatura.getFimPeriodo());
     }
 
     @Override
     public int hashCode() {
         int result;
         long temp;
-        result = getCodCasa() != null ? getCodCasa().hashCode() : 0;
-        result = 31 * result + (getFornecedor() != null ? getFornecedor().hashCode() : 0);
-        result = 31 * result + (getNifCliente() != null ? getNifCliente().hashCode() : 0);
+        result = getCodigoFatura();
+        result = 31 * result + getCodCasa().hashCode();
+        result = 31 * result + getFornecedor().hashCode();
+        result = 31 * result + getNifCliente().hashCode();
         temp = Double.doubleToLongBits(getCusto());
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(getConsumo());
         result = 31 * result + (int) (temp ^ (temp >>> 32));
-        result = 31 * result + (getInicioPeriodo() != null ? getInicioPeriodo().hashCode() : 0);
-        result = 31 * result + (getFimPeriodo() != null ? getFimPeriodo().hashCode() : 0);
+        result = 31 * result + getInicioPeriodo().hashCode();
+        result = 31 * result + getFimPeriodo().hashCode();
         return result;
     }
 

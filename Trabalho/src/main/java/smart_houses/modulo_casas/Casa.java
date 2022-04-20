@@ -1,11 +1,8 @@
 package smart_houses.modulo_casas;
 
-import com.sun.source.tree.Tree;
-import smart_houses.Fatura;
 import smart_houses.smart_devices.SmartDevice;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,7 +13,6 @@ public class Casa implements Serializable {
     private String nif;
     private Map<Integer, SmartDevice> devices;
     private Map<String, Set<Integer>> rooms;
-    private Map<LocalDate, Fatura> faturas;
     private String fornecedor;
 
     public Casa(){
@@ -25,7 +21,6 @@ public class Casa implements Serializable {
         this.nif = "";
         this.devices = new HashMap<>();
         this.rooms = new HashMap<>();
-        this.faturas = new TreeMap<>();
         this.fornecedor = "";
     }
 
@@ -36,7 +31,6 @@ public class Casa implements Serializable {
         this.devices = new HashMap<>();
         this.rooms = new HashMap<>();
         this.fornecedor = fornecedor;
-        this.faturas = new TreeMap<>();
     }
 
     public Casa(String code, String nome, String nif, Set<String> rooms, String fornecedor){
@@ -46,7 +40,6 @@ public class Casa implements Serializable {
         this.devices = new HashMap<>();
         this.setRooms(rooms);
         this.fornecedor = fornecedor;
-        this.faturas = new TreeMap<>();
     }
 
     public Casa(String code, String nome, String nif, Map<String, Set<Integer>> rooms, String fornecedor){
@@ -56,7 +49,6 @@ public class Casa implements Serializable {
         this.devices = new HashMap<>();
         this.setRooms(rooms);
         this.fornecedor = fornecedor;
-        this.faturas = new TreeMap<>();
     }
 
     public Casa(String code, String nome, String nif, Map<Integer, SmartDevice> devices, Map<String, Set<Integer>> rooms, String fornecedor){
@@ -66,7 +58,6 @@ public class Casa implements Serializable {
         this.setDevices(devices);
         this.setRooms(rooms);
         this.fornecedor = fornecedor;
-        this.faturas = new TreeMap<>();
     }
 
     public Casa(Casa casa){
@@ -76,7 +67,6 @@ public class Casa implements Serializable {
         this.devices = casa.getMapDevices();
         this.rooms = casa.getRooms();
         this.fornecedor = casa.getFornecedor();
-        this.faturas = casa.getFaturas();
     }
 
     public String getCode() {
@@ -85,14 +75,6 @@ public class Casa implements Serializable {
 
     public void setCode(String code) {
         this.code = code;
-    }
-
-    public Map<LocalDate, Fatura> getFaturas(){
-        return this.faturas.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
-    }
-
-    public void setFaturas(Map<LocalDate, Fatura> faturas){
-        this.faturas = faturas.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
     }
 
     public String getFornecedor() {
@@ -127,7 +109,6 @@ public class Casa implements Serializable {
         if (getNif() != null ? !getNif().equals(casa.getNif()) : casa.getNif() != null) return false;
         if (!Objects.equals(devices, casa.devices)) return false;
         if (getRooms() != null ? !getRooms().equals(casa.getRooms()) : casa.getRooms() != null) return false;
-        if (getFaturas() != null ? !getFaturas().equals(casa.getFaturas()) : casa.getFaturas() != null) return false;
         return getFornecedor() != null ? getFornecedor().equals(casa.getFornecedor()) : casa.getFornecedor() == null;
     }
 
@@ -138,7 +119,6 @@ public class Casa implements Serializable {
         result = 31 * result + (getNif() != null ? getNif().hashCode() : 0);
         result = 31 * result + (devices != null ? devices.hashCode() : 0);
         result = 31 * result + (getRooms() != null ? getRooms().hashCode() : 0);
-        result = 31 * result + (getFaturas() != null ? getFaturas().hashCode() : 0);
         result = 31 * result + (getFornecedor() != null ? getFornecedor().hashCode() : 0);
         return result;
     }
@@ -151,7 +131,6 @@ public class Casa implements Serializable {
                 ", nif='" + nif + '\'' +
                 ", devices=" + devices +
                 ", rooms=" + rooms +
-                ", faturas=" + faturas +
                 ", fornecedor='" + fornecedor + '\'' +
                 '}';
     }
@@ -188,9 +167,6 @@ public class Casa implements Serializable {
         this.rooms = rooms.stream().collect(Collectors.toMap(r -> r, r -> new TreeSet<>()));
     }
 
-    public void adicionaFatura(Fatura fatura){
-        this.faturas.put(fatura.getInicioPeriodo(), fatura.clone());
-    }
 
     public Casa clone(){
         return new Casa(this);
@@ -220,11 +196,6 @@ public class Casa implements Serializable {
             Set<Integer> ds = d.next();
             found = ds.remove(id);
         }
-    }
-
-    public Fatura getLastFatura(){
-        TreeMap<LocalDate, Fatura> f = new TreeMap<>(this.faturas);
-        return f.lastEntry().getValue().clone();
     }
 
     public boolean existRoom(String room){
