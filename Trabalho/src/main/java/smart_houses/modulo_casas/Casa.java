@@ -193,6 +193,9 @@ public class Casa implements Serializable {
         this.rooms = rooms.stream().collect(Collectors.toMap(r -> r, r -> new TreeSet<>()));
     }
 
+    public void setAllDevicesStateRoom(String room, boolean on){
+        this.rooms.get(room).forEach(device -> this.devices.get(device).setOn(on));
+    }
 
     public Casa clone(){
         return new Casa(this);

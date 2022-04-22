@@ -1,28 +1,38 @@
 package smart_houses.input_output;
 
 import smart_houses.EstadoPrograma;
+import smart_houses.exceptions.ExisteFornecedorException;
 import smart_houses.modulo_fornecedores.Fornecedor;
 
 import java.util.Scanner;
 
 public class MenuFornecedores {
 
-    private static Fornecedor criarFornecedor(){
+    private static void criarFornecedor(EstadoPrograma e){
 
         Scanner scan = new Scanner(System.in);
-        System.out.println("Insira o Nome da empresa");
-        String name = scan.next();
+        String name = null;
+        do{
+            name = scan.next();
+            if(e.existeFornecedor(name)){
+                System.out.println("Este Fornecedor ja existe, tente novamente");
+                name = null;
+            }
+        }while(name == null);
 
-        return new Fornecedor(name);
+        try {
+            e.addFornecedor(new Fornecedor(name));
+        } catch (ExisteFornecedorException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
-    protected static void run(EstadoPrograma c){
+    protected static void run(EstadoPrograma e){
         int choice = 0;
         while(choice != 2){
             choice = MenuFornecedores.gestaoFornecedores();
             if (choice == 1) {
-                Fornecedor f = MenuFornecedores.criarFornecedor();
-                c.addFornecedor(f);
+                MenuFornecedores.criarFornecedor(e);
             }
         }
     }

@@ -19,10 +19,21 @@ public class MenuCasas {
         return scanner.nextInt();
     }
 
-    private static Casa criacaoCasa(EstadoPrograma e) {
+    private static void criacaoCasa(EstadoPrograma e) {
         Scanner scan = new Scanner(System.in);
+
+        String codigo = null;
+        do{
+            System.out.println("Insira o codigo da casa");
+            codigo = scan.next();
+            if(e.existeCasa(codigo)){
+                System.out.println("O codigo desta casa ja existe, insira outro");
+                codigo = null;
+            }
+        }while(codigo == null);
+
         System.out.println("Insira o nome do proprietario:");
-        String nome = scan.nextLine();
+        String nome = scan.next();
         System.out.println("Insira o nif do proprietario:");
         String nif = scan.next();
 
@@ -38,18 +49,22 @@ public class MenuCasas {
             System.out.println("Pretende continuar a adicionar? S(1)/N(0)");
             keep = scan.nextInt();
         }
-        System.out.println("Insira o nome do Fornecedor da casa");
-        String empresa = scan.next();
-        Casa casa = null;
-        System.out.println("Insira o codigo da casa a criar");
-        String code = scan.next();
-        if (e.existeFornecedor(empresa)) {
-            casa = new Casa(code, nome, nif, rooms, empresa);
-        } else {
-            System.out.println("Este Fornecedor nao existe tente novamente");
+        String empresa = null;
+        do{
+            System.out.println("Insira o nome do Fornecedor da casa");
+            empresa = scan.next();
+            if(!e.existeFornecedor(empresa)){
+                System.out.println("Este fornecedor não existe, tente novamente");
+                empresa = null;
+            }
+        }while(empresa == null);
+        Casa casa = new Casa(codigo, nome, nif, rooms, empresa);
+        try {
+            e.adicionaCasa(casa);
         }
-
-        return casa;
+        catch(ExisteCasaException exc){
+            System.out.println(exc.getMessage());
+        }
     }
 
     protected static void run(EstadoPrograma e) {
@@ -57,15 +72,7 @@ public class MenuCasas {
         while (choice != 2) {
             choice = MenuCasas.gestaoCasas();
             if (choice == 1) {
-                Casa casa = MenuCasas.criacaoCasa(e);
-                if (casa != null) {
-                    try{
-                        e.adicionaCasa(casa);
-                    }
-                    catch(ExisteCasaException exc){
-                        System.out.println(exc.getMessage());
-                    }
-                }
+                MenuCasas.criacaoCasa(e);
             }
         }
     }

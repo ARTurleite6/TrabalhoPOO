@@ -1,6 +1,7 @@
 package smart_houses;
 
 import smart_houses.exceptions.ExisteCasaException;
+import smart_houses.exceptions.ExisteFornecedorException;
 import smart_houses.modulo_casas.Casa;
 import smart_houses.modulo_fornecedores.Fornecedor;
 import smart_houses.smart_devices.SmartDevice;
@@ -14,10 +15,9 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class EstadoPrograma implements Serializable{
+public class EstadoPrograma implements Serializable {
     private final Map<String, Casa> casas;
     private final Map<String, Fornecedor> fornecedores;
     private final Map<Integer, Fatura> faturas;
@@ -27,14 +27,14 @@ public class EstadoPrograma implements Serializable{
     public static final double imposto = 0.06;
 
 
-    public EstadoPrograma(){
+    public EstadoPrograma() {
         this.casas = new HashMap<>();
         this.fornecedores = new HashMap<>();
         this.data_atual = LocalDate.now();
         this.faturas = new HashMap<>();
     }
 
-    public EstadoPrograma(EstadoPrograma c){
+    public EstadoPrograma(EstadoPrograma c) {
         this.casas = c.getCasas();
         this.fornecedores = c.getFornecedores();
         this.data_atual = c.getDataAtual();
@@ -53,51 +53,61 @@ public class EstadoPrograma implements Serializable{
         this.data_atual = data_atual;
     }
 
-    private void geraFaturas(int days){
+    private void geraFaturas(int days) {
         this.casas.values().forEach(casa -> {
             Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getCode(), casa.getNif(), casa.getListDevices(), this.data_atual, this.data_atual.plusDays(days));
             this.guardaFatura(f);
         });
     }
 
-    private void geraFaturas(LocalDate fim){
+    private void geraFaturas(LocalDate fim) {
         this.casas.values().forEach(casa -> {
             Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getCode(), casa.getNif(), casa.getListDevices(), this.data_atual, fim);
             this.guardaFatura(f);
         });
     }
 
-    private void guardaFatura(Fatura f){
+    private void guardaFatura(Fatura f) {
         this.faturas.put(f.getCodigoFatura(), f.clone());
         this.casas.get(f.getCodCasa()).adicionaFatura(f.getCodigoFatura());
         this.fornecedores.get(f.getFornecedor()).adicionaFatura(f.getCodigoFatura());
     }
 
 
-    public List<Fatura> getFaturasFornecedor(String nome){
-        return this.fornecedores.get(nome).
-                getFaturas().
-                stream().
-                map(codigo -> this.faturas.get(codigo).clone()).
+    public List<Fatura> getFaturasFornecedor(String nome) {
+        return this.fornecedores.get(nome)
+                .getFaturas()
+                .stream()
+                .map(codigo -> this.faturas.get(codigo).clone()).
                 toList();
     }
 
-    public void avancaData(){
+    public void avancaData() {
         this.geraFaturas(1);
         this.data_atual = this.data_atual.plusDays(1);
     }
 
-    public Casa getCasaMaisGastadora() {
-        Map.Entry<String, Fatura> maior = this.casas.
-                values().
-                stream().
-                filter(c -> !c.getFaturas().isEmpty()).
-                collect(Collectors.
-                        toMap(Casa::getCode, c -> this.faturas.get(c.getTreeSetFaturas().last()))).
-                entrySet().stream().max(Comparator.comparingDouble(entry -> entry.getValue().getConsumo())).orElse(null);
-        Casa casa = null;
-        if(maior != null) casa = this.casas.get(maior.getKey());
-        return casa;
+    public Optional<Casa> getCasaMaisGastadora() {
+
+        Map<String, Double> consumoHouse = this.faturas.values().stream().collect(Collectors.groupingBy(Fatura::getCodCasa, Collectors.summingDouble(Fatura::getConsumo)));
+
+        return consumoHouse
+                .entrySet()
+                .stream()
+                .max(Comparator
+                        .comparingDouble(Map.Entry::getValue))
+                .map(e -> this.casas.get(e.getValue()));
+    }
+
+    public Optional<Casa> maiorConsumidorPeriodo(LocalDate inicio, LocalDate fim) {
+        Map<String, Double> consumoHouse = this.faturas.values()
+                .stream()
+                .filter(f -> (f.getInicioPeriodo().isAfter(inicio) || f.getInicioPeriodo().equals(inicio)) && (f.getFimPeriodo().isBefore(fim) || f.getFimPeriodo().isEqual(fim)))
+                .collect(Collectors.groupingBy(Fatura::getCodCasa, Collectors.summingDouble(Fatura::getConsumo)));
+
+        return consumoHouse.entrySet()
+                .stream()
+                .max(Comparator.comparingDouble(Map.Entry::getValue)).map(e -> this.casas.get(e.getKey()));
     }
 
     @Override
@@ -132,7 +142,7 @@ public class EstadoPrograma implements Serializable{
                 '}';
     }
 
-    public Fornecedor getFornecedorMaiorFaturacao(){
+    public Fornecedor getFornecedorMaiorFaturacao() {
         Map<String, Double> faturasFornecedor = this.fornecedores.
                 values().
                 stream().
@@ -143,24 +153,26 @@ public class EstadoPrograma implements Serializable{
                                 mapToDouble(cod -> this.faturas.get(cod).getConsumo()).sum()));
         Map.Entry<String, Double> maior = faturasFornecedor.entrySet().stream().max(Comparator.comparingDouble(e -> e.getValue())).orElse(null);
         Fornecedor f = null;
-        if(maior != null) f = this.fornecedores.get(maior.getKey());
+        if (maior != null) f = this.fornecedores.get(maior.getKey());
         return f;
     }
 
-    public void avancaData(int days){
+    public void avancaData(int days) {
         this.geraFaturas(days);
         this.data_atual = this.data_atual.plusDays(days);
     }
 
-    public void avancaData(LocalDate date){
+    public void avancaData(LocalDate date) {
         this.geraFaturas(date);
         this.data_atual = date;
     }
 
-    public EstadoPrograma carregaDados(){
+    public EstadoPrograma carregaDados() {
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./src/main/resources/teste.txt"));
-            return (EstadoPrograma) ois.readObject();
+            EstadoPrograma programa = (EstadoPrograma) ois.readObject();
+            ois.close();
+            return programa;
         } catch (IOException | ClassNotFoundException e) {
             System.out.println(e.getMessage());
             return null;
@@ -176,27 +188,27 @@ public class EstadoPrograma implements Serializable{
     }
 
     public void adicionaCasa(Casa c) throws ExisteCasaException {
-        if(this.existeCasa(c.getCode())) throw new ExisteCasaException("Este codigo ja existe");
+        if (this.casas.containsKey(c.getCode())) throw new ExisteCasaException("Esta casa tem um codigo que ja existe");
         this.casas.put(c.getCode(), c.clone());
     }
 
-    public boolean existeFornecedor(String nome){
+    public boolean existeFornecedor(String nome) {
         return this.fornecedores.containsKey(nome);
     }
 
-    public boolean existeCasa(String code){
+    public boolean existeCasa(String code) {
         return this.casas.containsKey(code);
     }
 
-    public void addDeviceToCasa(String code, SmartDevice device){
+    public void addDeviceToCasa(String code, SmartDevice device) {
         this.casas.get(code).addDevice(device);
     }
 
-    public EstadoPrograma clone(){
+    public EstadoPrograma clone() {
         return new EstadoPrograma(this);
     }
 
-    public void guardaDados(){
+    public void guardaDados() {
         try {
             FileOutputStream file = new FileOutputStream("./src/main/resources/teste.txt");
             ObjectOutputStream oos = new ObjectOutputStream(file);
@@ -229,7 +241,13 @@ public class EstadoPrograma implements Serializable{
         this.casas.get(code).setDeviceState(id, ligar);
     }
 
-    public void addFornecedor(Fornecedor f) {
+    public void addFornecedor(Fornecedor f) throws ExisteFornecedorException {
+        if (this.fornecedores.containsKey(f.getName()))
+            throw new ExisteFornecedorException("Este fornecedor já existe");
         this.fornecedores.put(f.getName(), f.clone());
+    }
+
+    public void setAllDevicesHouseOnRoom(String code, String room, boolean on) {
+        this.casas.get(code).setAllDevicesStateRoom(room, on);
     }
 }

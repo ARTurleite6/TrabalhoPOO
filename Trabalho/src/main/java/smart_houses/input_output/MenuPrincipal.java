@@ -4,9 +4,27 @@ import smart_houses.EstadoPrograma;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class MenuPrincipal {
+
+    public static LocalDate inputData(){
+        Scanner scan = new Scanner(System.in);
+        LocalDate data = null;
+        String dataStr;
+        do{
+            System.out.println("Insira a data desejada");
+            dataStr = scan.next();
+            try{
+                data = LocalDate.parse(dataStr);
+            }
+            catch (DateTimeParseException e){
+                System.out.println("Data inseria de forma invalida(aaaa/mm/dd");
+            }
+        }while(dataStr == null);
+        return data;
+    }
 
     protected static void run(EstadoPrograma c){
         int choice = 0;
@@ -50,7 +68,7 @@ public class MenuPrincipal {
                 else System.out.println("Numero de dias invalido");
             }
             case 3 -> {
-                System.out.println("Insira a data para onde quer avancar(Dia/Mes/Ano)");
+                System.out.println("Insira a data para onde quer avancar(Ano/Mes/Dia)");
                 String dataStr = scan.nextLine();
                 try {
                     LocalDate data = LocalDate.parse(dataStr);
@@ -60,7 +78,7 @@ public class MenuPrincipal {
                     else System.out.println("Data invalida");
                 }
                 catch (DateTimeException exception){
-                    System.out.println("Data foi inserida de forma invalida, tente com (Dia/Mes/Ano)");
+                    System.out.println("Data foi inserida de forma invalida, tente com (Ano/Mes/Dia)");
                 }
             }
         }

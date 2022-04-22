@@ -6,12 +6,14 @@ import smart_houses.smart_devices.SmartCamera;
 import smart_houses.smart_devices.SmartDevice;
 import smart_houses.smart_devices.SmartSpeaker;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.Scanner;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class MenuDispositivos {
 
-    private static Optional<SmartDevice> criacaoSmartSpeaker(){
+    private static SmartDevice criacaoSmartSpeaker(){
         Scanner scan = new Scanner(System.in);
         System.out.println("Pretende ligar o dispositivo? True/False");
         boolean ligado = scan.nextBoolean();
@@ -25,10 +27,10 @@ public class MenuDispositivos {
         double baseConsumption = scan.nextDouble();
         System.out.println("Insira o custo de instalacao do dispositivo");
         double instalacao = scan.nextDouble();
-        return Optional.of(new SmartSpeaker(ligado, instalacao, volume, estacao, brand, baseConsumption));
+        return new SmartSpeaker(ligado, instalacao, volume, estacao, brand, baseConsumption);
     }
 
-    private static Optional<SmartDevice> criacaoSmartCamera(){
+    private static SmartDevice criacaoSmartCamera(){
         Scanner scan = new Scanner(System.in);
         System.out.println("Pretende ligar o dispositivo? True/False");
         boolean ligado = scan.nextBoolean();
@@ -38,10 +40,10 @@ public class MenuDispositivos {
         int dimensao = scan.nextInt();
         System.out.println("Insira a resolucao da camera");
         int resolucao = scan.nextInt();
-        return Optional.of(new SmartCamera(ligado, custoInstalacao, resolucao, dimensao));
+        return new SmartCamera(ligado, custoInstalacao, resolucao, dimensao);
     }
 
-    private static Optional<SmartDevice> criacaoSmartBulb(){
+    private static SmartDevice criacaoSmartBulb(){
         Scanner scan = new Scanner(System.in);
         System.out.println("Pretende ligar o dispositivo? True/False");
         boolean ligado = scan.nextBoolean();
@@ -56,59 +58,62 @@ public class MenuDispositivos {
         SmartBulb.Tones tone = SmartBulb.Tones.NEUTRAL;
         if(tonalidade == 1) tone = SmartBulb.Tones.WARM;
         else if(tonalidade == 2) tone = SmartBulb.Tones.COLD;
-        return Optional.of(new SmartBulb(ligado, custoInstalacao, tone, dimensao, custoBase));
+        return new SmartBulb(ligado, custoInstalacao, tone, dimensao, custoBase);
     }
 
     private static void criacaoSmartDevice(EstadoPrograma e) {
         System.out.println("Que tipo de Dispositivo pretende criar: \n1 : SmartBulb;\n2 : SmartCamera;\n3 : SmartSpeaker");
         Scanner scan = new Scanner(System.in);
-        int tipoDispositivo = scan.nextInt();
-        Optional<SmartDevice> dispositivo = Optional.empty();
-        if (tipoDispositivo == 1) {
-            dispositivo = criacaoSmartBulb();
-        } else if (tipoDispositivo == 2) {
-            dispositivo = criacaoSmartCamera();
-        } else if (tipoDispositivo == 3) {
-            dispositivo = criacaoSmartSpeaker();
-        } else {
-            System.out.println("Tipo invalido de dispositivo");
-        }
-        dispositivo.ifPresent(d -> {
-            System.out.println("Insira o codigo da casa a instalar");
-            String code = scan.next();
-            if (e.existeCasa(code)) {
-                e.addDeviceToCasa(code, d);
-                System.out.println("Deseja inserir em uma divisao da casa? S(1)/N(0)");
-                int choice = scan.nextInt();
-                if (choice == 1) {
-                    System.out.println("Insira o nome da divisao a inserir");
-                    String room = scan.next();
-                     e.addDeviceToCasaOnRoom(code, room, d.getId());
-                }
-            } else System.out.println("A casa nao existe");
-        });
+        Integer tipoDispositivo;
+        do{
+           tipoDispositivo = scan.nextInt();
+           if(tipoDispositivo < 1 || tipoDispositivo > 3){
+               System.out.println("Tipo de dispositivo inválido");
+               tipoDispositivo = null;
+           }
+        }while(tipoDispositivo == null);
+        System.out.println("funcao");
+        List<Supplier<SmartDevice>> funcoesCriacao = List.of(MenuDispositivos::criacaoSmartBulb, MenuDispositivos::criacaoSmartCamera, MenuDispositivos::criacaoSmartSpeaker);
+        SmartDevice dispositivo = funcoesCriacao.get(tipoDispositivo - 1).get();
+        System.out.println("Insira o codigo da casa a instalar");
+        String code = scan.next();
+        if (e.existeCasa(code)) {
+            e.addDeviceToCasa(code, dispositivo);
+            System.out.println("Deseja inserir em uma divisao da casa? S(1)/N(0)");
+            int choice = scan.nextInt();
+            if (choice == 1) {
+                System.out.println("Insira o nome da divisao a inserir");
+                String room = scan.next();
+                e.addDeviceToCasaOnRoom(code, room, dispositivo.getId());
+            }
+        } else System.out.println("A casa nao existe");
     }
 
         private static void ligarDesligarDispositivos(EstadoPrograma e){
             Scanner s = new Scanner(System.in);
-            System.out.println("Qual a casa que pretender ligar/desligar os dipositivos(Insira o nif)");
-            String nif = s.nextLine();
-            if(e.existeCasa(nif)){
+            System.out.println("Qual a casa que pretender ligar/desligar os dipositivos(Insira o codigo da casa)");
+            String codigo = s.nextLine();
+            if(e.existeCasa(codigo)){
                 System.out.println("Pretende ligar ou desligar: Ligar(True)/Desligar(False)");
                 boolean ligar = s.nextBoolean();
                 System.out.println("Pretende Ligar/Desligar os dispositivos de uma divisao ou um dispositivo em especifio: Divisao(1)/Especifico(2)");
                 int divisao = s.nextInt();
                 if(divisao == 1){
-                    System.out.println("Lista de divisoes da casa: " + e.getRoomsHouse(nif));
+                    System.out.println("Lista de divisoes da casa: " + e.getRoomsHouse(codigo));
                     System.out.println("Diga qual divisao : ");
                     String room = s.next();
-                    e.setAllDevicesHouseOn(nif, ligar);
+                    if(e.getCasas().get(codigo).existRoom(room)){
+                        e.setAllDevicesHouseOnRoom(codigo, room, ligar);
+                    }
+                    else{
+                        System.out.println("Esta divisao não existe");
+                    }
                 }
                 else{
-                    System.out.println("Lista de devices da casa: " + e.getSetDevicesHouse(nif));
+                    System.out.println("Lista de devices da casa: " + e.getSetDevicesHouse(codigo));
                     System.out.println("Diga qual o dispostivo(id) : ");
                     int id = s.nextInt();
-                    e.setDeviceHouseOn(nif, id, ligar);
+                    e.setDeviceHouseOn(codigo, id, ligar);
                 }
             }
             else System.out.println("A casa nao existe");
