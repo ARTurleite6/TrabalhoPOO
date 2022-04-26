@@ -14,7 +14,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EstadoPrograma implements Serializable {
@@ -89,17 +93,18 @@ public class EstadoPrograma implements Serializable {
 
     public Optional<Casa> getCasaMaisGastadora() {
 
-        Map<String, Double> consumoHouse = this.faturas.values().stream().collect(Collectors.groupingBy(Fatura::getCodCasa, Collectors.summingDouble(Fatura::getConsumo)));
+        Map<String, Double> consumoHouse = this.faturas.values()
+                .stream()
+                .collect(Collectors.groupingBy(Fatura::getCodCasa, Collectors.summingDouble(Fatura::getConsumo)));
 
         return consumoHouse
                 .entrySet()
                 .stream()
-                .max(Comparator
-                        .comparingDouble(Map.Entry::getValue))
+                .max(Comparator.comparingDouble(Map.Entry::getValue))
                 .map(e -> this.casas.get(e.getValue()));
     }
 
-    public Optional<Casa> maiorConsumidorPeriodo(LocalDate inicio, LocalDate fim) {
+    public List<Casa> maiorConsumidorPeriodo(LocalDate inicio, LocalDate fim, int N) {
         Map<String, Double> consumoHouse = this.faturas.values()
                 .stream()
                 .filter(f -> (f.getInicioPeriodo().isAfter(inicio) || f.getInicioPeriodo().equals(inicio)) && (f.getFimPeriodo().isBefore(fim) || f.getFimPeriodo().isEqual(fim)))
@@ -107,7 +112,10 @@ public class EstadoPrograma implements Serializable {
 
         return consumoHouse.entrySet()
                 .stream()
-                .max(Comparator.comparingDouble(Map.Entry::getValue)).map(e -> this.casas.get(e.getKey()));
+                .sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()))
+                .limit(N)
+                .map(e -> this.casas.get(e.getKey())).toList();
+
     }
 
     @Override
@@ -142,19 +150,14 @@ public class EstadoPrograma implements Serializable {
                 '}';
     }
 
-    public Fornecedor getFornecedorMaiorFaturacao() {
-        Map<String, Double> faturasFornecedor = this.fornecedores.
-                values().
-                stream().
-                collect(Collectors.
-                        toMap(Fornecedor::getName, f -> f.
-                                getFaturas().
-                                stream().
-                                mapToDouble(cod -> this.faturas.get(cod).getConsumo()).sum()));
-        Map.Entry<String, Double> maior = faturasFornecedor.entrySet().stream().max(Comparator.comparingDouble(e -> e.getValue())).orElse(null);
-        Fornecedor f = null;
-        if (maior != null) f = this.fornecedores.get(maior.getKey());
-        return f;
+    public Optional<Fornecedor> getFornecedorMaiorFaturacao() {
+
+        Map<String ,Double> faturasFornecedor = this.faturas.values().stream().collect(Collectors.groupingBy(Fatura::getFornecedor, Collectors.summingDouble(Fatura::getCusto)));
+
+        return faturasFornecedor.entrySet()
+                .stream()
+                .max(Comparator.comparingDouble(Map.Entry::getValue))
+                .map(e -> this.fornecedores.get(e.getKey()));
     }
 
     public void avancaData(int days) {

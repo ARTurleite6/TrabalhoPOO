@@ -1,10 +1,8 @@
 package smart_houses.input_output;
 
 import smart_houses.EstadoPrograma;
-import smart_houses.modulo_casas.Casa;
 
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.Scanner;
 
 public class MenuEstadoPrograma {
@@ -28,7 +26,10 @@ public class MenuEstadoPrograma {
                 );
             }
             else if(choice == 2){
-                System.out.println(e.getFornecedorMaiorFaturacao());
+                e.getFornecedorMaiorFaturacao().ifPresentOrElse(
+                        System.out::println,
+                        () -> System.out.println("Nao existe nenhum fornecedor para calcular o maximo")
+                );
             }
             else if(choice == 3){
                 System.out.println("Insere o nome do fornecedor ao qual queres as faturas");
@@ -45,11 +46,9 @@ public class MenuEstadoPrograma {
                 LocalDate dataI = MenuPrincipal.inputData();
                 System.out.println("Insercao da segunda data");
                 LocalDate dataF = MenuPrincipal.inputData();
-                Optional<Casa> casa = e.maiorConsumidorPeriodo(dataI, dataF);
-                casa.ifPresentOrElse(
-                        System.out::println,
-                        () -> System.out.println("Nao existe output possivel para maior consumidor")
-                );
+                System.out.println("Insira quantos elementos quer no ranking");
+                int N = scan.nextInt();
+                System.out.println(e.maiorConsumidorPeriodo(dataI, dataF, N));
             }
         }
     }
