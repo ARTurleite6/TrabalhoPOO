@@ -1,8 +1,8 @@
 package smart_houses.input_output;
 
 import smart_houses.EstadoPrograma;
+import smart_houses.exceptions.DataInvalidaException;
 
-import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
@@ -54,32 +54,30 @@ public class MenuPrincipal {
                 """);
         Scanner scan = new Scanner(System.in);
         int choice = scan.nextInt();
-        switch (choice) {
-            case 1 -> {
-                e.avancaData();
-                System.out.println("Avancando, Gerando Faturas...");
-            }
+        LocalDate next_date = null;
+        switch(choice) {
+            case 1 -> next_date = e.getDataAtual().plusDays(1);
             case 2 -> {
                 System.out.println("Insira o numero de dias a avancar");
-                int days = scan.nextInt();
-                if(days > 0) {
-                    e.avancaData(days);
-                }
-                else System.out.println("Numero de dias invalido");
+                int dias = scan.nextInt();
+                next_date = e.getDataAtual().plusDays(dias);
             }
             case 3 -> {
-                System.out.println("Insira a data para onde quer avancar(Ano/Mes/Dia)");
-                String dataStr = scan.nextLine();
+                System.out.println("Insira a data a avancar");
+                String dateStr = scan.next();
                 try {
-                    LocalDate data = LocalDate.parse(dataStr);
-                    if(data.isAfter(e.getDataAtual())){
-                        e.avancaData(data);
-                    }
-                    else System.out.println("Data invalida");
+                    next_date = LocalDate.parse(dateStr);
                 }
-                catch (DateTimeException exception){
-                    System.out.println("Data foi inserida de forma invalida, tente com (Ano/Mes/Dia)");
+                catch(DateTimeParseException exception){
+                    System.out.println("Formato Inserido de forma invalida");
                 }
+            }
+        }
+        if(next_date != null){
+            try {
+                e.avancaData(next_date);
+            } catch (DataInvalidaException ex) {
+                System.out.println(ex.getMessage());
             }
         }
     }

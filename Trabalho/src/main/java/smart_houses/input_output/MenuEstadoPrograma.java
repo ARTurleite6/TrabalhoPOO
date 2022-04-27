@@ -41,7 +41,7 @@ public class MenuEstadoPrograma {
                     System.out.println("Este fornecedor não existe");
                 }
             }
-            else if(choice == 5){
+            else if(choice == 4){
                 System.out.println("Insercao da primeira data");
                 LocalDate dataI = MenuPrincipal.inputData();
                 System.out.println("Insercao da segunda data");

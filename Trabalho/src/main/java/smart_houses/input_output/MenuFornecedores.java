@@ -11,15 +11,8 @@ public class MenuFornecedores {
     private static void criarFornecedor(EstadoPrograma e){
 
         Scanner scan = new Scanner(System.in);
-        String name = null;
-        do{
-            name = scan.next();
-            if(e.existeFornecedor(name)){
-                System.out.println("Este Fornecedor ja existe, tente novamente");
-                name = null;
-            }
-        }while(name == null);
-
+        System.out.println("Insere o nome do fonecedor");
+        String name = scan.next();
         try {
             e.addFornecedor(new Fornecedor(name));
         } catch (ExisteFornecedorException ex) {

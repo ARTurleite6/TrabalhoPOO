@@ -1,7 +1,6 @@
 package smart_houses;
 
-import smart_houses.exceptions.ExisteCasaException;
-import smart_houses.exceptions.ExisteFornecedorException;
+import smart_houses.exceptions.*;
 import smart_houses.modulo_casas.Casa;
 import smart_houses.modulo_fornecedores.Fornecedor;
 import smart_houses.smart_devices.SmartDevice;
@@ -14,17 +13,17 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class EstadoPrograma implements Serializable {
     private final Map<String, Casa> casas;
     private final Map<String, Fornecedor> fornecedores;
     private final Map<Integer, Fatura> faturas;
+
+    private Queue<Consumer<EstadoPrograma>> pedidos;
+
     private LocalDate data_atual;
 
     public static final double custoEnergia = 4.8;
@@ -36,6 +35,7 @@ public class EstadoPrograma implements Serializable {
         this.fornecedores = new HashMap<>();
         this.data_atual = LocalDate.now();
         this.faturas = new HashMap<>();
+        this.pedidos = new LinkedList<>();
     }
 
     public EstadoPrograma(EstadoPrograma c) {
@@ -43,6 +43,24 @@ public class EstadoPrograma implements Serializable {
         this.fornecedores = c.getFornecedores();
         this.data_atual = c.getDataAtual();
         this.faturas = c.getFaturas();
+        this.pedidos = c.getPedidos();
+    }
+
+    public Queue<Consumer<EstadoPrograma>> getPedidos() {
+        return new LinkedList<>(this.pedidos);
+    }
+
+
+    public void setPedidos(Queue<Consumer<EstadoPrograma>> pedidos) {
+        this.pedidos = new LinkedList<>(pedidos);
+    }
+
+    public void addPedido(Consumer<EstadoPrograma> pedido){
+        this.pedidos.add(pedido);
+    }
+
+    private void runAllRequests(){
+        this.pedidos.forEach(p -> p.accept(this));
     }
 
     public Map<Integer, Fatura> getFaturas() {
@@ -86,11 +104,6 @@ public class EstadoPrograma implements Serializable {
                 toList();
     }
 
-    public void avancaData() {
-        this.geraFaturas(1);
-        this.data_atual = this.data_atual.plusDays(1);
-    }
-
     public Optional<Casa> getCasaMaisGastadora() {
 
         Map<String, Double> consumoHouse = this.faturas.values()
@@ -101,7 +114,7 @@ public class EstadoPrograma implements Serializable {
                 .entrySet()
                 .stream()
                 .max(Comparator.comparingDouble(Map.Entry::getValue))
-                .map(e -> this.casas.get(e.getValue()));
+                .map(e -> this.casas.get(e.getKey()));
     }
 
     public List<Casa> maiorConsumidorPeriodo(LocalDate inicio, LocalDate fim, int N) {
@@ -128,6 +141,7 @@ public class EstadoPrograma implements Serializable {
         if (!getCasas().equals(that.getCasas())) return false;
         if (!getFornecedores().equals(that.getFornecedores())) return false;
         if (!getFaturas().equals(that.getFaturas())) return false;
+        if (!getPedidos().equals(that.getPedidos())) return false;
         return data_atual.equals(that.data_atual);
     }
 
@@ -136,6 +150,7 @@ public class EstadoPrograma implements Serializable {
         int result = getCasas().hashCode();
         result = 31 * result + getFornecedores().hashCode();
         result = 31 * result + getFaturas().hashCode();
+        result = 31 * result + getPedidos().hashCode();
         result = 31 * result + data_atual.hashCode();
         return result;
     }
@@ -146,13 +161,16 @@ public class EstadoPrograma implements Serializable {
                 "casas=" + casas +
                 ", fornecedores=" + fornecedores +
                 ", faturas=" + faturas +
+                ", pedidos=" + pedidos +
                 ", data_atual=" + data_atual +
                 '}';
     }
 
     public Optional<Fornecedor> getFornecedorMaiorFaturacao() {
 
-        Map<String ,Double> faturasFornecedor = this.faturas.values().stream().collect(Collectors.groupingBy(Fatura::getFornecedor, Collectors.summingDouble(Fatura::getCusto)));
+        Map<String ,Double> faturasFornecedor = this.faturas.values()
+                .stream()
+                .collect(Collectors.groupingBy(Fatura::getFornecedor, Collectors.summingDouble(Fatura::getCusto)));
 
         return faturasFornecedor.entrySet()
                 .stream()
@@ -160,14 +178,11 @@ public class EstadoPrograma implements Serializable {
                 .map(e -> this.fornecedores.get(e.getKey()));
     }
 
-    public void avancaData(int days) {
-        this.geraFaturas(days);
-        this.data_atual = this.data_atual.plusDays(days);
-    }
-
-    public void avancaData(LocalDate date) {
+    public void avancaData(LocalDate date) throws DataInvalidaException{
+        if(date.isBefore(this.data_atual)) throw new DataInvalidaException("Esta data é anterior à atual");
         this.geraFaturas(date);
         this.data_atual = date;
+        this.runAllRequests();
     }
 
     public EstadoPrograma carregaDados() {
@@ -252,5 +267,20 @@ public class EstadoPrograma implements Serializable {
 
     public void setAllDevicesHouseOnRoom(String code, String room, boolean on) {
         this.casas.get(code).setAllDevicesStateRoom(room, on);
+    }
+
+    public List<String> getCodigosCasa(){
+        return new ArrayList<>(this.casas.keySet());
+    }
+
+    public List<String> getNomeFornecedores(){
+        return new ArrayList<>(this.fornecedores.keySet());
+    }
+
+    public void mudaFornecedorCasa(String casa, String fornecedor) throws CasaInexistenteException, FornecedorInexistenteException{
+        Casa c = this.casas.get(casa);
+        if(c == null) throw new CasaInexistenteException("Nao existe esta casa");
+        if(!this.fornecedores.containsKey(fornecedor)) throw new FornecedorInexistenteException("Nao existe este Fornecedor");
+        c.setFornecedor(fornecedor);
     }
 }

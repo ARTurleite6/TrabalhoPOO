@@ -8,7 +8,6 @@ import smart_houses.smart_devices.SmartSpeaker;
 
 import java.util.List;
 import java.util.Scanner;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class MenuDispositivos {
@@ -103,7 +102,7 @@ public class MenuDispositivos {
                     System.out.println("Diga qual divisao : ");
                     String room = s.next();
                     if(e.getCasas().get(codigo).existRoom(room)){
-                        e.setAllDevicesHouseOnRoom(codigo, room, ligar);
+                        e.addPedido(estado -> estado.setAllDevicesHouseOnRoom(codigo, room, ligar));
                     }
                     else{
                         System.out.println("Esta divisao não existe");
@@ -113,7 +112,7 @@ public class MenuDispositivos {
                     System.out.println("Lista de devices da casa: " + e.getSetDevicesHouse(codigo));
                     System.out.println("Diga qual o dispostivo(id) : ");
                     int id = s.nextInt();
-                    e.setDeviceHouseOn(codigo, id, ligar);
+                    e.addPedido(estado -> estado.setDeviceHouseOn(codigo, id, ligar));
                 }
             }
             else System.out.println("A casa nao existe");

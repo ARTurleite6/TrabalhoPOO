@@ -1,7 +1,9 @@
 package smart_houses.input_output;
 
 import smart_houses.EstadoPrograma;
+import smart_houses.exceptions.CasaInexistenteException;
 import smart_houses.exceptions.ExisteCasaException;
+import smart_houses.exceptions.FornecedorInexistenteException;
 import smart_houses.modulo_casas.Casa;
 
 import java.util.Scanner;
@@ -14,9 +16,27 @@ public class MenuCasas {
         System.out.println("""
                 Menu Gestao Casas
                 1: Criar Casa
-                2: Sair""");
+                2: Mudar Fornecedor da Casa
+                3: Sair""");
         Scanner scanner = new Scanner(System.in);
         return scanner.nextInt();
+    }
+
+    private static void mudaFornecedorCasa(EstadoPrograma e){
+        System.out.println("Codigos das casas existentes: " + e.getCodigosCasa());
+        System.out.println("Insira o codigo da casa desejada");
+        Scanner scan = new Scanner(System.in);
+        String cod = scan.next();
+        System.out.println("Lista de fornecedors: " + e.getNomeFornecedores());
+        System.out.println("Insira o fornecedor desejado");
+        String fornecedor = scan.next();
+        e.addPedido(estado -> {
+            try {
+                estado.mudaFornecedorCasa(cod, fornecedor);
+            } catch (CasaInexistenteException | FornecedorInexistenteException ex) {
+                System.out.println(ex.getMessage());
+            }
+        });
     }
 
     private static void criacaoCasa(EstadoPrograma e) {
@@ -69,7 +89,7 @@ public class MenuCasas {
 
     protected static void run(EstadoPrograma e) {
         int choice = 0;
-        while (choice != 2) {
+        while (choice != 3) {
             choice = MenuCasas.gestaoCasas();
             if (choice == 1) {
                 MenuCasas.criacaoCasa(e);
