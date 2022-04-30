@@ -40,7 +40,7 @@ public class SmartCamera extends SmartDevice{
 
     @Override
     public String toString() {
-        return new StringBuilder().append("SmartCamera{").append("id=").append(this.getId()).append(", on=").append(this.isOn()).append(", instalationCost=").append(this.getInstalationCost()).append(", resolution=").append(this.resolution).append(", fileDim=").append(this.fileDim).toString();
+        return new StringBuilder().append("SmartCamera{").append("id=").append(this.getId()).append(", on=").append(this.isOn()).append(", consumoBase=").append(this.getConsume()).append(", resolution=").append(this.resolution).append(", fileDim=").append(this.fileDim).toString();
     }
 
     @Override

@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 
 public class Casa implements Serializable {
 
-    private String code;
     private String nome;
     private String nif;
     private Map<Integer, SmartDevice> devices;
@@ -17,7 +16,6 @@ public class Casa implements Serializable {
     private String fornecedor;
 
     public Casa(){
-        this.code = "";
         this.nome = "";
         this.nif = "";
         this.devices = new HashMap<>();
@@ -26,8 +24,7 @@ public class Casa implements Serializable {
         this.faturas = new TreeSet<>();
     }
 
-    public Casa(String code, String nome, String nif, String fornecedor){
-        this.code = code;
+    public Casa(String nome, String nif, String fornecedor){
         this.nome = nome;
         this.nif = nif;
         this.devices = new HashMap<>();
@@ -36,8 +33,7 @@ public class Casa implements Serializable {
         this.faturas = new TreeSet<>();
     }
 
-    public Casa(String code, String nome, String nif, Set<String> rooms, String fornecedor){
-        this.code = code;
+    public Casa(String nome, String nif, Set<String> rooms, String fornecedor){
         this.nome = nome;
         this.nif = nif;
         this.devices = new HashMap<>();
@@ -46,8 +42,7 @@ public class Casa implements Serializable {
         this.faturas = new TreeSet<>();
     }
 
-    public Casa(String code, String nome, String nif, Map<String, Set<Integer>> rooms, String fornecedor){
-        this.code = code;
+    public Casa(String nome, String nif, Map<String, Set<Integer>> rooms, String fornecedor){
         this.nome = nome;
         this.nif = nif;
         this.devices = new HashMap<>();
@@ -56,8 +51,7 @@ public class Casa implements Serializable {
         this.faturas = new TreeSet<>();
     }
 
-    public Casa(String code, String nome, String nif, Map<Integer, SmartDevice> devices, Map<String, Set<Integer>> rooms, String fornecedor){
-        this.code =code;
+    public Casa(String nome, String nif, Map<Integer, SmartDevice> devices, Map<String, Set<Integer>> rooms, String fornecedor){
         this.nome = nome;
         this.nif = nif;
         this.setDevices(devices);
@@ -67,7 +61,6 @@ public class Casa implements Serializable {
     }
 
     public Casa(Casa casa){
-        this.code = casa.getCode();
         this.nome = casa.getNome();
         this.nif = casa.getNif();
         this.devices = casa.getMapDevices();
@@ -90,14 +83,6 @@ public class Casa implements Serializable {
 
     public TreeSet<Integer> getTreeSetFaturas(){
         return new TreeSet<>(this.faturas);
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getFornecedor() {
@@ -127,7 +112,6 @@ public class Casa implements Serializable {
 
         Casa casa = (Casa) o;
 
-        if (!getCode().equals(casa.getCode())) return false;
         if (!getNome().equals(casa.getNome())) return false;
         if (!getNif().equals(casa.getNif())) return false;
         if (!devices.equals(casa.devices)) return false;
@@ -138,7 +122,7 @@ public class Casa implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = getCode().hashCode();
+        int result = 7;
         result = 31 * result + getNome().hashCode();
         result = 31 * result + getNif().hashCode();
         result = 31 * result + devices.hashCode();
@@ -151,7 +135,6 @@ public class Casa implements Serializable {
     @Override
     public String toString() {
         return "Casa{" +
-                "code='" + code + '\'' +
                 ", nome='" + nome + '\'' +
                 ", nif='" + nif + '\'' +
                 ", devices=" + devices +

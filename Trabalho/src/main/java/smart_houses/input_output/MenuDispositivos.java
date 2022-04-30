@@ -24,9 +24,7 @@ public class MenuDispositivos {
         String estacao = scan.next();
         System.out.println("Insira o consumo base do dispositivo");
         double baseConsumption = scan.nextDouble();
-        System.out.println("Insira o custo de instalacao do dispositivo");
-        double instalacao = scan.nextDouble();
-        return new SmartSpeaker(ligado, instalacao, volume, estacao, brand, baseConsumption);
+        return new SmartSpeaker(ligado, baseConsumption, volume, estacao, brand);
     }
 
     private static SmartDevice criacaoSmartCamera(){
@@ -46,10 +44,8 @@ public class MenuDispositivos {
         Scanner scan = new Scanner(System.in);
         System.out.println("Pretende ligar o dispositivo? True/False");
         boolean ligado = scan.nextBoolean();
-        System.out.println("Insira o custo de instalacao do dispostivo");
-        double custoInstalacao = scan.nextDouble();
         System.out.println("Insira o consumo base da lampada");
-        double custoBase = scan.nextDouble();
+        double consumoBase = scan.nextDouble();
         System.out.println("Insira a dimensao do dispositivo em centimetros");
         int dimensao = scan.nextInt();
         System.out.println("Insira a tonalidade do dispositivo(Neutral(0), Warm(1) ou Cold(2)");
@@ -57,7 +53,7 @@ public class MenuDispositivos {
         SmartBulb.Tones tone = SmartBulb.Tones.NEUTRAL;
         if(tonalidade == 1) tone = SmartBulb.Tones.WARM;
         else if(tonalidade == 2) tone = SmartBulb.Tones.COLD;
-        return new SmartBulb(ligado, custoInstalacao, tone, dimensao, custoBase);
+        return new SmartBulb(ligado, consumoBase, tone, dimensao);
     }
 
     private static void criacaoSmartDevice(EstadoPrograma e) {
@@ -74,7 +70,7 @@ public class MenuDispositivos {
         System.out.println("funcao");
         List<Supplier<SmartDevice>> funcoesCriacao = List.of(MenuDispositivos::criacaoSmartBulb, MenuDispositivos::criacaoSmartCamera, MenuDispositivos::criacaoSmartSpeaker);
         SmartDevice dispositivo = funcoesCriacao.get(tipoDispositivo - 1).get();
-        System.out.println("Insira o codigo da casa a instalar");
+        System.out.println("Insira o nif da casa a instalar");
         String code = scan.next();
         if (e.existeCasa(code)) {
             e.addDeviceToCasa(code, dispositivo);
@@ -90,7 +86,7 @@ public class MenuDispositivos {
 
         private static void ligarDesligarDispositivos(EstadoPrograma e){
             Scanner s = new Scanner(System.in);
-            System.out.println("Qual a casa que pretender ligar/desligar os dipositivos(Insira o codigo da casa)");
+            System.out.println("Qual a casa que pretender ligar/desligar os dipositivos(Insira o nif da casa)");
             String codigo = s.nextLine();
             if(e.existeCasa(codigo)){
                 System.out.println("Pretende ligar ou desligar: Ligar(True)/Desligar(False)");

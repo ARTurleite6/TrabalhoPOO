@@ -8,24 +8,24 @@ public abstract class SmartDevice implements Serializable {
 
     private boolean on;
     private int id;
-    private double instalationCost;
+    private double consume;
 
     public SmartDevice(){
         this.on = false;
         this.id = SmartDevice.next_id++;
-        this.instalationCost = 0;
+        this.consume = 0;
     }
 
-    public SmartDevice(boolean on, double instalationCost){
+    public SmartDevice(boolean on, double consume){
         this.id = SmartDevice.next_id++;
         this.on = on;
-        this.instalationCost = instalationCost;
+        this.consume = consume;
     }
 
     public SmartDevice(SmartDevice device){
         this.on = device.isOn();
         this.id = device.getId();
-        this.instalationCost = device.getInstalationCost();
+        this.consume = device.getConsume();
     }
 
     public boolean isOn() {
@@ -44,12 +44,12 @@ public abstract class SmartDevice implements Serializable {
         this.id = id;
     }
 
-    public double getInstalationCost() {
-        return instalationCost;
+    public double getConsume() {
+        return this.consume;
     }
 
-    public void setInstalationCost(double instalationCost) {
-        this.instalationCost = instalationCost;
+    public void setConsume(double consume) {
+        this.consume = this.consume;
     }
 
     @Override
@@ -57,7 +57,7 @@ public abstract class SmartDevice implements Serializable {
         return "SmartDevice{" +
                 "on=" + on +
                 ", id='" + id + '\'' +
-                ", instalationCost=" + instalationCost +
+                ", consume=" + consume +
                 '}';
     }
 
@@ -69,7 +69,7 @@ public abstract class SmartDevice implements Serializable {
         SmartDevice that = (SmartDevice) o;
 
         if (isOn() != that.isOn()) return false;
-        if (Double.compare(that.getInstalationCost(), getInstalationCost()) != 0) return false;
+        if (Double.compare(that.getConsume(), getConsume()) != 0) return false;
         return getId() == that.getId();
     }
 
@@ -79,7 +79,7 @@ public abstract class SmartDevice implements Serializable {
         long temp;
         result = (isOn() ? 1 : 0);
         result = 31 * result + getId();
-        temp = Double.doubleToLongBits(getInstalationCost());
+        temp = Double.doubleToLongBits(getConsume());
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }

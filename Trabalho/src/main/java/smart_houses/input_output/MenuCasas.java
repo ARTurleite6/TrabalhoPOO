@@ -24,7 +24,7 @@ public class MenuCasas {
 
     private static void mudaFornecedorCasa(EstadoPrograma e){
         System.out.println("Codigos das casas existentes: " + e.getCodigosCasa());
-        System.out.println("Insira o codigo da casa desejada");
+        System.out.println("Insira o nif da casa desejada");
         Scanner scan = new Scanner(System.in);
         String cod = scan.next();
         System.out.println("Lista de fornecedors: " + e.getNomeFornecedores());
@@ -42,20 +42,18 @@ public class MenuCasas {
     private static void criacaoCasa(EstadoPrograma e) {
         Scanner scan = new Scanner(System.in);
 
-        String codigo = null;
+        String nif = null;
         do{
-            System.out.println("Insira o codigo da casa");
-            codigo = scan.next();
-            if(e.existeCasa(codigo)){
-                System.out.println("O codigo desta casa ja existe, insira outro");
-                codigo = null;
+            System.out.println("Insira o nif da casa");
+            nif = scan.next();
+            if(e.existeCasa(nif)){
+                System.out.println("O nif desta casa ja existe, insira outro");
+                nif = null;
             }
-        }while(codigo == null);
+        }while(nif == null);
 
         System.out.println("Insira o nome do proprietario:");
         String nome = scan.next();
-        System.out.println("Insira o nif do proprietario:");
-        String nif = scan.next();
 
         System.out.println("Pretende adicionar divisoes à casa? S(1)/N(0)");
         Set<String> rooms = new TreeSet<>();
@@ -78,7 +76,7 @@ public class MenuCasas {
                 empresa = null;
             }
         }while(empresa == null);
-        Casa casa = new Casa(codigo, nome, nif, rooms, empresa);
+        Casa casa = new Casa(nome, nif, rooms, empresa);
         try {
             e.adicionaCasa(casa);
         }
@@ -93,6 +91,7 @@ public class MenuCasas {
             choice = MenuCasas.gestaoCasas();
             if (choice == 1) {
                 MenuCasas.criacaoCasa(e);
+                MenuCasas.mudaFornecedorCasa(e);
             }
         }
     }

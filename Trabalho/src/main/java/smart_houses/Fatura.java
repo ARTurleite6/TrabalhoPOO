@@ -8,7 +8,6 @@ public class Fatura implements Comparable<Fatura>, Serializable {
     private static int next_codigoFatura = 1;
 
     private int codigoFatura;
-    private String codCasa;
     private String fornecedor;
     private String nifCliente;
     private double custo;
@@ -19,7 +18,6 @@ public class Fatura implements Comparable<Fatura>, Serializable {
 
     public Fatura(){
         this.codigoFatura = Fatura.next_codigoFatura++;
-        this.codCasa = "";
         this.fornecedor = "";
         this.nifCliente = "";
         this.custo = 0;
@@ -28,9 +26,8 @@ public class Fatura implements Comparable<Fatura>, Serializable {
         this.fimPeriodo = LocalDate.now();
     }
 
-    public Fatura(String codCasa, String fornecedor, String nifCliente, double custo, double consumo, LocalDate inicioPeriodo, LocalDate fimPeriodo) {
+    public Fatura(String fornecedor, String nifCliente, double custo, double consumo, LocalDate inicioPeriodo, LocalDate fimPeriodo) {
         this.codigoFatura = Fatura.next_codigoFatura++;
-        this.codCasa = codCasa;
         this.fornecedor = fornecedor;
         this.nifCliente = nifCliente;
         this.custo = custo;
@@ -41,7 +38,6 @@ public class Fatura implements Comparable<Fatura>, Serializable {
 
     public Fatura(Fatura f){
         this.codigoFatura = f.getCodigoFatura();
-        this.codCasa = f.getCodCasa();
         this.fornecedor = f.getFornecedor();
         this.nifCliente = f.getNifCliente();
         this.custo = f.getCusto();
@@ -52,14 +48,6 @@ public class Fatura implements Comparable<Fatura>, Serializable {
 
     public int getCodigoFatura() {
         return codigoFatura;
-    }
-
-    public String getCodCasa() {
-        return codCasa;
-    }
-
-    public void setCodCasa(String codCasa) {
-        this.codCasa = codCasa;
     }
 
     public String getFornecedor() {
@@ -114,7 +102,6 @@ public class Fatura implements Comparable<Fatura>, Serializable {
     public String toString() {
         return "Fatura{" +
                 "codigoFatura=" + codigoFatura +
-                ", codCasa='" + codCasa + '\'' +
                 ", fornecedor='" + fornecedor + '\'' +
                 ", nifCliente='" + nifCliente + '\'' +
                 ", custo=" + custo +
@@ -134,7 +121,6 @@ public class Fatura implements Comparable<Fatura>, Serializable {
         if (getCodigoFatura() != fatura.getCodigoFatura()) return false;
         if (Double.compare(fatura.getCusto(), getCusto()) != 0) return false;
         if (Double.compare(fatura.getConsumo(), getConsumo()) != 0) return false;
-        if (!getCodCasa().equals(fatura.getCodCasa())) return false;
         if (!getFornecedor().equals(fatura.getFornecedor())) return false;
         if (!getNifCliente().equals(fatura.getNifCliente())) return false;
         if (!getInicioPeriodo().equals(fatura.getInicioPeriodo())) return false;
@@ -146,7 +132,6 @@ public class Fatura implements Comparable<Fatura>, Serializable {
         int result;
         long temp;
         result = getCodigoFatura();
-        result = 31 * result + getCodCasa().hashCode();
         result = 31 * result + getFornecedor().hashCode();
         result = 31 * result + getNifCliente().hashCode();
         temp = Double.doubleToLongBits(getCusto());

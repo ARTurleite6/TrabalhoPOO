@@ -1,7 +1,5 @@
 package smart_houses.smart_devices;
 
-import java.util.Objects;
-
 public class SmartSpeaker extends SmartDevice{
 
     private static final int MAX = 100;
@@ -9,22 +7,19 @@ public class SmartSpeaker extends SmartDevice{
     private int volume;
     private String radioStation;
     private String brand;
-    private double baseComsumption;
 
     public SmartSpeaker(){
         super();
         this.volume=0;
         this.radioStation="n/a";
         this.brand="n/a";
-        this.baseComsumption=0;
     }
 
-    public SmartSpeaker(boolean on, double instalationCost, int volume, String radioStation, String brand, double baseComsumption){
-        super(on, instalationCost);
+    public SmartSpeaker(boolean on, double consume, int volume, String radioStation, String brand){
+        super(on, consume);
         this.volume=volume;
         this.radioStation= radioStation;
         this.brand=brand;
-        this.baseComsumption=baseComsumption;
     }
 
     public SmartSpeaker(SmartSpeaker device){
@@ -32,8 +27,8 @@ public class SmartSpeaker extends SmartDevice{
         this.volume= device.getVolume();
         this.radioStation=device.getRadioStation();
         this.brand=device.getBrand();
-        this.baseComsumption= device.getBaseComsumption();
     }
+
     public int getVolume() {
         return volume;
     }
@@ -68,20 +63,11 @@ public class SmartSpeaker extends SmartDevice{
         this.brand = brand;
     }
 
-    public double getBaseComsumption() {
-        return baseComsumption;
-    }
-
-    public void setBaseComsumption(double baseComsumption) {
-        this.baseComsumption = baseComsumption;
-    }
-
     public String toString() {
         return "SmartSpeaker{" +
                 "volume=" + volume +
                 ", radioStation='" + radioStation + '\'' +
                 ", brand='" + brand + '\'' +
-                ", baseComsumption=" + baseComsumption +
                 '}';
     }
 
@@ -89,13 +75,22 @@ public class SmartSpeaker extends SmartDevice{
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+
         SmartSpeaker that = (SmartSpeaker) o;
-        return super.equals(o) && volume == that.volume && Double.compare(that.baseComsumption, baseComsumption) == 0 && Objects.equals(radioStation, that.radioStation) && Objects.equals(brand, that.brand);
+
+        if (getVolume() != that.getVolume()) return false;
+        if (!getRadioStation().equals(that.getRadioStation())) return false;
+        return getBrand().equals(that.getBrand());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(volume, radioStation, brand, baseComsumption);
+        int result = super.hashCode();
+        result = 31 * result + getVolume();
+        result = 31 * result + getRadioStation().hashCode();
+        result = 31 * result + getBrand().hashCode();
+        return result;
     }
 
     public SmartSpeaker clone(){
@@ -103,6 +98,6 @@ public class SmartSpeaker extends SmartDevice{
     }
 
     public double comsumption(){
-        return baseComsumption + this.volume;
+        return this.getConsume() + this.volume;
     }
 }

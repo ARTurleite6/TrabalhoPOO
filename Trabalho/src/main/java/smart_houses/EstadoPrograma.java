@@ -77,21 +77,21 @@ public class EstadoPrograma implements Serializable {
 
     private void geraFaturas(int days) {
         this.casas.values().forEach(casa -> {
-            Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getCode(), casa.getNif(), casa.getListDevices(), this.data_atual, this.data_atual.plusDays(days));
+            Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getNif(), casa.getListDevices(), this.data_atual, this.data_atual.plusDays(days));
             this.guardaFatura(f);
         });
     }
 
     private void geraFaturas(LocalDate fim) {
         this.casas.values().forEach(casa -> {
-            Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getCode(), casa.getNif(), casa.getListDevices(), this.data_atual, fim);
+            Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getNif(), casa.getListDevices(), this.data_atual, fim);
             this.guardaFatura(f);
         });
     }
 
     private void guardaFatura(Fatura f) {
         this.faturas.put(f.getCodigoFatura(), f.clone());
-        this.casas.get(f.getCodCasa()).adicionaFatura(f.getCodigoFatura());
+        this.casas.get(f.getNifCliente()).adicionaFatura(f.getCodigoFatura());
         this.fornecedores.get(f.getFornecedor()).adicionaFatura(f.getCodigoFatura());
     }
 
@@ -108,7 +108,7 @@ public class EstadoPrograma implements Serializable {
 
         Map<String, Double> consumoHouse = this.faturas.values()
                 .stream()
-                .collect(Collectors.groupingBy(Fatura::getCodCasa, Collectors.summingDouble(Fatura::getConsumo)));
+                .collect(Collectors.groupingBy(Fatura::getNifCliente, Collectors.summingDouble(Fatura::getConsumo)));
 
         return consumoHouse
                 .entrySet()
@@ -121,7 +121,7 @@ public class EstadoPrograma implements Serializable {
         Map<String, Double> consumoHouse = this.faturas.values()
                 .stream()
                 .filter(f -> (f.getInicioPeriodo().isAfter(inicio) || f.getInicioPeriodo().equals(inicio)) && (f.getFimPeriodo().isBefore(fim) || f.getFimPeriodo().isEqual(fim)))
-                .collect(Collectors.groupingBy(Fatura::getCodCasa, Collectors.summingDouble(Fatura::getConsumo)));
+                .collect(Collectors.groupingBy(Fatura::getNifCliente, Collectors.summingDouble(Fatura::getConsumo)));
 
         return consumoHouse.entrySet()
                 .stream()
@@ -206,8 +206,8 @@ public class EstadoPrograma implements Serializable {
     }
 
     public void adicionaCasa(Casa c) throws ExisteCasaException {
-        if (this.casas.containsKey(c.getCode())) throw new ExisteCasaException("Esta casa tem um codigo que ja existe");
-        this.casas.put(c.getCode(), c.clone());
+        if (this.casas.containsKey(c.getNif())) throw new ExisteCasaException("Esta casa tem um codigo que ja existe");
+        this.casas.put(c.getNif(), c.clone());
     }
 
     public boolean existeFornecedor(String nome) {

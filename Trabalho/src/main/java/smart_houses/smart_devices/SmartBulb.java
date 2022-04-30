@@ -17,27 +17,23 @@ public class SmartBulb extends SmartDevice{
 
     private Tones tone;
     private int dimension;
-    private double baseConsume;
 
     public SmartBulb(){
         super();
         this.tone = Tones.NEUTRAL;
         this.dimension = 20;
-        this.baseConsume = 10;
     }
 
-    public SmartBulb(boolean on, double instalationCost, Tones tone, int dimension, double baseConsume){
-        super(on, instalationCost);
+    public SmartBulb(boolean on, double consume, Tones tone, int dimension){
+        super(on, consume);
         this.tone = tone;
         this.dimension = dimension;
-        this.baseConsume = baseConsume;
     }
 
     public SmartBulb(SmartBulb device){
         super(device);
         this.tone = device.getTone();
         this.dimension = device.getDimension();
-        this.baseConsume = device.getBaseConsume();
     }
 
     public Tones getTone() {
@@ -56,16 +52,8 @@ public class SmartBulb extends SmartDevice{
         this.dimension = dimension;
     }
 
-    public double getBaseConsume() {
-        return baseConsume;
-    }
-
-    public void setBaseConsume(double baseConsume) {
-        this.baseConsume = baseConsume;
-    }
-
     public double comsumption(){
-        return this.baseConsume + tone.getConsume();
+        return this.getConsume() + tone.getConsume();
     }
 
     public SmartBulb clone(){
@@ -74,7 +62,7 @@ public class SmartBulb extends SmartDevice{
 
     @Override
     public String toString() {
-        return new StringBuilder().append("SmartBulb{").append("id=").append(this.getId()).append(", on=").append(this.isOn()).append(", instalationCost=").append(this.getInstalationCost()).append(", tone=").append(tone).append(", dimension=").append(dimension).append(", baseConsume=").append(baseConsume).append('}').toString();
+        return new StringBuilder().append("SmartBulb{").append("id=").append(this.getId()).append(", on=").append(this.isOn()).append(", tone=").append(tone).append(", dimension=").append(dimension).append(", consume=").append(this.getConsume()).append('}').toString();
     }
 
     @Override
@@ -86,18 +74,14 @@ public class SmartBulb extends SmartDevice{
         SmartBulb smartBulb = (SmartBulb) o;
 
         if (getDimension() != smartBulb.getDimension()) return false;
-        if (Double.compare(smartBulb.getBaseConsume(), getBaseConsume()) != 0) return false;
         return getTone() == smartBulb.getTone();
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        long temp;
         result = 31 * result + getTone().hashCode();
         result = 31 * result + getDimension();
-        temp = Double.doubleToLongBits(getBaseConsume());
-        result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
