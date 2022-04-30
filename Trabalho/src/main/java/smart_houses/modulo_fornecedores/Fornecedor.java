@@ -7,8 +7,6 @@ import smart_houses.smart_devices.SmartDevice;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -16,22 +14,16 @@ public class Fornecedor implements Serializable {
 
     private String name;
 
-    private Set<Integer> faturas;
-
-
     public Fornecedor() {
         this.name = "n/a";
-        this.faturas = new TreeSet<>();
     }
 
     public Fornecedor(String name){
         this.name = name;
-        this.faturas = new TreeSet<>();
     }
 
     public Fornecedor(Fornecedor fornecedor){
         this.name=fornecedor.getName();
-        this.faturas = fornecedor.getFaturas();
     }
 
     public Fatura criaFatura(String nif, List<SmartDevice> devices, LocalDate inicio, LocalDate fim){
@@ -41,16 +33,9 @@ public class Fornecedor implements Serializable {
         return new Fatura(this.name, nif, preco, consumo, inicio, fim);
     }
 
-    public void adicionaFatura(int codigo){
-        this.faturas.add(codigo);
-    }
 
     public String getName() {
         return name;
-    }
-
-    public Set<Integer> getFaturas(){
-        return new TreeSet<>(this.faturas);
     }
 
     public void setName(String name) {
@@ -61,7 +46,6 @@ public class Fornecedor implements Serializable {
     public String toString() {
         return "Fornecedor{" +
                 "name='" + name + '\'' +
-                ", faturas=" + faturas +
                 '}';
     }
 
@@ -72,14 +56,12 @@ public class Fornecedor implements Serializable {
 
         Fornecedor that = (Fornecedor) o;
 
-        if (!getName().equals(that.getName())) return false;
-        return getFaturas().equals(that.getFaturas());
+        return this.getName().equals(that.getName());
     }
 
     @Override
     public int hashCode() {
         int result = getName().hashCode();
-        result = 31 * result + getFaturas().hashCode();
         return result;
     }
 

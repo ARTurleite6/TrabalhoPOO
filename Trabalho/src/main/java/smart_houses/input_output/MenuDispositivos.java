@@ -35,9 +35,11 @@ public class MenuDispositivos {
         double custoInstalacao = scan.nextDouble();
         System.out.println("Insira a dimensao dos ficheiros em bytes");
         int dimensao = scan.nextInt();
-        System.out.println("Insira a resolucao da camera");
-        int resolucao = scan.nextInt();
-        return new SmartCamera(ligado, custoInstalacao, resolucao, dimensao);
+        System.out.println("Insira a resolucao height da camera");
+        int resolucaoX= scan.nextInt();
+        System.out.println("Insira a resolucao width da camera");
+        int resolucaoY = scan.nextInt();
+        return new SmartCamera(ligado, custoInstalacao, resolucaoX, resolucaoY, dimensao);
     }
 
     private static SmartDevice criacaoSmartBulb(){

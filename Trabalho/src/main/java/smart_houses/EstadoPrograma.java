@@ -15,12 +15,12 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class EstadoPrograma implements Serializable {
     private final Map<String, Casa> casas;
     private final Map<String, Fornecedor> fornecedores;
-    private final Map<Integer, Fatura> faturas;
 
     private Queue<Consumer<EstadoPrograma>> pedidos;
 
@@ -34,7 +34,6 @@ public class EstadoPrograma implements Serializable {
         this.casas = new HashMap<>();
         this.fornecedores = new HashMap<>();
         this.data_atual = LocalDate.now();
-        this.faturas = new HashMap<>();
         this.pedidos = new LinkedList<>();
     }
 
@@ -42,7 +41,6 @@ public class EstadoPrograma implements Serializable {
         this.casas = c.getCasas();
         this.fornecedores = c.getFornecedores();
         this.data_atual = c.getDataAtual();
-        this.faturas = c.getFaturas();
         this.pedidos = c.getPedidos();
     }
 
@@ -63,10 +61,6 @@ public class EstadoPrograma implements Serializable {
         this.pedidos.forEach(p -> p.accept(this));
     }
 
-    public Map<Integer, Fatura> getFaturas() {
-        return faturas;
-    }
-
     public LocalDate getDataAtual() {
         return data_atual;
     }
@@ -78,57 +72,37 @@ public class EstadoPrograma implements Serializable {
     private void geraFaturas(int days) {
         this.casas.values().forEach(casa -> {
             Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getNif(), casa.getListDevices(), this.data_atual, this.data_atual.plusDays(days));
-            this.guardaFatura(f);
+            this.casas.get(f.getNifCliente()).adicionaFatura(f);
         });
     }
 
     private void geraFaturas(LocalDate fim) {
         this.casas.values().forEach(casa -> {
             Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getNif(), casa.getListDevices(), this.data_atual, fim);
-            this.guardaFatura(f);
+            this.casas.get(f.getNifCliente()).adicionaFatura(f);
         });
     }
 
     private void guardaFatura(Fatura f) {
-        this.faturas.put(f.getCodigoFatura(), f.clone());
-        this.casas.get(f.getNifCliente()).adicionaFatura(f.getCodigoFatura());
-        this.fornecedores.get(f.getFornecedor()).adicionaFatura(f.getCodigoFatura());
+        this.casas.get(f.getNifCliente()).adicionaFatura(f);
     }
 
 
     public List<Fatura> getFaturasFornecedor(String nome) {
-        return this.fornecedores.get(nome)
-                .getFaturas()
-                .stream()
-                .map(codigo -> this.faturas.get(codigo).clone()).
-                toList();
+        return this.casas.values().stream().flatMap(c -> c.faturasFornecedor(nome).stream()).toList();
     }
 
     public Optional<Casa> getCasaMaisGastadora() {
 
-        Map<String, Double> consumoHouse = this.faturas.values()
-                .stream()
-                .collect(Collectors.groupingBy(Fatura::getNifCliente, Collectors.summingDouble(Fatura::getConsumo)));
+        return this.casas.values().stream().max(Comparator.comparingDouble(Casa::consumo));
 
-        return consumoHouse
-                .entrySet()
-                .stream()
-                .max(Comparator.comparingDouble(Map.Entry::getValue))
-                .map(e -> this.casas.get(e.getKey()));
     }
 
     public List<Casa> maiorConsumidorPeriodo(LocalDate inicio, LocalDate fim, int N) {
-        Map<String, Double> consumoHouse = this.faturas.values()
+        return this.casas.values()
                 .stream()
-                .filter(f -> (f.getInicioPeriodo().isAfter(inicio) || f.getInicioPeriodo().equals(inicio)) && (f.getFimPeriodo().isBefore(fim) || f.getFimPeriodo().isEqual(fim)))
-                .collect(Collectors.groupingBy(Fatura::getNifCliente, Collectors.summingDouble(Fatura::getConsumo)));
-
-        return consumoHouse.entrySet()
-                .stream()
-                .sorted((e1, e2) -> Double.compare(e2.getValue(), e1.getValue()))
-                .limit(N)
-                .map(e -> this.casas.get(e.getKey())).toList();
-
+                .sorted(Comparator.comparingDouble(c -> c.consumo(inicio, fim)))
+                .limit(N).toList();
     }
 
     @Override
@@ -140,7 +114,6 @@ public class EstadoPrograma implements Serializable {
 
         if (!getCasas().equals(that.getCasas())) return false;
         if (!getFornecedores().equals(that.getFornecedores())) return false;
-        if (!getFaturas().equals(that.getFaturas())) return false;
         if (!getPedidos().equals(that.getPedidos())) return false;
         return data_atual.equals(that.data_atual);
     }
@@ -149,7 +122,6 @@ public class EstadoPrograma implements Serializable {
     public int hashCode() {
         int result = getCasas().hashCode();
         result = 31 * result + getFornecedores().hashCode();
-        result = 31 * result + getFaturas().hashCode();
         result = 31 * result + getPedidos().hashCode();
         result = 31 * result + data_atual.hashCode();
         return result;
@@ -160,7 +132,6 @@ public class EstadoPrograma implements Serializable {
         return "EstadoPrograma{" +
                 "casas=" + casas +
                 ", fornecedores=" + fornecedores +
-                ", faturas=" + faturas +
                 ", pedidos=" + pedidos +
                 ", data_atual=" + data_atual +
                 '}';
@@ -168,14 +139,11 @@ public class EstadoPrograma implements Serializable {
 
     public Optional<Fornecedor> getFornecedorMaiorFaturacao() {
 
-        Map<String ,Double> faturasFornecedor = this.faturas.values()
+        return this.fornecedores.values()
                 .stream()
-                .collect(Collectors.groupingBy(Fatura::getFornecedor, Collectors.summingDouble(Fatura::getCusto)));
-
-        return faturasFornecedor.entrySet()
-                .stream()
-                .max(Comparator.comparingDouble(Map.Entry::getValue))
-                .map(e -> this.fornecedores.get(e.getKey()));
+                .max(Comparator.comparingDouble(f -> this.getFaturasFornecedor(f.getName())
+                        .stream()
+                        .mapToDouble(Fatura::getCusto).sum()));
     }
 
     public void avancaData(LocalDate date) throws DataInvalidaException{
@@ -187,7 +155,7 @@ public class EstadoPrograma implements Serializable {
 
     public EstadoPrograma carregaDados() {
         try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./src/main/resources/teste.txt"));
+            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./src/main/resources/data.obj"));
             EstadoPrograma programa = (EstadoPrograma) ois.readObject();
             ois.close();
             return programa;
@@ -228,7 +196,7 @@ public class EstadoPrograma implements Serializable {
 
     public void guardaDados() {
         try {
-            FileOutputStream file = new FileOutputStream("./src/main/resources/teste.txt");
+            FileOutputStream file = new FileOutputStream("./src/main/resources/data.obj");
             ObjectOutputStream oos = new ObjectOutputStream(file);
             oos.writeObject(this);
             oos.close();

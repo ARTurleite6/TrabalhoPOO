@@ -1,33 +1,45 @@
 package smart_houses.smart_devices;
 
 public class SmartCamera extends SmartDevice{
-    private int resolution;
+    private int resolutionX;
+    private int resolutionY;
     private int fileDim;
 
     public SmartCamera(){
         super();
-        this.resolution = 0;
+        this.resolutionX = 0;
+        this.resolutionY = 0;
         this.fileDim = 0;
     }
 
-    public SmartCamera(boolean ligado, double instalationPrice, int resolution, int fileDim){
-        super(ligado, instalationPrice);
-        this.resolution = resolution;
+    public SmartCamera(boolean ligado, double consumo, int resolutionX, int resolutionY, int fileDim){
+        super(ligado, consumo);
+        this.resolutionX = resolutionX;
+        this.resolutionY = resolutionY;
         this.fileDim = fileDim;
     }
 
     public SmartCamera(SmartCamera camera){
         super(camera);
-        this.resolution = camera.getResolution();
+        this.resolutionX = camera.getResolutionX();
+        this.resolutionY = camera.getResolutionY();
         this.fileDim = camera.getFileDim();
     }
 
-    public int getResolution() {
-        return resolution;
+    public int getResolutionX() {
+        return resolutionX;
     }
 
-    public void setResolution(int resolution) {
-        this.resolution = resolution;
+    public void setResolutionX(int resolutionX) {
+        this.resolutionX = resolutionX;
+    }
+
+    public int getResolutionY() {
+        return resolutionY;
+    }
+
+    public void setResolutionY(int resolutionY) {
+        this.resolutionY = resolutionY;
     }
 
     public int getFileDim() {
@@ -40,7 +52,11 @@ public class SmartCamera extends SmartDevice{
 
     @Override
     public String toString() {
-        return new StringBuilder().append("SmartCamera{").append("id=").append(this.getId()).append(", on=").append(this.isOn()).append(", consumoBase=").append(this.getConsume()).append(", resolution=").append(this.resolution).append(", fileDim=").append(this.fileDim).toString();
+        return "SmartCamera{" +
+                "resolutionX=" + resolutionX +
+                ", resolutionY=" + resolutionY +
+                ", fileDim=" + fileDim +
+                '}';
     }
 
     @Override
@@ -51,14 +67,16 @@ public class SmartCamera extends SmartDevice{
 
         SmartCamera that = (SmartCamera) o;
 
-        if (getResolution() != that.getResolution()) return false;
+        if (getResolutionX() != that.getResolutionX()) return false;
+        if (getResolutionY() != that.getResolutionY()) return false;
         return getFileDim() == that.getFileDim();
     }
 
     @Override
     public int hashCode() {
         int result = super.hashCode();
-        result = 31 * result + getResolution();
+        result = 31 * result + getResolutionX();
+        result = 31 * result + getResolutionY();
         result = 31 * result + getFileDim();
         return result;
     }
@@ -68,6 +86,7 @@ public class SmartCamera extends SmartDevice{
     }
 
     public double comsumption(){
-        return this.resolution * this.fileDim;
+        return 0;
+        //return this.getConsume()  + (this.resolutionX * this.resolutionY * this.fileDim);
     }
 }

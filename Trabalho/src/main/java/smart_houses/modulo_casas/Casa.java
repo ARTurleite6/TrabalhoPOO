@@ -1,8 +1,10 @@
 package smart_houses.modulo_casas;
 
+import smart_houses.Fatura;
 import smart_houses.smart_devices.SmartDevice;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -12,7 +14,7 @@ public class Casa implements Serializable {
     private String nif;
     private Map<Integer, SmartDevice> devices;
     private Map<String, Set<Integer>> rooms;
-    private Set<Integer> faturas;
+    private Set<Fatura> faturas;
     private String fornecedor;
 
     public Casa(){
@@ -69,19 +71,19 @@ public class Casa implements Serializable {
         this.faturas = casa.getFaturas();
     }
 
-    public void setFaturas(Set<Integer> faturas){
-        this.faturas = new TreeSet<>(faturas);
+    public void setFaturas(Set<Fatura> faturas){
+        this.faturas = faturas.stream().map(Fatura::clone).collect(Collectors.toSet());
     }
 
-    public void adicionaFatura(int codigo){
-        this.faturas.add(codigo);
+    public void adicionaFatura(Fatura fatura){
+        this.faturas.add(fatura.clone());
     }
 
-    public Set<Integer> getFaturas() {
-        return new TreeSet<>(this.faturas);
+    public Set<Fatura> getFaturas() {
+        return this.faturas.stream().map(Fatura::clone).collect(Collectors.toSet());
     }
 
-    public TreeSet<Integer> getTreeSetFaturas(){
+    public TreeSet<Fatura> getTreeSetFaturas(){
         return new TreeSet<>(this.faturas);
     }
 
@@ -234,4 +236,15 @@ public class Casa implements Serializable {
         this.rooms.get(room).remove(device);
     }
 
+    public double consumo(){
+        return this.faturas.stream().mapToDouble(Fatura::getConsumo).sum();
+    }
+
+    public double consumo(LocalDate inicio, LocalDate fim){
+        return this.faturas.stream().filter(f -> (f.getInicioPeriodo().isEqual(inicio) || f.getInicioPeriodo().isAfter(inicio)) && (f.getFimPeriodo().isEqual(fim) || f.getFimPeriodo().isBefore(fim))).mapToDouble(Fatura::getConsumo).sum();
+    }
+
+    public List<Fatura> faturasFornecedor(String fornecedor){
+        return this.faturas.stream().filter(f -> f.getFornecedor().equals(fornecedor)).toList();
+    }
 }
