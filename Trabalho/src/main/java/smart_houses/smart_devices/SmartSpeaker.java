@@ -98,6 +98,6 @@ public class SmartSpeaker extends SmartDevice{
     }
 
     public double comsumption(){
-        return this.getConsume() + this.volume;
+        return (this.isOn() ? 1 : 0) * (this.getConsume() + this.volume);
     }
 }

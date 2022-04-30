@@ -76,13 +76,9 @@ public class MenuDispositivos {
         String code = scan.next();
         if (e.existeCasa(code)) {
             e.addDeviceToCasa(code, dispositivo);
-            System.out.println("Deseja inserir em uma divisao da casa? S(1)/N(0)");
-            int choice = scan.nextInt();
-            if (choice == 1) {
-                System.out.println("Insira o nome da divisao a inserir");
-                String room = scan.next();
-                e.addDeviceToCasaOnRoom(code, room, dispositivo.getId());
-            }
+            System.out.println("Insira o nome da divisao a inserir");
+            String room = scan.next();
+            e.addDeviceToCasaOnRoom(code, room, dispositivo.getId());
         } else System.out.println("A casa nao existe");
     }
 

@@ -53,7 +53,7 @@ public class SmartBulb extends SmartDevice{
     }
 
     public double comsumption(){
-        return this.getConsume() + tone.getConsume();
+        return (this.isOn() ? 1 : 0) * (this.getConsume() + tone.getConsume());
     }
 
     public SmartBulb clone(){
