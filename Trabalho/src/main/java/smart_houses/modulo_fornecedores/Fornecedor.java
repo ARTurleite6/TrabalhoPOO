@@ -2,6 +2,7 @@ package smart_houses.modulo_fornecedores;
 
 import smart_houses.EstadoPrograma;
 import smart_houses.Fatura;
+import smart_houses.modulo_casas.Casa;
 import smart_houses.smart_devices.SmartDevice;
 
 import java.io.Serializable;
@@ -33,6 +34,12 @@ public class Fornecedor implements Serializable {
         return new Fatura(this.name, nif, preco, consumo, inicio, fim);
     }
 
+    public Fatura criaFatura(Casa casa, LocalDate inicio, LocalDate fim){
+        long days = DAYS.between(inicio, fim);
+        double consumo = casa.consumoDispositivos() * days;
+        double preco = this.precoDiaDispositivos(casa.getListDevices()) * days;
+        return new Fatura(this.name, casa.getNif(), preco, consumo, inicio, fim);
+    }
 
     public String getName() {
         return name;

@@ -15,7 +15,6 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class EstadoPrograma implements Serializable {
@@ -69,16 +68,9 @@ public class EstadoPrograma implements Serializable {
         this.data_atual = data_atual;
     }
 
-    private void geraFaturas(int days) {
-        this.casas.values().forEach(casa -> {
-            Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getNif(), casa.getListDevices(), this.data_atual, this.data_atual.plusDays(days));
-            this.casas.get(f.getNifCliente()).adicionaFatura(f);
-        });
-    }
-
     private void geraFaturas(LocalDate fim) {
         this.casas.values().forEach(casa -> {
-            Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.getNif(), casa.getListDevices(), this.data_atual, fim);
+            Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.clone(), this.data_atual, fim);
             this.casas.get(f.getNifCliente()).adicionaFatura(f);
         });
     }

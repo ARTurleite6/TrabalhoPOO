@@ -236,6 +236,10 @@ public class Casa implements Serializable {
         this.rooms.get(room).remove(device);
     }
 
+    public double consumoDispositivos(){
+        return this.devices.values().stream().mapToDouble(SmartDevice::comsumption).sum();
+    }
+
     public double consumo(){
         return this.faturas.stream().mapToDouble(Fatura::getConsumo).sum();
     }
