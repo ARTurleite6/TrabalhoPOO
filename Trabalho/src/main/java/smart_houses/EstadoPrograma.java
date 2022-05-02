@@ -68,17 +68,12 @@ public class EstadoPrograma implements Serializable {
         this.data_atual = data_atual;
     }
 
-    private void geraFaturas(LocalDate fim) {
-        this.casas.values().forEach(casa -> {
+    private void geraFaturas(LocalDate fim) throws FornecedorErradoException{
+        for (Casa casa : this.casas.values()) {
             Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.clone(), this.data_atual, fim);
-            this.casas.get(f.getNifCliente()).adicionaFatura(f);
-        });
+            casa.adicionaFatura(f);
+        }
     }
-
-    private void guardaFatura(Fatura f) {
-        this.casas.get(f.getNifCliente()).adicionaFatura(f);
-    }
-
 
     public List<Fatura> getFaturasFornecedor(String nome) {
         return this.casas.values().stream().flatMap(c -> c.faturasFornecedor(nome).stream()).toList();
@@ -86,14 +81,18 @@ public class EstadoPrograma implements Serializable {
 
     public Optional<Casa> getCasaMaisGastadora() {
 
-        return this.casas.values().stream().max(Comparator.comparingDouble(Casa::consumo));
+        return this.casas.values().stream().max(Comparator.comparingDouble(c -> {
+            List<Fatura> faturas = c.getFaturas();
+            if(faturas.isEmpty()) return 0;
+            else return faturas.get(faturas.size() - 1).getConsumo();
+        }));
 
     }
 
     public List<Casa> maiorConsumidorPeriodo(LocalDate inicio, LocalDate fim, int N) {
         return this.casas.values()
                 .stream()
-                .sorted(Comparator.comparingDouble(c -> c.consumo(inicio, fim)))
+                .sorted(Comparator.comparingDouble(c -> c.consumoPeriodo(inicio, fim)))
                 .limit(N).toList();
     }
 
@@ -129,32 +128,29 @@ public class EstadoPrograma implements Serializable {
                 '}';
     }
 
+    public double faturacaoFornecedor(String nome){
+        return this.getFaturasFornecedor(nome).stream().mapToDouble(Fatura::getCusto).sum();
+    }
+
     public Optional<Fornecedor> getFornecedorMaiorFaturacao() {
 
         return this.fornecedores.values()
                 .stream()
-                .max(Comparator.comparingDouble(f -> this.getFaturasFornecedor(f.getName())
-                        .stream()
-                        .mapToDouble(Fatura::getCusto).sum()));
+                .max(Comparator.comparingDouble(f -> this.faturacaoFornecedor(f.getName())));
     }
 
-    public void avancaData(LocalDate date) throws DataInvalidaException{
+    public void avancaData(LocalDate date) throws DataInvalidaException, FornecedorErradoException {
         if(date.isBefore(this.data_atual)) throw new DataInvalidaException("Esta data é anterior à atual");
         this.geraFaturas(date);
         this.data_atual = date;
         this.runAllRequests();
     }
 
-    public EstadoPrograma carregaDados() {
-        try {
-            ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./src/main/resources/data.obj"));
-            EstadoPrograma programa = (EstadoPrograma) ois.readObject();
-            ois.close();
-            return programa;
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
+    public static EstadoPrograma carregaDados() throws IOException, ClassNotFoundException {
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./src/main/resources/data.obj"));
+        EstadoPrograma programa = (EstadoPrograma) ois.readObject();
+        ois.close();
+        return programa;
     }
 
     public Map<String, Casa> getCasas() {
@@ -165,8 +161,9 @@ public class EstadoPrograma implements Serializable {
         return this.fornecedores.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
     }
 
-    public void adicionaCasa(Casa c) throws ExisteCasaException {
-        if (this.casas.containsKey(c.getNif())) throw new ExisteCasaException("Esta casa tem um codigo que ja existe");
+    public void adicionaCasa(Casa c) throws ExisteCasaException, FornecedorInexistenteException{
+        if (this.casas.containsKey(c.getNif())) throw new ExisteCasaException("Esta casa tem um nif que ja existe");
+        if (!this.fornecedores.containsKey(c.getFornecedor())) throw new FornecedorInexistenteException("Nao existe este fornecedores");
         this.casas.put(c.getNif(), c.clone());
     }
 
@@ -178,8 +175,10 @@ public class EstadoPrograma implements Serializable {
         return this.casas.containsKey(code);
     }
 
-    public void addDeviceToCasa(String code, SmartDevice device) {
-        this.casas.get(code).addDevice(device);
+    public void addDeviceToCasa(String nif, SmartDevice device) throws CasaInexistenteException {
+        Casa c = this.casas.get(nif);
+        if(c == null) throw new CasaInexistenteException("Casa inexistente");
+        this.casas.get(nif).addDevice(device);
     }
 
     public EstadoPrograma clone() {
@@ -199,24 +198,24 @@ public class EstadoPrograma implements Serializable {
         }
     }
 
-    public void addDeviceToCasaOnRoom(String code, String room, int id) {
-        this.casas.get(code).addDeviceOnRoom(room, id);
+    public void addDeviceToCasaOnRoom(String nif, String room, int id) {
+        this.casas.get(nif).addDeviceOnRoom(room, id);
     }
 
-    public List<String> getRoomsHouse(String code) {
-        return this.casas.get(code).getListRooms();
+    public List<String> getRoomsHouse(String nif) {
+        return this.casas.get(nif).getListRooms();
     }
 
-    public void setAllDevicesHouseOn(String code, boolean ligar) {
-        this.casas.get(code).setAllDevicesState(ligar);
+    public void setAllDevicesHouseOn(String nif, boolean ligar) {
+        this.casas.get(nif).setAllDevicesState(ligar);
     }
 
-    public List<SmartDevice> getSetDevicesHouse(String code) {
-        return this.casas.get(code).getListDevices();
+    public List<SmartDevice> getSetDevicesHouse(String nif) {
+        return this.casas.get(nif).getListDevices();
     }
 
-    public void setDeviceHouseOn(String code, int id, boolean ligar) {
-        this.casas.get(code).setDeviceState(id, ligar);
+    public void setDeviceHouseOn(String nif, int id, boolean ligar) {
+        this.casas.get(nif).setDeviceState(id, ligar);
     }
 
     public void addFornecedor(Fornecedor f) throws ExisteFornecedorException {
@@ -225,12 +224,8 @@ public class EstadoPrograma implements Serializable {
         this.fornecedores.put(f.getName(), f.clone());
     }
 
-    public void setAllDevicesHouseOnRoom(String code, String room, boolean on) {
-        this.casas.get(code).setAllDevicesStateRoom(room, on);
-    }
-
-    public List<String> getCodigosCasa(){
-        return new ArrayList<>(this.casas.keySet());
+    public void setAllDevicesHouseOnRoom(String nif, String room, boolean on) {
+        this.casas.get(nif).setAllDevicesStateRoom(room, on);
     }
 
     public List<String> getNomeFornecedores(){

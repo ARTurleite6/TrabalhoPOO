@@ -2,12 +2,11 @@ package smart_houses.modulo_fornecedores;
 
 import smart_houses.EstadoPrograma;
 import smart_houses.Fatura;
+import smart_houses.exceptions.FornecedorErradoException;
 import smart_houses.modulo_casas.Casa;
-import smart_houses.smart_devices.SmartDevice;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.util.List;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -27,17 +26,11 @@ public class Fornecedor implements Serializable {
         this.name=fornecedor.getName();
     }
 
-    public Fatura criaFatura(String nif, List<SmartDevice> devices, LocalDate inicio, LocalDate fim){
-        long days = DAYS.between(inicio, fim);
-        double consumo = devices.stream().mapToDouble(SmartDevice::comsumption).sum() * days;
-        double preco = this.precoDiaDispositivos(devices) * days;
-        return new Fatura(this.name, nif, preco, consumo, inicio, fim);
-    }
-
-    public Fatura criaFatura(Casa casa, LocalDate inicio, LocalDate fim){
+    public Fatura criaFatura(Casa casa, LocalDate inicio, LocalDate fim) throws FornecedorErradoException {
+        if(!casa.getFornecedor().equals(this.name)) throw new FornecedorErradoException("Este nao é o fornecedor desta casa, casa = " + casa);
         long days = DAYS.between(inicio, fim);
         double consumo = casa.consumoDispositivos() * days;
-        double preco = this.precoDiaDispositivos(casa.getListDevices()) * days;
+        double preco = this.precoDia(consumo) * days;
         return new Fatura(this.name, casa.getNif(), preco, consumo, inicio, fim);
     }
 
@@ -68,15 +61,11 @@ public class Fornecedor implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = getName().hashCode();
-        return result;
+        return getName().hashCode();
     }
 
-    public double precoDiaDispositivos(List<SmartDevice> devices){
-        double per = 0.9;
-        if(devices.size() < 10) per = 0.7;
-        double finalPer = per;
-        return devices.stream().mapToDouble(d -> EstadoPrograma.custoEnergia * d.comsumption() * (1 + EstadoPrograma.imposto) * finalPer).sum();
+    public double precoDia(double consumo){
+        return EstadoPrograma.custoEnergia * consumo * (1 + EstadoPrograma.imposto) * 0.9;
     }
 
     public Fornecedor clone(){

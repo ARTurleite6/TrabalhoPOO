@@ -49,7 +49,7 @@ public abstract class SmartDevice implements Serializable {
     }
 
     public void setConsume(double consume) {
-        this.consume = this.consume;
+        this.consume = consume;
     }
 
     @Override

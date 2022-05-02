@@ -2,6 +2,7 @@ package smart_houses;
 
 import smart_houses.exceptions.ExisteCasaException;
 import smart_houses.exceptions.ExisteFornecedorException;
+import smart_houses.exceptions.FornecedorInexistenteException;
 import smart_houses.modulo_casas.Casa;
 import smart_houses.modulo_fornecedores.Fornecedor;
 import smart_houses.smart_devices.SmartBulb;
@@ -14,10 +15,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Parser {
 
-    public EstadoPrograma Parse() {
+    public EstadoPrograma parse() {
         List<String> linhas = lerFicheiro("./src/main/resources/log.txt");
         String[] linhaPartida;
         String divisao = null;
@@ -38,7 +40,7 @@ public class Parser {
                     if(casaMaisRecente != null) {
                         try {
                             estado.adicionaCasa(casaMaisRecente);
-                        } catch (ExisteCasaException e) {
+                        } catch (ExisteCasaException | FornecedorInexistenteException e) {
                             e.printStackTrace();
                         }
                     }
@@ -78,15 +80,17 @@ public class Parser {
     }
 
     private SmartSpeaker parseSmartSpeaker(String input) {
+        Random r = new Random();
         String[] campos = input.split(",");
         int volume = Integer.parseInt(campos[0]);
         String estacao = campos[1];
         String marca = campos[2];
         double consumo = Double.parseDouble(campos[3]);
-        return new SmartSpeaker(false, consumo, volume, estacao, marca);
+        return new SmartSpeaker(r.nextBoolean(), consumo, volume, estacao, marca);
     }
 
     private SmartCamera parseSmartCamera(String s) {
+        Random r = new Random();
         String[] campos = s.split(",");
         String res = campos[0];
         String[] camposRes = res.split("x");
@@ -94,10 +98,11 @@ public class Parser {
         int resY = Integer.parseInt(camposRes[1].substring(0, camposRes[1].length() - 1));
         int tam = Integer.parseInt(campos[1]);
         double consumo = Double.parseDouble(campos[2]);
-        return new SmartCamera(false, consumo, resX, resY, tam);
+        return new SmartCamera(r.nextBoolean(), consumo, resX, resY, tam);
     }
 
     public SmartBulb parseSmartBulb(String linha){
+        Random r = new Random();
         String[] campos = linha.split(",");
         String tone = campos[0];
         SmartBulb.Tones t = SmartBulb.Tones.WARM;
@@ -106,7 +111,7 @@ public class Parser {
         else t = SmartBulb.Tones.COLD;
         int dimensao = Integer.parseInt(campos[1]);
         double consumo = Double.parseDouble(campos[2]);
-        return new SmartBulb(false, consumo, t, dimensao);
+        return new SmartBulb(r.nextBoolean(), consumo, t, dimensao);
     }
 
     public List<String> lerFicheiro(String nomeFich) {

@@ -1,6 +1,7 @@
 package smart_houses.input_output;
 
 import smart_houses.EstadoPrograma;
+import smart_houses.exceptions.CasaInexistenteException;
 import smart_houses.smart_devices.SmartBulb;
 import smart_houses.smart_devices.SmartCamera;
 import smart_houses.smart_devices.SmartDevice;
@@ -72,41 +73,45 @@ public class MenuDispositivos {
         System.out.println("funcao");
         List<Supplier<SmartDevice>> funcoesCriacao = List.of(MenuDispositivos::criacaoSmartBulb, MenuDispositivos::criacaoSmartCamera, MenuDispositivos::criacaoSmartSpeaker);
         SmartDevice dispositivo = funcoesCriacao.get(tipoDispositivo - 1).get();
-        System.out.println("Insira o nif da casa a instalar");
-        String code = scan.next();
-        if (e.existeCasa(code)) {
-            e.addDeviceToCasa(code, dispositivo);
+        System.out.println("Insira o nif do proprietario da casa a instalar");
+        String nif = scan.next();
+        if (e.existeCasa(nif)) {
+            try {
+                e.addDeviceToCasa(nif, dispositivo);
+            } catch (CasaInexistenteException ex) {
+                System.out.println("Casa inexistente");
+            }
             System.out.println("Insira o nome da divisao a inserir");
             String room = scan.next();
-            e.addDeviceToCasaOnRoom(code, room, dispositivo.getId());
+            e.addDeviceToCasaOnRoom(nif, room, dispositivo.getId());
         } else System.out.println("A casa nao existe");
     }
 
         private static void ligarDesligarDispositivos(EstadoPrograma e){
             Scanner s = new Scanner(System.in);
-            System.out.println("Qual a casa que pretender ligar/desligar os dipositivos(Insira o nif da casa)");
-            String codigo = s.nextLine();
-            if(e.existeCasa(codigo)){
+            System.out.println("Qual o nif do propietario da casa que pretende ligar/desligar os dipositivos(Insira o codigo da casa)");
+            String nif = s.next();
+            if(e.existeCasa(nif)){
                 System.out.println("Pretende ligar ou desligar: Ligar(True)/Desligar(False)");
                 boolean ligar = s.nextBoolean();
                 System.out.println("Pretende Ligar/Desligar os dispositivos de uma divisao ou um dispositivo em especifio: Divisao(1)/Especifico(2)");
                 int divisao = s.nextInt();
                 if(divisao == 1){
-                    System.out.println("Lista de divisoes da casa: " + e.getRoomsHouse(codigo));
+                    System.out.println("Lista de divisoes da casa: " + e.getRoomsHouse(nif));
                     System.out.println("Diga qual divisao : ");
                     String room = s.next();
-                    if(e.getCasas().get(codigo).existRoom(room)){
-                        e.addPedido(estado -> estado.setAllDevicesHouseOnRoom(codigo, room, ligar));
+                    if(e.getCasas().get(nif).existRoom(room)){
+                        e.addPedido(estado -> estado.setAllDevicesHouseOnRoom(nif, room, ligar));
                     }
                     else{
                         System.out.println("Esta divisao não existe");
                     }
                 }
                 else{
-                    System.out.println("Lista de devices da casa: " + e.getSetDevicesHouse(codigo));
+                    System.out.println("Lista de devices da casa: " + e.getSetDevicesHouse(nif));
                     System.out.println("Diga qual o dispostivo(id) : ");
                     int id = s.nextInt();
-                    e.addPedido(estado -> estado.setDeviceHouseOn(codigo, id, ligar));
+                    e.addPedido(estado -> estado.setDeviceHouseOn(nif, id, ligar));
                 }
             }
             else System.out.println("A casa nao existe");

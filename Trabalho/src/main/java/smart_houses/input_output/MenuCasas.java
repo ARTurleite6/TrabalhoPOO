@@ -23,16 +23,15 @@ public class MenuCasas {
     }
 
     private static void mudaFornecedorCasa(EstadoPrograma e){
-        System.out.println("Codigos das casas existentes: " + e.getCodigosCasa());
-        System.out.println("Insira o nif da casa desejada");
+        System.out.println("Insira o nif do proprietário da casa desejada");
         Scanner scan = new Scanner(System.in);
-        String cod = scan.next();
+        String nif = scan.next();
         System.out.println("Lista de fornecedors: " + e.getNomeFornecedores());
         System.out.println("Insira o fornecedor desejado");
         String fornecedor = scan.next();
         e.addPedido(estado -> {
             try {
-                estado.mudaFornecedorCasa(cod, fornecedor);
+                estado.mudaFornecedorCasa(nif, fornecedor);
             } catch (CasaInexistenteException | FornecedorInexistenteException ex) {
                 System.out.println(ex.getMessage());
             }
@@ -42,35 +41,32 @@ public class MenuCasas {
     private static void criacaoCasa(EstadoPrograma e) {
         Scanner scan = new Scanner(System.in);
 
-        String nif = null;
-        do{
-            System.out.println("Insira o nif da casa");
-            nif = scan.next();
-            if(e.existeCasa(nif)){
-                System.out.println("O nif desta casa ja existe, insira outro");
-                nif = null;
-            }
-        }while(nif == null);
+        System.out.println("Insira o nif do Proprietário");
+        String nif = scan.next();
+        scan.nextLine(); // clear buffer
 
         System.out.println("Insira o nome do proprietario:");
-        String nome = scan.next();
+        String nome = scan.nextLine();
 
         System.out.println("Pretende adicionar divisoes à casa? S(1)/N(0)");
         Set<String> rooms = new TreeSet<>();
         int keep = scan.nextInt();
+        scan.nextLine();
         while (keep == 1) {
             System.out.println("Insira o nome da divisao(Nao pode ser repetido)");
-            String room = scan.next();
+            String room = scan.nextLine();
             if (rooms.contains(room)) {
                 System.out.println("Esta divisao ja existe");
             } else rooms.add(room);
             System.out.println("Pretende continuar a adicionar? S(1)/N(0)");
             keep = scan.nextInt();
+            scan.nextLine();
         }
-        String empresa = null;
+        String empresa;
         do{
             System.out.println("Insira o nome do Fornecedor da casa");
-            empresa = scan.next();
+            System.out.println("Lista de fornecedores existentes: " + e.getFornecedores().values());
+            empresa = scan.nextLine();
             if(!e.existeFornecedor(empresa)){
                 System.out.println("Este fornecedor não existe, tente novamente");
                 empresa = null;
@@ -80,7 +76,7 @@ public class MenuCasas {
         try {
             e.adicionaCasa(casa);
         }
-        catch(ExisteCasaException exc){
+        catch(ExisteCasaException | FornecedorInexistenteException exc){
             System.out.println(exc.getMessage());
         }
     }
@@ -91,6 +87,8 @@ public class MenuCasas {
             choice = MenuCasas.gestaoCasas();
             if (choice == 1) {
                 MenuCasas.criacaoCasa(e);
+            }
+            else if(choice == 2){
                 MenuCasas.mudaFornecedorCasa(e);
             }
         }

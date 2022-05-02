@@ -2,6 +2,7 @@ package smart_houses.input_output;
 
 import smart_houses.EstadoPrograma;
 import smart_houses.exceptions.DataInvalidaException;
+import smart_houses.exceptions.FornecedorErradoException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -76,7 +77,7 @@ public class MenuPrincipal {
         if(next_date != null){
             try {
                 e.avancaData(next_date);
-            } catch (DataInvalidaException ex) {
+            } catch (DataInvalidaException | FornecedorErradoException ex) {
                 System.out.println(ex.getMessage());
             }
         }
