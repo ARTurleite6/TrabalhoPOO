@@ -5,5 +5,7 @@ public class DataGen {
         Parser p = new Parser();
         EstadoPrograma e = p.parse();
         e.guardaDados();
+
+        System.out.println(e.getCasas().get("365597405"));
     }
 }

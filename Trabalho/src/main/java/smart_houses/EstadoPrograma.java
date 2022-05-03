@@ -47,7 +47,6 @@ public class EstadoPrograma implements Serializable {
         return new LinkedList<>(this.pedidos);
     }
 
-
     public void setPedidos(Queue<Consumer<EstadoPrograma>> pedidos) {
         this.pedidos = new LinkedList<>(pedidos);
     }
@@ -57,7 +56,9 @@ public class EstadoPrograma implements Serializable {
     }
 
     private void runAllRequests(){
-        this.pedidos.forEach(p -> p.accept(this));
+        while(!this.pedidos.isEmpty()){
+            this.pedidos.poll().accept(this);
+        }
     }
 
     public LocalDate getDataAtual() {
@@ -198,24 +199,32 @@ public class EstadoPrograma implements Serializable {
         }
     }
 
-    public void addDeviceToCasaOnRoom(String nif, String room, int id) {
+    public void addDeviceToCasaOnRoom(String nif, String room, int id) throws CasaInexistenteException, RoomInexistenteException {
+      Casa casa = this.casas.get(nif);
+      if(casa == null) throw new CasaInexistenteException("Esta casa não existe");
         this.casas.get(nif).addDeviceOnRoom(room, id);
     }
 
-    public List<String> getRoomsHouse(String nif) {
-        return this.casas.get(nif).getListRooms();
+    public List<String> getRoomsHouse(String nif) throws CasaInexistenteException {
+      Casa casa = this.casas.get(nif);
+      if(casa == null) throw new CasaInexistenteException("Esta casa com nif : " + nif);
+        return casa.getListRooms();
     }
 
-    public void setAllDevicesHouseOn(String nif, boolean ligar) {
-        this.casas.get(nif).setAllDevicesState(ligar);
+    public void setAllDevicesHouseOn(String nif, boolean ligar) throws CasaInexistenteException {
+      Casa casa = this.casas.get(nif);
+      if(casa == null) throw new CasaInexistenteException("Esta casa com nif : " + nif);
+      casa.setAllDevicesState(ligar);
     }
 
     public List<SmartDevice> getSetDevicesHouse(String nif) {
         return this.casas.get(nif).getListDevices();
     }
 
-    public void setDeviceHouseOn(String nif, int id, boolean ligar) {
-        this.casas.get(nif).setDeviceState(id, ligar);
+    public void setDeviceHouseOn(String nif, int id, boolean ligar) throws DeviceInexistenteException, CasaInexistenteException {
+        Casa c = this.casas.get(nif);
+        if(c == null) throw new CasaInexistenteException("Nao existe a casas com o nif " + nif);
+        c.setDeviceState(id, ligar);
     }
 
     public void addFornecedor(Fornecedor f) throws ExisteFornecedorException {
@@ -224,8 +233,10 @@ public class EstadoPrograma implements Serializable {
         this.fornecedores.put(f.getName(), f.clone());
     }
 
-    public void setAllDevicesHouseOnRoom(String nif, String room, boolean on) {
-        this.casas.get(nif).setAllDevicesStateRoom(room, on);
+    public void setAllDevicesHouseOnRoom(String nif, String room, boolean on) throws RoomInexistenteException, CasaInexistenteException {
+        Casa c = this.casas.get(nif);
+        if(c == null) throw new CasaInexistenteException("Nao existe a casa com nif" + nif);
+        c.setAllDevicesStateRoom(room, on);
     }
 
     public List<String> getNomeFornecedores(){
@@ -237,5 +248,11 @@ public class EstadoPrograma implements Serializable {
         if(c == null) throw new CasaInexistenteException("Nao existe esta casa");
         if(!this.fornecedores.containsKey(fornecedor)) throw new FornecedorInexistenteException("Nao existe este Fornecedor");
         c.setFornecedor(fornecedor);
+    }
+
+    public List<SmartDevice> getListDevicesHouse(String nif) throws CasaInexistenteException {
+        Casa c = this.casas.get(nif);
+        if(c == null) throw new CasaInexistenteException("Esta casa com nif : " + nif + " nao existe");
+        return c.getListDevices();
     }
 }

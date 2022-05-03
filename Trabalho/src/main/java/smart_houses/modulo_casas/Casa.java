@@ -1,7 +1,9 @@
 package smart_houses.modulo_casas;
 
 import smart_houses.Fatura;
+import smart_houses.exceptions.RoomInexistenteException;
 import smart_houses.smart_devices.SmartDevice;
+import smart_houses.exceptions.DeviceInexistenteException;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -173,7 +175,9 @@ public class Casa implements Serializable {
         this.rooms = rooms.stream().collect(Collectors.toMap(r -> r, r -> new TreeSet<>()));
     }
 
-    public void setAllDevicesStateRoom(String room, boolean on){
+    public void setAllDevicesStateRoom(String room, boolean on) throws RoomInexistenteException {
+      Set<Integer> devices = this.rooms.get(room);
+      if(devices == null) throw new RoomInexistenteException("Nao existe a divisao : " + room + " nesta casa");
         this.rooms.get(room).forEach(device -> this.devices.get(device).setOn(on));
     }
 
@@ -185,7 +189,9 @@ public class Casa implements Serializable {
         this.devices.values().forEach(device -> device.setOn(state));
     }
 
-    public void setDeviceState(int id, boolean state){
+    public void setDeviceState(int id, boolean state) throws DeviceInexistenteException {
+        SmartDevice device = this.devices.get(id);
+        if(device == null) throw new DeviceInexistenteException("Não existe o device de id " + id + "nesta casa");
         this.devices.get(id).setOn(state);
     }
 
@@ -219,7 +225,9 @@ public class Casa implements Serializable {
         this.rooms.remove(room);
     }
 
-    public void addDeviceOnRoom(String room, int device) {
+    public void addDeviceOnRoom(String room, int device) throws RoomInexistenteException {
+      Set<Integer> devices = this.rooms.get(room);
+      if(devices == null) throw new RoomInexistenteException("Esta room nao existe na casa");
         this.rooms.get(room).add(device);
     }
 

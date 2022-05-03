@@ -5,6 +5,7 @@ import smart_houses.Parser;
 import smart_houses.modulo_casas.Casa;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 public class Programa {
 
@@ -21,6 +22,7 @@ public class Programa {
             Parser p = new Parser();
             c = p.parse();
         }
+
         MenuPrincipal.run(c);
         c.guardaDados();
     }

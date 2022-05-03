@@ -3,6 +3,7 @@ package smart_houses;
 import smart_houses.exceptions.ExisteCasaException;
 import smart_houses.exceptions.ExisteFornecedorException;
 import smart_houses.exceptions.FornecedorInexistenteException;
+import smart_houses.exceptions.RoomInexistenteException;
 import smart_houses.modulo_casas.Casa;
 import smart_houses.modulo_fornecedores.Fornecedor;
 import smart_houses.smart_devices.SmartBulb;
@@ -56,19 +57,31 @@ public class Parser {
                     if (divisao == null) System.out.println("Linha inválida.");
                     SmartBulb sd = parseSmartBulb(linhaPartida[1]);
                     casaMaisRecente.addDevice(sd);
-                    casaMaisRecente.addDeviceOnRoom(divisao, sd.getId());
+                    try {
+                        casaMaisRecente.addDeviceOnRoom(divisao, sd.getId());
+                    } catch (RoomInexistenteException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case "SmartCamera":
                     if (divisao == null) System.out.println("Linha inválida.");
                     SmartCamera sc = parseSmartCamera(linhaPartida[1]);
                     casaMaisRecente.addDevice(sc);
-                    casaMaisRecente.addDeviceOnRoom(divisao, sc.getId());
+                    try {
+                        casaMaisRecente.addDeviceOnRoom(divisao, sc.getId());
+                    } catch (RoomInexistenteException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case "SmartSpeaker":
                     if(divisao == null) System.out.println("Linha Invalida.");
                     SmartSpeaker ss = parseSmartSpeaker(linhaPartida[1]);
                     casaMaisRecente.addDevice(ss);
-                    casaMaisRecente.addDeviceOnRoom(divisao, ss.getId());
+                    try {
+                        casaMaisRecente.addDeviceOnRoom(divisao, ss.getId());
+                    } catch (RoomInexistenteException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 default:
                     System.out.println("Linha inválida.");
