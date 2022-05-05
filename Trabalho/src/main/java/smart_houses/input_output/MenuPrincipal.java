@@ -8,7 +8,15 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
-public class MenuPrincipal {
+public class MenuPrincipal{
+
+    private int opcao;
+    private Scanner scan;
+
+    public MenuPrincipal(){
+        this.opcao = -1;
+        this.scan = new Scanner(System.in);
+    }
 
     public static LocalDate inputData(){
         Scanner scan = new Scanner(System.in);
@@ -27,24 +35,39 @@ public class MenuPrincipal {
         return data;
     }
 
-    protected static void run(EstadoPrograma c){
+    public void run(){
         int choice = 0;
+        do{
+            showMenu();
+            this.opcao = this.scan.nextInt();
+            this.scan.nextLine();
+        } while(this.opcao == -1);
 
-        while(choice != 7){
-            choice = MenuPrincipal.initialMenu();
-            switch (choice) {
-                case 1 -> MenuCasas.run(c);
-                case 2 -> MenuDispositivos.run(c);
-                case 3 -> MenuFornecedores.run(c);
-                case 4 -> System.out.println(c.toString());
-                case 5 -> MenuPrincipal.alteraDia(c);
-                case 6 -> MenuEstadoPrograma.run(c);
-            }
-        }
-
-        System.out.println("Saindo...");
     }
 
+    public int getOpcao() {
+        return opcao;
+    }
+
+    /*
+        protected void run(EstadoPrograma c){
+            int choice = 0;
+
+            while(choice != 7){
+                choice = MenuPrincipal.initialMenu();
+                switch (choice) {
+                    case 1 -> MenuCasas.run(c);
+                    case 2 -> MenuDispositivos.run(c);
+                    case 3 -> MenuFornecedores.run(c);
+                    case 4 -> System.out.println(c.toString());
+                    case 5 -> MenuPrincipal.alteraDia(c);
+                    case 6 -> MenuEstadoPrograma.run(c);
+                }
+            }
+
+            System.out.println("Saindo...");
+        }
+    */
     private static void alteraDia(EstadoPrograma e){
         System.out.println("""
                 Alterar Dia:
@@ -83,7 +106,7 @@ public class MenuPrincipal {
         }
     }
 
-    private static int initialMenu(){
+    private static void showMenu(){
         System.out.println("""
                 Menu Principal:
                 1: Gerir Casas
@@ -92,9 +115,7 @@ public class MenuPrincipal {
                 4: Estado programa
                 5: Alterar dia
                 6: Estatisticas do Programa
-                7: Sair do Programa""");
-        Scanner input = new Scanner(System.in);
-        return input.nextInt();
+                0: Sair do Programa""");
     }
 
 
