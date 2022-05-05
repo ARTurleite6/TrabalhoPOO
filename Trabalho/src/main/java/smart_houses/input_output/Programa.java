@@ -10,6 +10,7 @@ import smart_houses.smart_devices.SmartCamera;
 import smart_houses.smart_devices.SmartDevice;
 import smart_houses.smart_devices.SmartSpeaker;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -19,14 +20,12 @@ public class Programa {
     private Scanner scan;
 
     public Programa(){
-        /*
         try {
             this.log = EstadoPrograma.carregaDados();
         } catch (IOException | ClassNotFoundException e) {
             this.log = new Parser().parse();
         }
-         */
-        this.log = new EstadoPrograma();
+        //this.log = new EstadoPrograma();
         this.scan = new Scanner(System.in);
     }
 
@@ -204,7 +203,7 @@ public class Programa {
     }
 
     public void gestaoData(){
-        Menu data = new Menu(List.of("AVANCAR DATA: ", "Avancar 1 dia", "Avancar x dias", "Avancar para uma data", "0. Voltar"));
+        Menu data = new Menu(List.of("AVANCAR DATA: ", "1. Avancar 1 dia", "2. Avancar x dias", "3. Avancar para uma data", "0. Voltar"));
         LocalDate date = null;
         do{
             data.run();
@@ -234,6 +233,40 @@ public class Programa {
         }
     }
 
+    public void estatisticasPrograma(){
+        Menu menu = new Menu(List.of("Menu Estatisticas:", "1. Casa que mais consumiu", "2. Comercializador com maior Faturaração", "3. Maior Consumidor de um Periodo, 0. Voltar"));
+        do{
+            menu.run();
+            switch (menu.getOpcao()){
+                case 1 : {
+                    this.log.getCasaMaisGastadora().ifPresentOrElse(
+                            c -> System.out.println("A casa que mais gastou no ultimo periodo : " + c),
+                            () -> System.out.println("Nao existe nenhuma casa ainda")
+                    );
+                    break;
+                }
+                case 2 : {
+                    this.log.getFornecedorMaiorFaturacao().ifPresentOrElse(
+                            c -> System.out.println("O fornecedor que mais faturou foi : " + c),
+                            () -> System.out.println("Nao existe nenhuma casa ainda")
+                    );
+                    break;
+                }
+                case 3 : {
+                    System.out.println("Insira a data inicial do periodo AAAA/MM/DD");
+                    LocalDate dataInicial = LocalDate.parse(this.scan.nextLine());
+                    System.out.println("Insira a data final do periodo AAAA/MM/DD");
+                    LocalDate dataFinal = LocalDate.parse(this.scan.nextLine());
+                    System.out.println("Insira o numero de casas que quer recolher informação");
+                    int N = this.scan.nextInt();
+                    this.scan.nextLine();
+                    System.out.println("Top " + N + " de casas mais gastadoras neste periodo: " + this.log.maiorConsumidorPeriodo(dataInicial, dataFinal, N));
+                    break;
+                }
+            }
+        }while(menu.getOpcao() != 0);
+    }
+
     public void gestaoPrograma(){
         Menu menuP = new Menu(List.of("MENU ESTADO PROGRAMA", "1. Apresentar estado", "2. Apresentar Estatísticas", "3. Avancar data", "0. Voltar"));
         do{
@@ -241,22 +274,21 @@ public class Programa {
             switch (menuP.getOpcao()){
                 case 1: System.out.println(this.log);
                     break;
-                case 2:
+                case 2: estatisticasPrograma();
                     break;
                 case 3: gestaoData();
-                    break;
-                case 4:
                     break;
             }
         } while(menuP.getOpcao() != 0);
     }
 
     public void gestaoFornecedor(){
-        Menu menuF = new Menu(List.of("Menu Gestao Fornecedores", "1: Criar Fornecedores", "0. Voltar"));
+        Menu menuF = new Menu(List.of("Menu Gestao Fornecedores", "1: Criar Fornecedores","2. Faturas de um fornecedor", "0. Voltar"));
         do{
             menuF.run();
             switch (menuF.getOpcao()){
-                case 1 : System.out.println("Insira o nome do fornecedor a inserir");
+                case 1 : {
+                    System.out.println("Insira o nome do fornecedor a inserir");
                     String fornecedor = this.scan.nextLine();
                     try {
                         this.log.addFornecedor(new Fornecedor(fornecedor));
@@ -264,7 +296,13 @@ public class Programa {
                     } catch (ExisteFornecedorException e) {
                         System.out.println("Ja existe este fornecedor");
                     }
+                }
                     break;
+                case 2: {
+                    System.out.println("Insira o nome do fornecedor");
+                    String fornecedor = this.scan.nextLine();
+                    System.out.println("Lista de faturas : " + this.log.getFaturasFornecedor(fornecedor));
+                }
             }
         }while(menuF.getOpcao() != 0);
     }
@@ -288,6 +326,7 @@ public class Programa {
                     break;
             }
         } while(menuPrincipal.getOpcao() != 0);
+        this.log.guardaDados();
     }
 
     public static void main(String[] args) {
