@@ -30,7 +30,7 @@ public class Fornecedor implements Serializable {
         if(!casa.getFornecedor().equals(this.name)) throw new FornecedorErradoException("Este nao é o fornecedor desta casa, casa = " + casa);
         long days = DAYS.between(inicio, fim);
         double consumo = casa.consumoDispositivos() * days;
-        double preco = this.precoDia(consumo) * days;
+        double preco = this.precoDia(consumo, casa.getMapDevices().size()) * days;
         return new Fatura(this.name, casa.getNif(), preco, consumo, inicio, fim);
     }
 
@@ -64,7 +64,7 @@ public class Fornecedor implements Serializable {
         return getName().hashCode();
     }
 
-    public double precoDia(double consumo){
+    public double precoDia(double consumo, int n_devices){
         return EstadoPrograma.custoEnergia * consumo * (1 + EstadoPrograma.imposto) * 0.9;
     }
 
