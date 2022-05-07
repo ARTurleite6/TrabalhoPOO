@@ -52,16 +52,8 @@ public abstract class SmartDevice implements Serializable {
         this.consume = consume;
     }
 
-    @Override
-    public String toString() {
-        return "SmartDevice{" +
-                "on=" + on +
-                ", id='" + id + '\'' +
-                ", consume=" + consume +
-                '}';
-    }
+    public abstract String toString();
 
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -73,7 +65,6 @@ public abstract class SmartDevice implements Serializable {
         return getId() == that.getId();
     }
 
-    @Override
     public int hashCode() {
         int result;
         long temp;

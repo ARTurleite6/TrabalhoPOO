@@ -2,8 +2,13 @@ package smart_houses.modulo_casas;
 
 import org.junit.jupiter.api.Test;
 import smart_houses.Fatura;
+import smart_houses.exceptions.DeviceInexistenteException;
 import smart_houses.exceptions.FornecedorErradoException;
+import smart_houses.exceptions.RoomAlreadyExistsException;
+import smart_houses.exceptions.RoomInexistenteException;
 import smart_houses.modulo_fornecedores.Fornecedor;
+import smart_houses.smart_devices.SmartBulb;
+import smart_houses.smart_devices.SmartDevice;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -46,6 +51,43 @@ class CasaTest {
         List<Fatura> l = List.of(f, f2);
 
         assertEquals(l, c.faturasFornecedor("EDP"));
+
+    }
+
+    @Test
+    void mudaDispositivoRoom(){
+        Fornecedor f1 = new Fornecedor("EDP");
+        Casa c = new Casa("Artur", "256", "EDP");
+        try {
+            c.addRoom("Quarto");
+        } catch (RoomAlreadyExistsException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            c.addRoom("Quarto 1");
+        } catch (RoomAlreadyExistsException e) {
+            e.printStackTrace();
+        }
+
+        SmartDevice sm = new SmartBulb();
+        c.addDevice(sm);
+        try {
+            c.addDeviceOnRoom("Quarto", sm.getId());
+        } catch (RoomInexistenteException e) {
+            e.printStackTrace();
+        }
+
+        assertTrue(c.existDeviceOnRoom("Quarto", sm.getId()));
+
+        try {
+            c.mudaDeviceDeRoom("Quarto 1", 1);
+        } catch (DeviceInexistenteException | RoomInexistenteException e) {
+            e.printStackTrace();
+        }
+
+        assertFalse(c.existDeviceOnRoom("Quarto", 1));
+        assertTrue(c.existDeviceOnRoom("Quarto 1", 1));
 
     }
 }

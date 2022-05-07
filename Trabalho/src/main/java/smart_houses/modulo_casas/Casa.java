@@ -1,6 +1,7 @@
 package smart_houses.modulo_casas;
 
 import smart_houses.Fatura;
+import smart_houses.exceptions.RoomAlreadyExistsException;
 import smart_houses.exceptions.RoomInexistenteException;
 import smart_houses.smart_devices.SmartDevice;
 import smart_houses.exceptions.DeviceInexistenteException;
@@ -134,7 +135,7 @@ public class Casa implements Serializable {
     @Override
     public String toString() {
         return "Casa{" +
-                ", nome='" + nome + '\'' +
+                "nome='" + nome + '\'' +
                 ", nif='" + nif + '\'' +
                 ", devices=" + devices +
                 ", rooms=" + rooms +
@@ -217,7 +218,8 @@ public class Casa implements Serializable {
         return this.rooms.containsKey(room);
     }
 
-    public void addRoom(String room){
+    public void addRoom(String room) throws RoomAlreadyExistsException{
+        if(this.rooms.containsKey(room)) throw new RoomAlreadyExistsException("A divisao: " + room + " já existe nesta casa");
         this.rooms.put(room, new TreeSet<>());
     }
 
@@ -235,8 +237,12 @@ public class Casa implements Serializable {
         return this.rooms.containsKey(room) && this.devices.containsKey(device) && this.rooms.get(room).contains(device);
     }
 
-    public void removeDeviceOnRoom(String room, int device){
-        this.rooms.get(room).remove(device);
+    public void removeDeviceOnRoom(int device) throws DeviceInexistenteException {
+        if(!this.devices.containsKey(device)) throw new DeviceInexistenteException("Não existe dispositivo com código " + device);
+        String room = divisaoDeDispositivo(device);
+        if(room != null){
+            this.rooms.get(room).remove(device);
+        }
     }
 
     public double consumoDispositivos(){
@@ -253,5 +259,46 @@ public class Casa implements Serializable {
 
     public int quantos(){
         return this.devices.size();
+    }
+
+    private String divisaoDeDispositivo (int device){
+        String room = null;
+        Iterator<Map.Entry<String, Set<Integer>>> iter = this.rooms.entrySet().iterator();
+
+        while(iter.hasNext() && room == null){
+            Map.Entry<String, Set<Integer>> div = iter.next();
+            Iterator<Integer> iter1 = div.getValue().iterator();
+            while(iter1.hasNext() && room == null){
+                int dev = iter1.next();
+                if(dev == device) room = div.getKey();
+            }
+        }
+
+        return room;
+    }
+
+    public void mudaDeviceDeRoom(String room, int device) throws DeviceInexistenteException, RoomInexistenteException {
+        if(!this.devices.containsKey(device)) throw new DeviceInexistenteException("Não existe o device de código : " + device);
+        if(!this.rooms.containsKey(room)) throw new RoomInexistenteException("Não existe a divisao " + room + " nesta casa");
+
+        String divisao = this.divisaoDeDispositivo(device);
+        if(room != null){
+            this.rooms.get(divisao).remove(device);
+        }
+        this.rooms.get(room).add(device);
+    }
+
+    public void juntaRooms(String room1, String room2, String nova) throws RoomAlreadyExistsException {
+        if(this.rooms.containsKey(nova)) throw new RoomAlreadyExistsException("Esta room ja existe na casa");
+
+        Set<Integer> devices1 = this.rooms.get(room1);
+        Set<Integer> devices2 = this.rooms.get(room2);
+
+        this.rooms.put(nova, new TreeSet<>());
+        if(devices1 != null) devices1.forEach(d -> this.rooms.get(nova).add(d));
+        if(devices2 != null) devices2.forEach(d -> this.rooms.get(nova).add(d));
+        this.rooms.remove(room1);
+        this.rooms.remove(room2);
+
     }
 }

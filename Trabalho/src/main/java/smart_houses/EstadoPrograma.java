@@ -255,4 +255,60 @@ public class EstadoPrograma implements Serializable {
         if(c == null) throw new CasaInexistenteException("Esta casa com nif : " + nif + " nao existe");
         return c.getListDevices();
     }
+
+    public void removeCasa(String nif) throws CasaInexistenteException {
+        if(this.casas.remove(nif) == null) throw new CasaInexistenteException("Nao existe casa com o nif de " + nif);
+    }
+
+    public Set<String> setNIFs(){
+        return new TreeSet<>(this.casas.keySet());
+    }
+
+    public List<Casa> listaCasas(){
+        return this.casas.values().stream().map(Casa::clone).collect(Collectors.toList());
+    }
+
+    public Casa getCasa(String nif) throws CasaInexistenteException{
+        Casa c = this.casas.get(nif);
+        if(c == null) throw new CasaInexistenteException("Nao existe casa com NIF " + nif);
+        return c.clone();
+    }
+
+    public List<Fatura> faturasCasa(String nif) throws CasaInexistenteException{
+        return this.getCasa(nif).getFaturas();
+    }
+
+    public Set<Fornecedor> getSetFornecedores(){
+        return this.fornecedores.values().stream().map(Fornecedor::clone).collect(Collectors.toSet());
+    }
+
+    public void addDivisaoToCasa(String nif, String room) throws RoomAlreadyExistsException, CasaInexistenteException {
+        Casa c = this.casas.get(nif);
+        if(c == null) throw new CasaInexistenteException("nao existe a casa com o nif: " + nif);
+        c.addRoom(room);
+    }
+
+    public void mudaDeviceRoom(String nif, int device, String room) throws CasaInexistenteException, DeviceInexistenteException, RoomInexistenteException {
+        Casa c = this.casas.get(nif);
+        if(c == null) throw new CasaInexistenteException("Não existe casa com nif de " + nif);
+        c.mudaDeviceDeRoom(room, device);
+    }
+
+    public void removeDeviceRoom(String nif, int device) throws CasaInexistenteException, DeviceInexistenteException{
+        Casa c = this.casas.get(nif);
+        if(c == null) throw new CasaInexistenteException("Não existe casa com nif " + nif);
+        c.removeDeviceOnRoom(device);
+    }
+
+    public void removeRoomCasa(String nif, String divisao) throws CasaInexistenteException {
+        Casa c = this.casas.get(nif);
+        if(c == null) throw new CasaInexistenteException("Não existe casa com o nif de " + nif);
+        c.removeRoom(divisao);
+    }
+
+    public void juntaRoomsHouse(String nif, String room1, String room2, String nova) throws CasaInexistenteException, RoomAlreadyExistsException {
+        Casa c = this.casas.get(nif);
+        if(c == null) throw new CasaInexistenteException("Nao existe device com o nif " + nif);
+        c.juntaRooms(room1, room2, nova);
+    }
 }

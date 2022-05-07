@@ -136,8 +136,58 @@ public class Programa {
                         }
                     }
                     break;
-                case 2 :
+                case 2 : {
+                    System.out.println("Insira o nif da casa onde deseja ligar/desligar dispositivos");
+                    String nif = scan.nextLine();
+                    try {
+                        System.out.println("Casa selecionada: " + this.log.getCasa(nif));
+                        System.out.println("Que dispositivos pretende ligar/desligar(Casa, Individual, Divisao");
+                        String decisao = scan.nextLine();
+                        System.out.println("Pretende desligar ou ligar? Ligar(True), Desligar(False)");
+                        boolean on_off = scan.nextBoolean();
+                        if(decisao.equals("Casa")){
+                            this.log.addPedido(estado -> {
+                                try {
+                                    estado.setAllDevicesHouseOn(nif, on_off);
+                                } catch (CasaInexistenteException e) {
+                                    System.out.println("Casa nao existe");
+                                }
+                            });
+                        }
+                        else if(decisao.equals("Individual")){
+                            System.out.println("Insira o id do dispositivo");
+                            System.out.println("Ids disponives : " + this.log.getCasa(nif).getMapDevices().keySet());
+                            int id = scan.nextInt();
+                            scan.nextLine();
+                            this.log.addPedido(estado -> {
+                                try {
+                                    estado.setDeviceHouseOn(nif, id, on_off);
+                                } catch (DeviceInexistenteException e) {
+                                    System.out.println("Nao existe o dispositivo na casa");
+                                } catch (CasaInexistenteException e) {
+                                    System.out.println("Nao existe a casa inserida");
+                                }
+                            });
+                        }
+                        else if(decisao.equals("Divisao")){
+                            System.out.println("Insira a divisao que pretende selecionar: ");
+                            System.out.println("Lista de divisões da casa: " + this.log.getRoomsHouse(nif));
+                            String room = scan.nextLine();
+                            this.log.addPedido(estado -> {
+                                try {
+                                    estado.setAllDevicesHouseOnRoom(nif, room, on_off);
+                                } catch (RoomInexistenteException e) {
+                                    System.out.println("Nao existe a divisao na casa");
+                                } catch (CasaInexistenteException e) {
+                                    System.out.println("Nao existe a casa inserida");
+                                }
+                            });
+                        }
+                    } catch (CasaInexistenteException e) {
+                        System.out.println("Nao existe uma casa com o nif " + nif);
+                    }
                     break;
+                }
             }
         } while(menuDispositivos.getOpcao() != 0);
     }
@@ -167,25 +217,132 @@ public class Programa {
         else return new Casa(nome, nif, empresa);
     }
 
+    public void edicaoCasas(){
+        Menu menu = new Menu(List.of("MENU EDICÃO CASA: ", "1. Adicionar divisões", "2. Adicionar/Mudar device de divisão", "3. Remover divisão", "4. Juntar duas ou mais divisões", "0. Sair"));
+        do{
+            menu.run();
+            switch (menu.getOpcao()){
+                case 1 : {
+                    System.out.println("Insira o NIF associado à casa que pretende adicionar divisões");
+                    System.out.println("NIFs inscritos no programa: " + this.log.setNIFs());
+                    String nif = scan.nextLine();
+                    try {
+                        System.out.println("Casa que vai editar: " + this.log.getCasa(nif));
+                        System.out.println("Insira o nome das divisões que pretende adicionar(Digite sair para parar de adicionar: ");
+                        String divisao;
+                        do {
+                            divisao = this.scan.nextLine();
+                            try {
+                                this.log.addDivisaoToCasa(nif, divisao);
+                                System.out.println("Divisão adicionada com sucesso");
+                            } catch (RoomAlreadyExistsException e) {
+                                System.out.println("Já existe a divisão " + divisao + " nesta casa");
+                            }
+                        }
+                        while (!divisao.equals("sair"));
+                    } catch (CasaInexistenteException e) {
+                        System.out.println("Não existe uma casa com o nif inserido");
+                    }
+                    break;
+                }
+                case 2 : {
+                    System.out.println("Insira o NIF associado à casa que pretende remover");
+                    System.out.println("NIFs inscritos no programa: " + this.log.setNIFs());
+                    String nif = this.scan.nextLine();
+                    try {
+                        System.out.println("Casa a editar: " + this.log.getCasa(nif));
+                        System.out.println("Insira o codigo do dispositivo que pretende mudar de divisão");
+                        int device = this.scan.nextInt();
+                        scan.nextLine(); // clear buffer
+                        System.out.println("Insira a divisão onde pretende colocar(Digita \"Nenhuma\" se nao quiser por em nenhum sítio)");
+                        String divisao = scan.nextLine();
+                        if(!divisao.equals("Nenhuma")){
+                            try {
+                                this.log.mudaDeviceRoom(nif, device, divisao);
+                                System.out.println("Mudança bem sucedida");
+                            } catch (DeviceInexistenteException e) {
+                                System.out.println("Não existe o dispositivo com o código inserido: " + device + " na casa de nif: " + nif);
+                            } catch (RoomInexistenteException e) {
+                                System.out.println("Não existe a divisão " + divisao + " na casa de nif " + nif);
+                            }
+                        }
+                        else {
+                            try {
+                                this.log.removeDeviceRoom(nif, device);
+                                System.out.println("O device foi removido da divisão com sucesso");
+                            } catch (DeviceInexistenteException e) {
+                                System.out.println("Não existe o dispositivo de código " + device);
+                            }
+                        }
+                    } catch (CasaInexistenteException e) {
+                        System.out.println("Não existe a casa com o nif: " + nif);
+                    }
+                    break;
+                }
+                case 3 :{
+                    System.out.println("Insira o NIF associado à casa que pretende remover");
+                    System.out.println("NIFs inscritos no programa: " + this.log.setNIFs());
+                    String nif = this.scan.nextLine();
+                    try{
+                        System.out.println("Casa a editar : " + this.log.getCasa(nif));
+                        System.out.println("Insira a divisão que pretende remover");
+                        String divisao = scan.nextLine();
+                        this.log.removeRoomCasa(nif, divisao);
+                        System.out.println("Divisão removida com sucesso");
+                    }
+                    catch (CasaInexistenteException exc){
+                        System.out.println("Não existe casa com o nif " + nif);
+                    }
+                    break;
+                }
+                case 4 :{
+                    System.out.println("Insira o NIF associado à casa que pretende remover");
+                    System.out.println("NIFs inscritos no programa: " + this.log.setNIFs());
+                    String nif = this.scan.nextLine();
+                    try{
+                        System.out.println("Casa a editar : " + this.log.getCasa(nif));
+                        System.out.println("Insira o nome de uma das divisões a juntar");
+                        String divisao = scan.nextLine();
+                        System.out.println("Insira o nome da outra divisão a juntar");
+                        String divisao2 = scan.nextLine();
+                        System.out.println("Insira o nome da nova divisão");
+                        String nova = scan.nextLine();
+                        this.log.juntaRoomsHouse(nif, divisao, divisao2, nova);
+                    }
+                    catch (CasaInexistenteException exc){
+                        System.out.println("Não existe casa com o nif " + nif);
+                    } catch (RoomAlreadyExistsException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                }
+            }
+        } while(menu.getOpcao() != 0);
+    }
+
     public void gestaoCasas(){
-        Menu menu = new Menu(List.of("Menu Gestao Casas:", "1. Criar Casa", "2. Mudar Fornecedor Casa", "0. Voltar"));
+        Menu menu = new Menu(List.of("MENU GESTÃO CASAS:", "1. Criar Casa", "2. Mudar Fornecedor Casa", "3. Remover Casa", "4. Listar Casas", "5. Listar NIFs inscritos no programa", "6. Visualizar o conteúdo de uma casa", "7. Ver Faturas de uma Casa", "8. Editar Casa", "0. Voltar"));
 
         do{
             menu.run();
             switch (menu.getOpcao()){
-                case 1 : try {
-                    this.log.adicionaCasa(criacaoCasa());
-                    System.out.println("Casa criada com sucesso");
+                case 1 : {
+                    try {
+                        this.log.adicionaCasa(criacaoCasa());
+                        System.out.println("Casa criada com sucesso");
                     } catch (ExisteCasaException e) {
                         System.out.println("Ja existe uma casa com o proprietário inserido");
                     } catch (FornecedorInexistenteException e) {
                         System.out.println("Nao existe o fornecedor inserido");
                     }
                     break;
-                case 2 :
+                }
+                case 2 : {
                     System.out.println("Diga o fornecedor para o qual quer mudar");
+                    System.out.println("Fornecedores disponiveis: " + this.log.getFornecedores().keySet());
                     String fornecedor = this.scan.nextLine();
-                    System.out.println("Diga insira o nif do prorietário da casa onde quer mudar de fornecedor");
+                    System.out.println("Insira o nif do prorietário da casa onde quer mudar de fornecedor");
+                    System.out.println("Lista de NIFs no programa: " + this.log.setNIFs());
                     String casa = this.scan.nextLine();
                     this.log.addPedido(l -> {
                         try {
@@ -198,7 +355,56 @@ public class Programa {
                     });
                     System.out.println("Pedido de mudanca de fornecedor emitido");
                     break;
-            }
+                }
+                case 3: {
+                    System.out.println("Insira o nif associado à casa que pretende remover");
+                    System.out.println("NIFs inscritos no programa: " + this.log.setNIFs());
+                    String nif = scan.nextLine();
+                    try {
+                        this.log.removeCasa(nif);
+                        System.out.println("Casa removida com sucesso");
+                    } catch (CasaInexistenteException exc) {
+                        System.out.println("Não foi possivel realizar a remoção da casa, pois não existe nenhuma casa com o nif inserido");
+                    }
+                    break;
+                }
+                case 4: {
+                    System.out.println("Lista de casas presentes no programa: " + this.log.listaCasas());
+                    break;
+                }
+                case 5: {
+                    System.out.println("Lista de NIFs inscritos no programa: " + this.log.setNIFs());
+                    break;
+                }
+                case 6 : {
+                    System.out.println("Insira o NIF do proprietário da casa que deseja visualizar: ");
+                    System.out.println("NIFs disponíveis no programa: " + this.log.setNIFs());
+                    String nif = scan.nextLine();
+                    try{
+                        System.out.println("Casa: " + this.log.getCasa(nif));
+                    }
+                    catch(CasaInexistenteException exc){
+                        System.out.println("Não existe casa com um NIF inserido");
+                    }
+                    break;
+                }
+                case 7 : {
+                    System.out.println("Insira o NIF do proprietário da casa: ");
+                    System.out.println("NIFs disponíveis no programa: " + this.log.setNIFs());
+                    String nif = scan.nextLine();
+                    try {
+                        System.out.println("Faturas da casa: " + this.log.faturasCasa(nif));
+                    } catch (CasaInexistenteException exc) {
+                        System.out.println("Casa inexistente com o nif de: " + nif);
+                    }
+                }
+                case 8:{
+                    edicaoCasas();
+                    break;
+                }
+
+
+                }
         } while(menu.getOpcao() != 0);
     }
 
@@ -220,17 +426,17 @@ public class Programa {
                     date = LocalDate.parse(d);
                     break;
             }
-        } while(data.getOpcao() != 0);
-        if(date != null) {
-            try {
-                this.log.avancaData(date);
-                System.out.println("Avançou no tempo com sucesso");
-            } catch (DataInvalidaException e) {
-                System.out.println("Data inserida era inválida");
-            } catch (FornecedorErradoException e) {
-                System.out.println("Ocorreu algum erro no calculo das faturas");
+            if(date != null) {
+                try {
+                    this.log.avancaData(date);
+                    System.out.println("Avançou no tempo com sucesso");
+                } catch (DataInvalidaException e) {
+                    System.out.println("Data inserida era inválida");
+                } catch (FornecedorErradoException e) {
+                    System.out.println("Ocorreu algum erro no calculo das faturas");
+                }
             }
-        }
+        } while(data.getOpcao() != 0);
     }
 
     public void estatisticasPrograma(){
@@ -283,7 +489,7 @@ public class Programa {
     }
 
     public void gestaoFornecedor(){
-        Menu menuF = new Menu(List.of("Menu Gestao Fornecedores", "1: Criar Fornecedores","2. Faturas de um fornecedor", "0. Voltar"));
+        Menu menuF = new Menu(List.of("Menu Gestao Fornecedores", "1: Criar Fornecedores","2. Faturas de um fornecedor", "3. Lista de Fornecedores", "0. Voltar"));
         do{
             menuF.run();
             switch (menuF.getOpcao()){
@@ -302,6 +508,9 @@ public class Programa {
                     System.out.println("Insira o nome do fornecedor");
                     String fornecedor = this.scan.nextLine();
                     System.out.println("Lista de faturas : " + this.log.getFaturasFornecedor(fornecedor));
+                }
+                case 3 : {
+                    System.out.println("Lista de fornecedores: " + this.log.getSetFornecedores());
                 }
             }
         }while(menuF.getOpcao() != 0);

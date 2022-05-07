@@ -1,9 +1,6 @@
 package smart_houses;
 
-import smart_houses.exceptions.ExisteCasaException;
-import smart_houses.exceptions.ExisteFornecedorException;
-import smart_houses.exceptions.FornecedorInexistenteException;
-import smart_houses.exceptions.RoomInexistenteException;
+import smart_houses.exceptions.*;
 import smart_houses.modulo_casas.Casa;
 import smart_houses.modulo_fornecedores.Fornecedor;
 import smart_houses.smart_devices.SmartBulb;
@@ -49,9 +46,19 @@ public class Parser {
                     break;
                 case "Divisao":
                     if (casaMaisRecente == null) System.out.println("Linha inválida.");
-                    if(divisao != null) casaMaisRecente.addRoom(divisao);
+                    if(divisao != null) {
+                        try {
+                            casaMaisRecente.addRoom(divisao);
+                        } catch (RoomAlreadyExistsException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     divisao = linhaPartida[1];
-                    casaMaisRecente.addRoom(divisao);
+                    try {
+                        casaMaisRecente.addRoom(divisao);
+                    } catch (RoomAlreadyExistsException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 case "SmartBulb":
                     if (divisao == null) System.out.println("Linha inválida.");
