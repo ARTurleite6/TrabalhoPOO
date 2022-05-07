@@ -13,16 +13,25 @@ import static java.time.temporal.ChronoUnit.DAYS;
 public class Fornecedor implements Serializable {
 
     private String name;
+    private double desconto;
 
     public Fornecedor() {
+        this.desconto = 0.1;
         this.name = "n/a";
     }
 
     public Fornecedor(String name){
         this.name = name;
+        this.desconto = 0.1;
+    }
+
+    public Fornecedor(String name, double desconto){
+        this.name = name;
+        this.desconto = desconto;
     }
 
     public Fornecedor(Fornecedor fornecedor){
+        this.desconto = fornecedor.getDesconto();
         this.name=fornecedor.getName();
     }
 
@@ -34,6 +43,14 @@ public class Fornecedor implements Serializable {
         return new Fatura(this.name, casa.getNif(), preco, consumo, inicio, fim);
     }
 
+    public double getDesconto() {
+        return desconto;
+    }
+
+    public void setDesconto(double desconto) {
+        this.desconto = desconto;
+    }
+
     public String getName() {
         return name;
     }
@@ -42,10 +59,10 @@ public class Fornecedor implements Serializable {
         this.name = name;
     }
 
-    @Override
     public String toString() {
         return "Fornecedor{" +
                 "name='" + name + '\'' +
+                "desconto=" + desconto + '\'' +
                 '}';
     }
 
@@ -56,7 +73,7 @@ public class Fornecedor implements Serializable {
 
         Fornecedor that = (Fornecedor) o;
 
-        return this.getName().equals(that.getName());
+        return this.getName().equals(that.getName()) && this.desconto == that.getDesconto();
     }
 
     @Override
@@ -65,7 +82,9 @@ public class Fornecedor implements Serializable {
     }
 
     public double precoDia(double consumo, int n_devices){
-        return EstadoPrograma.custoEnergia * consumo * (1 + EstadoPrograma.imposto) * 0.9;
+        double precoSDesc = EstadoPrograma.custoEnergia * consumo * (1 + EstadoPrograma.imposto) * 0.9;
+        double desc = precoSDesc * this.desconto;
+        return precoSDesc - desc;
     }
 
     public Fornecedor clone(){

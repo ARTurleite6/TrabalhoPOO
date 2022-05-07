@@ -311,4 +311,14 @@ public class EstadoPrograma implements Serializable {
         if(c == null) throw new CasaInexistenteException("Nao existe device com o nif " + nif);
         c.juntaRooms(room1, room2, nova);
     }
+
+    public Fornecedor getFornecedor(String nome) throws FornecedorInexistenteException{
+        Fornecedor f = this.fornecedores.get(nome);
+        if(f == null) throw new FornecedorInexistenteException("Não existe nenhum fornecedor com o nome: " + nome);
+        return f;
+    }
+
+    public void mudaDescontoFornecedor(String nome, double desconto) throws FornecedorInexistenteException{
+        this.fornecedores.get(nome).setDesconto(desconto);
+    }
 }

@@ -25,7 +25,6 @@ public class Programa {
         } catch (IOException | ClassNotFoundException e) {
             this.log = new Parser().parse();
         }
-        //this.log = new EstadoPrograma();
         this.scan = new Scanner(System.in);
     }
 
@@ -145,6 +144,7 @@ public class Programa {
                         String decisao = scan.nextLine();
                         System.out.println("Pretende desligar ou ligar? Ligar(True), Desligar(False)");
                         boolean on_off = scan.nextBoolean();
+                        scan.nextLine();
                         if(decisao.equals("Casa")){
                             this.log.addPedido(estado -> {
                                 try {
@@ -489,15 +489,18 @@ public class Programa {
     }
 
     public void gestaoFornecedor(){
-        Menu menuF = new Menu(List.of("Menu Gestao Fornecedores", "1: Criar Fornecedores","2. Faturas de um fornecedor", "3. Lista de Fornecedores", "0. Voltar"));
+        Menu menuF = new Menu(List.of("MENU GESTAO FORNECEDORES", "1: Criar Fornecedores","2. Faturas de um fornecedor", "3. Lista de Fornecedores", "4. Visualizar dados Fornecedor", "5. Mudar valor desconto Fornecedor", "0. Voltar"));
         do{
             menuF.run();
             switch (menuF.getOpcao()){
                 case 1 : {
                     System.out.println("Insira o nome do fornecedor a inserir");
                     String fornecedor = this.scan.nextLine();
+                    System.out.println("Insira o desconto que o fornecedor vai aplicar");
+                    double desconto = this.scan.nextDouble();
+                    this.scan.nextLine();
                     try {
-                        this.log.addFornecedor(new Fornecedor(fornecedor));
+                        this.log.addFornecedor(new Fornecedor(fornecedor, desconto));
                         System.out.println("Fornecedor criado com sucesso");
                     } catch (ExisteFornecedorException e) {
                         System.out.println("Ja existe este fornecedor");
@@ -508,9 +511,45 @@ public class Programa {
                     System.out.println("Insira o nome do fornecedor");
                     String fornecedor = this.scan.nextLine();
                     System.out.println("Lista de faturas : " + this.log.getFaturasFornecedor(fornecedor));
+                    break;
                 }
                 case 3 : {
                     System.out.println("Lista de fornecedores: " + this.log.getSetFornecedores());
+                    break;
+                }
+                case 4 : {
+                    System.out.println("Insira o nome do fornecedor desejado");
+                    System.out.println("Fornecedores existentes: " + this.log.getFornecedores().keySet());
+                    String nome = this.scan.nextLine();
+                    try{
+                        System.out.println(this.log.getFornecedor(nome));
+                    }
+                    catch (FornecedorInexistenteException exc){
+                        System.out.println("Nao existe o fornecedor com o nome inserido: " + nome);
+                    }
+                    break;
+                }
+                case 5 : {
+                    System.out.println("Insira o nome do fornecedor onde quer mudar o valor de desconto");
+                    System.out.println("Fornecedores disponiveis: " + this.log.getFornecedores().keySet());
+                    String nome = this.scan.nextLine();
+                    try {
+                        System.out.println("Fornecedor selecionado : " + this.log.getFornecedor(nome));
+                        System.out.println("Insira o valor novo do desconto(Insira a percentagem da forma decimal: ");
+                        double desconto = this.scan.nextDouble();
+                        this.scan.nextLine();
+                        this.log.addPedido(estado -> {
+                            try {
+                                estado.mudaDescontoFornecedor(nome, desconto);
+                            } catch (FornecedorInexistenteException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                        System.out.println("Pedido submetido com sucesso");
+                    } catch (FornecedorInexistenteException e) {
+                        System.out.println("Nao existe o fornecedor de nome " + nome);
+                    }
+                    break;
                 }
             }
         }while(menuF.getOpcao() != 0);
