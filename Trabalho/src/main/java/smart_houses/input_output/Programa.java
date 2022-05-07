@@ -440,7 +440,7 @@ public class Programa {
     }
 
     public void estatisticasPrograma(){
-        Menu menu = new Menu(List.of("Menu Estatisticas:", "1. Casa que mais consumiu", "2. Comercializador com maior Faturaração", "3. Maior Consumidor de um Periodo, 0. Voltar"));
+        Menu menu = new Menu(List.of("Menu Estatisticas:", "1. Casa que mais consumiu", "2. Comercializador com maior Faturaração", "3. Maior Consumidor de um Periodo", "4. Top de tipo de Dispositivo mais utilizado", "0. Voltar"));
         do{
             menu.run();
             switch (menu.getOpcao()){
@@ -467,6 +467,17 @@ public class Programa {
                     int N = this.scan.nextInt();
                     this.scan.nextLine();
                     System.out.println("Top " + N + " de casas mais gastadoras neste periodo: " + this.log.maiorConsumidorPeriodo(dataInicial, dataFinal, N));
+                    break;
+                }
+                case 4 :{
+                    System.out.println("Top tipo dispositivos:");
+                    Iterator<String> top = this.log.podiumDeviceMaisUsado().iterator();
+                    int i = 1;
+                    while(top.hasNext()){
+                       String d = top.next();
+                       System.out.println(i + "º- " + d);
+                       ++i;
+                    }
                     break;
                 }
             }

@@ -30,7 +30,7 @@ public class EstadoPrograma implements Serializable {
 
 
     public EstadoPrograma() {
-        this.casas = new HashMap<>();
+        this.casas = new TreeMap<>();
         this.fornecedores = new HashMap<>();
         this.data_atual = LocalDate.now();
         this.pedidos = new LinkedList<>();
@@ -320,5 +320,16 @@ public class EstadoPrograma implements Serializable {
 
     public void mudaDescontoFornecedor(String nome, double desconto) throws FornecedorInexistenteException{
         this.fornecedores.get(nome).setDesconto(desconto);
+    }
+
+    public List<String> podiumDeviceMaisUsado(){
+        return this.casas.values()
+                .stream()
+                .flatMap(c -> c.getListDevices()
+                        .stream()
+                        .map(d -> d.getClass().getSimpleName()))
+                .collect(Collectors.groupingBy(d  -> d, Collectors.counting()))
+                .entrySet().stream()
+                .sorted((e1, e2) -> (int) (e2.getValue() - e1.getValue())).map(Map.Entry::getKey).limit(3).collect(Collectors.toList());
     }
 }

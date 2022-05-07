@@ -7,6 +7,9 @@ import smart_houses.exceptions.*;
 import smart_houses.modulo_casas.Casa;
 import smart_houses.modulo_fornecedores.Fornecedor;
 import smart_houses.smart_devices.SmartBulb;
+import smart_houses.smart_devices.SmartCamera;
+import smart_houses.smart_devices.SmartDevice;
+import smart_houses.smart_devices.SmartSpeaker;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -99,5 +102,46 @@ class EstadoProgramaTest {
 
     @org.junit.jupiter.api.Test
     void getFornecedorMaiorFaturacao() {
+    }
+
+    @org.junit.jupiter.api.Test
+    void podiumDispositivos(){
+        EstadoPrograma e = new EstadoPrograma();
+        Fornecedor f = new Fornecedor("EDP");
+        Casa c = new Casa("Artur", "256", "EDP");
+        Casa c2 = new Casa("Artur", "200", "EDP");
+        SmartDevice sm1 = new SmartBulb();
+        SmartDevice sm2 = new SmartBulb();
+        SmartDevice sm3 = new SmartBulb();
+        SmartDevice sm4 = new SmartSpeaker();
+        SmartDevice sm5 = new SmartSpeaker();
+        SmartDevice sm6 = new SmartCamera();
+        c.addDevice(sm1);
+        c.addDevice(sm2);
+        c2.addDevice(sm3);
+        c2.addDevice(sm4);
+        c.addDevice(sm5);
+        c.addDevice(sm6);
+        try {
+            e.addFornecedor(f);
+        } catch (ExisteFornecedorException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            e.adicionaCasa(c);
+        } catch (ExisteCasaException ex) {
+            ex.printStackTrace();
+        } catch (FornecedorInexistenteException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            e.adicionaCasa(c2);
+        } catch (ExisteCasaException ex) {
+            ex.printStackTrace();
+        } catch (FornecedorInexistenteException ex) {
+            ex.printStackTrace();
+        }
+        List<String> podium = List.of("SmartBulb", "SmartSpeaker", "SmartCamera");
+        assertEquals(podium, e.podiumDeviceMaisUsado());
     }
 }
