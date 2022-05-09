@@ -1,6 +1,8 @@
 package smart_houses.smart_devices;
 
-public class SmartCamera extends SmartDevice{
+import java.io.Serializable;
+
+public class SmartCamera extends SmartDevice implements Serializable {
     private int resolutionX;
     private int resolutionY;
     private int fileDim;
@@ -86,7 +88,6 @@ public class SmartCamera extends SmartDevice{
     }
 
     public double comsumption(){
-        return 0;
-        //return this.getConsume()  + (this.resolutionX * this.resolutionY * this.fileDim);
+        return this.getConsume()  + (this.resolutionX * 0.05 * this.resolutionY * 0.05 * this.fileDim * 0.05);
     }
 }

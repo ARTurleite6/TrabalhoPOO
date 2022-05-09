@@ -1,6 +1,8 @@
 package smart_houses.smart_devices;
 
-public class SmartSpeaker extends SmartDevice{
+import java.io.Serializable;
+
+public class SmartSpeaker extends SmartDevice implements Serializable {
 
     private static final int MAX = 100;
 
@@ -98,6 +100,6 @@ public class SmartSpeaker extends SmartDevice{
     }
 
     public double comsumption(){
-        return (this.isOn() ? 1 : 0) * (this.getConsume() + this.volume);
+        return (this.isOn() ? 1 : 0) * (this.getConsume() + this.volume * 0.05);
     }
 }

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public abstract class SmartDevice implements Serializable {
 
-    private static int next_id = 1;
+    public static int next_id = 1;
 
     private boolean on;
     private int id;

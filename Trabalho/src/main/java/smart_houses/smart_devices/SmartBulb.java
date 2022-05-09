@@ -1,6 +1,8 @@
 package smart_houses.smart_devices;
 
-public class SmartBulb extends SmartDevice{
+import java.io.Serializable;
+
+public class SmartBulb extends SmartDevice implements Serializable {
     public static enum Tones{
         NEUTRAL(2), WARM(1), COLD(3);
 

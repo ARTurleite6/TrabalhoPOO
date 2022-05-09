@@ -14,14 +14,13 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class EstadoPrograma implements Serializable {
     private final Map<String, Casa> casas;
     private final Map<String, Fornecedor> fornecedores;
 
-    private Queue<Consumer<EstadoPrograma>> pedidos;
+    private Queue<SerializableConsumer> pedidos;
 
     private LocalDate data_atual;
 
@@ -43,15 +42,15 @@ public class EstadoPrograma implements Serializable {
         this.pedidos = c.getPedidos();
     }
 
-    public Queue<Consumer<EstadoPrograma>> getPedidos() {
+    public Queue<SerializableConsumer> getPedidos() {
         return new LinkedList<>(this.pedidos);
     }
 
-    public void setPedidos(Queue<Consumer<EstadoPrograma>> pedidos) {
+    public void setPedidos(Queue<SerializableConsumer> pedidos) {
         this.pedidos = new LinkedList<>(pedidos);
     }
 
-    public void addPedido(Consumer<EstadoPrograma> pedido){
+    public void addPedido(SerializableConsumer pedido){
         this.pedidos.add(pedido);
     }
 
@@ -149,7 +148,11 @@ public class EstadoPrograma implements Serializable {
 
     public static EstadoPrograma carregaDados() throws IOException, ClassNotFoundException {
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream("./src/main/resources/data.obj"));
+        int next_idDevice = ois.readInt();
+        int next_idFatura = ois.readInt();
         EstadoPrograma programa = (EstadoPrograma) ois.readObject();
+        Fatura.next_codigoFatura = next_idFatura;
+        SmartDevice.next_id = next_idDevice;
         ois.close();
         return programa;
     }
@@ -190,6 +193,8 @@ public class EstadoPrograma implements Serializable {
         try {
             FileOutputStream file = new FileOutputStream("./src/main/resources/data.obj");
             ObjectOutputStream oos = new ObjectOutputStream(file);
+            oos.writeInt(SmartDevice.next_id);
+            oos.writeInt(Fatura.next_codigoFatura);
             oos.writeObject(this);
             oos.close();
         } catch (FileNotFoundException e) {

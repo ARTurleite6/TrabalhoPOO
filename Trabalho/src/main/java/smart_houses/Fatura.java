@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 public class Fatura implements Comparable<Fatura>, Serializable {
 
-    private static int next_codigoFatura = 1;
+    public static int next_codigoFatura = 1;
 
     private int codigoFatura;
     private String fornecedor;
