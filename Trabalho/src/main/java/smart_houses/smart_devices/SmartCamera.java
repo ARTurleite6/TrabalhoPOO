@@ -55,7 +55,9 @@ public class SmartCamera extends SmartDevice implements Serializable {
     @Override
     public String toString() {
         return "SmartCamera{" +
-                "resolutionX=" + resolutionX +
+                "id=" + this.getId() +
+                ", on=" + this.isOn() +
+                ", resolutionX=" + resolutionX +
                 ", resolutionY=" + resolutionY +
                 ", fileDim=" + fileDim +
                 '}';
@@ -88,6 +90,6 @@ public class SmartCamera extends SmartDevice implements Serializable {
     }
 
     public double comsumption(){
-        return this.getConsume()  + (this.resolutionX * 0.05 * this.resolutionY * 0.05 * this.fileDim * 0.05);
+        return this.getConsume()  + (this.resolutionX * 0.001 * this.resolutionY * 0.001 * this.fileDim * 0.0001);
     }
 }

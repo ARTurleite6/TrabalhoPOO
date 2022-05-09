@@ -74,6 +74,17 @@ class EstadoProgramaTest {
     }
 
     @Test
+    void geraFaturas() throws ExisteFornecedorException, FornecedorInexistenteException, ExisteCasaException, DataInvalidaException, FornecedorErradoException, CasaInexistenteException {
+        EstadoPrograma e = new EstadoPrograma();
+        Fornecedor f = new Fornecedor("EDP");
+        Casa c = new Casa("Artur", "250", "EDP");
+        e.addFornecedor(f);
+        e.adicionaCasa(c);
+        e.avancaData(LocalDate.now().plusDays(1));
+        assertEquals(1, e.getCasa("250").getFaturas().size());
+    }
+
+    @Test
     void getCasaMaisGastadora() throws ExisteFornecedorException, FornecedorInexistenteException, ExisteCasaException, DataInvalidaException, FornecedorErradoException {
         EstadoPrograma e = new EstadoPrograma();
         Fornecedor f = new Fornecedor("EDP");

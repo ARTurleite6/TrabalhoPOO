@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class SmartBulb extends SmartDevice implements Serializable {
     public static enum Tones{
-        NEUTRAL(2), WARM(1), COLD(3);
+        NEUTRAL(0.03), WARM(0.05), COLD(0.02);
 
         private double consume;
 

@@ -24,7 +24,7 @@ public class EstadoPrograma implements Serializable {
 
     private LocalDate data_atual;
 
-    public static final double custoEnergia = 4.8;
+    public static final double custoEnergia = 0.15;
     public static final double imposto = 0.06;
 
 
@@ -89,11 +89,13 @@ public class EstadoPrograma implements Serializable {
 
     }
 
-    public List<Casa> maiorConsumidorPeriodo(LocalDate inicio, LocalDate fim, int N) {
+    public List<String> maiorConsumidorPeriodo(LocalDate inicio, LocalDate fim, int N) {
         return this.casas.values()
                 .stream()
                 .sorted(Comparator.comparingDouble(c -> c.consumoPeriodo(inicio, fim)))
-                .limit(N).toList();
+                .limit(N)
+                .map(Casa::getNif)
+                .toList();
     }
 
     @Override

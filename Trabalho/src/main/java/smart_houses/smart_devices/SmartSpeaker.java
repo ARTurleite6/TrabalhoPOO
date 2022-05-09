@@ -67,6 +67,8 @@ public class SmartSpeaker extends SmartDevice implements Serializable {
 
     public String toString() {
         return "SmartSpeaker{" +
+                "id = " + this.getId() +
+                ", on = " + this.isOn() +
                 "volume=" + volume +
                 ", radioStation='" + radioStation + '\'' +
                 ", brand='" + brand + '\'' +
@@ -100,6 +102,6 @@ public class SmartSpeaker extends SmartDevice implements Serializable {
     }
 
     public double comsumption(){
-        return (this.isOn() ? 1 : 0) * (this.getConsume() + this.volume * 0.05);
+        return (this.isOn() ? 1 : 0) * (this.getConsume() + this.volume * 0.0001);
     }
 }
