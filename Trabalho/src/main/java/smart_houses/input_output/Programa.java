@@ -101,8 +101,62 @@ public class Programa {
         };
     }
 
+    public void ligaDesDispositivo(){
+        System.out.println("Lista de NIFs disponiíveis: " + this.log.setNIFs());
+        System.out.println("Insira o nif da casa onde deseja ligar/desligar dispositivos");
+        String nif = scan.nextLine();
+        try {
+            System.out.println("Casa selecionada: " + this.log.getCasa(nif));
+            System.out.println("Que dispositivos pretende ligar/desligar(Casa, Individual, Divisao");
+            String decisao = scan.nextLine();
+            System.out.println("Pretende desligar ou ligar? Ligar(True), Desligar(False)");
+            boolean on_off = scan.nextBoolean();
+            scan.nextLine();
+            switch (decisao) {
+                case "Casa" -> this.log.addPedido(estado -> {
+                    try {
+                        estado.setAllDevicesHouseOn(nif, on_off);
+                    } catch (CasaInexistenteException e) {
+                        System.out.println("Casa nao existe");
+                    }
+                });
+                case "Individual" -> {
+                    System.out.println("Lista de dispositivos da casa: " + this.log.getCasa(nif).getListDevices());
+                    System.out.println("Insira o id do dispositivo");
+                    int id = scan.nextInt();
+                    scan.nextLine();
+                    this.log.addPedido(estado -> {
+                        try {
+                            estado.setDeviceHouseOn(nif, id, on_off);
+                        } catch (DeviceInexistenteException e) {
+                            System.out.println("Nao existe o dispositivo na casa");
+                        } catch (CasaInexistenteException e) {
+                            System.out.println("Nao existe a casa inserida");
+                        }
+                    });
+                }
+                case "Divisao" -> {
+                    System.out.println("Lista de divisões da casa: " + this.log.getRoomsHouse(nif));
+                    System.out.println("Insira a divisao que pretende selecionar: ");
+                    String room = scan.nextLine();
+                    this.log.addPedido(estado -> {
+                        try {
+                            estado.setAllDevicesHouseOnRoom(nif, room, on_off);
+                        } catch (RoomInexistenteException e) {
+                            System.out.println("Nao existe a divisao na casa");
+                        } catch (CasaInexistenteException e) {
+                            System.out.println("Nao existe a casa inserida");
+                        }
+                    });
+                }
+            }
+        } catch (CasaInexistenteException e) {
+            System.out.println("Nao existe uma casa com o nif " + nif);
+        }
+    }
+
     public void gestaoDispositivos(){
-        Menu menuDispositivos = new Menu(List.of("MENU GESTÃO DISPOSITIVOS", "1. Criar Dispositivo", "2. Ligar/Desligar Dispositivo", "0. Sair"));
+        Menu menuDispositivos = new Menu(List.of("MENU GESTÃO DISPOSITIVOS", "1. Criar Dispositivo", "2. Ligar/Desligar Dispositivo", "3. Editar Dispositivo", "0. Sair"));
         do{
             menuDispositivos.run();
             switch (menuDispositivos.getOpcao()) {
@@ -132,57 +186,7 @@ public class Programa {
                     }
                 }
                 case 2 -> {
-                    System.out.println("Lista de NIFs disponiíveis: " + this.log.setNIFs());
-                    System.out.println("Insira o nif da casa onde deseja ligar/desligar dispositivos");
-                    String nif = scan.nextLine();
-                    try {
-                        System.out.println("Casa selecionada: " + this.log.getCasa(nif));
-                        System.out.println("Que dispositivos pretende ligar/desligar(Casa, Individual, Divisao");
-                        String decisao = scan.nextLine();
-                        System.out.println("Pretende desligar ou ligar? Ligar(True), Desligar(False)");
-                        boolean on_off = scan.nextBoolean();
-                        scan.nextLine();
-                        switch (decisao) {
-                            case "Casa" -> this.log.addPedido(estado -> {
-                                try {
-                                    estado.setAllDevicesHouseOn(nif, on_off);
-                                } catch (CasaInexistenteException e) {
-                                    System.out.println("Casa nao existe");
-                                }
-                            });
-                            case "Individual" -> {
-                                System.out.println("Lista de dispositivos da casa: " + this.log.getCasa(nif).getListDevices());
-                                System.out.println("Insira o id do dispositivo");
-                                int id = scan.nextInt();
-                                scan.nextLine();
-                                this.log.addPedido(estado -> {
-                                    try {
-                                        estado.setDeviceHouseOn(nif, id, on_off);
-                                    } catch (DeviceInexistenteException e) {
-                                        System.out.println("Nao existe o dispositivo na casa");
-                                    } catch (CasaInexistenteException e) {
-                                        System.out.println("Nao existe a casa inserida");
-                                    }
-                                });
-                            }
-                            case "Divisao" -> {
-                                System.out.println("Lista de divisões da casa: " + this.log.getRoomsHouse(nif));
-                                System.out.println("Insira a divisao que pretende selecionar: ");
-                                String room = scan.nextLine();
-                                this.log.addPedido(estado -> {
-                                    try {
-                                        estado.setAllDevicesHouseOnRoom(nif, room, on_off);
-                                    } catch (RoomInexistenteException e) {
-                                        System.out.println("Nao existe a divisao na casa");
-                                    } catch (CasaInexistenteException e) {
-                                        System.out.println("Nao existe a casa inserida");
-                                    }
-                                });
-                            }
-                        }
-                    } catch (CasaInexistenteException e) {
-                        System.out.println("Nao existe uma casa com o nif " + nif);
-                    }
+                    this.ligaDesDispositivo();
                 }
             }
         } while(menuDispositivos.getOpcao() != 0);
