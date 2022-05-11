@@ -1,8 +1,7 @@
 package smart_houses.smart_devices;
 
-import java.io.Serializable;
 
-public class SmartCamera extends SmartDevice implements Serializable {
+public class SmartCamera extends SmartDevice {
     private int resolutionX;
     private int resolutionY;
     private int fileDim;

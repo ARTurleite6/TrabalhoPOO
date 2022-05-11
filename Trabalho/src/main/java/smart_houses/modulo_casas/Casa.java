@@ -3,12 +3,17 @@ package smart_houses.modulo_casas;
 import smart_houses.Fatura;
 import smart_houses.exceptions.RoomAlreadyExistsException;
 import smart_houses.exceptions.RoomInexistenteException;
+import smart_houses.exceptions.TipoDeviceErradoException;
+import smart_houses.smart_devices.SmartBulb;
+import smart_houses.smart_devices.SmartCamera;
 import smart_houses.smart_devices.SmartDevice;
+import smart_houses.smart_devices.SmartSpeaker;
 import smart_houses.exceptions.DeviceInexistenteException;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class Casa implements Serializable {
@@ -301,4 +306,40 @@ public class Casa implements Serializable {
         this.rooms.remove(room2);
 
     }
+
+    public void alteraInfoBulb(int id, Consumer<SmartBulb> mapperBulb) throws DeviceInexistenteException, TipoDeviceErradoException {
+      SmartDevice device = this.devices.get(id);
+      if(device == null) throw new DeviceInexistenteException("Não existe um device com id de " + id + " na casa de nif " + this.nif);
+
+      if(!(device instanceof SmartBulb)) throw new TipoDeviceErradoException("O tipo de device procurado não é do tipo SmartBulb");
+
+      mapperBulb.accept((SmartBulb) device);
+
+    }
+
+    public void alteraInfoCamera(int id, Consumer<SmartCamera> mapperCamera) throws DeviceInexistenteException, TipoDeviceErradoException {
+      SmartDevice device = this.devices.get(id);
+      if(device == null) throw new DeviceInexistenteException("Não existe um device com id de " + id + " na casa de nif " + this.nif);
+
+      if(!(device instanceof SmartCamera)) throw new TipoDeviceErradoException("O tipo de device procurado não é do tipo SmartCamera");
+
+      mapperCamera.accept((SmartCamera) device);
+
+    }
+
+    public void alteraInfoSpeaker(int id, Consumer<SmartSpeaker> mapperSpeaker) throws DeviceInexistenteException, TipoDeviceErradoException {
+      SmartDevice device = this.devices.get(id);
+      if(device == null) throw new DeviceInexistenteException("Não existe um device com id de " + id + " na casa de nif " + this.nif);
+
+      if(!(device instanceof SmartSpeaker)) throw new TipoDeviceErradoException("O tipo de device procurado não é do tipo SmartSpeaker");
+
+      mapperSpeaker.accept((SmartSpeaker) device);
+
+    }
+
+    public SmartDevice getDevice(int id) throws DeviceInexistenteException {
+      if(!this.devices.containsKey(id)) throw new DeviceInexistenteException("Não existe o device de id " + id + " na casa de nif " + this.nif);
+      return this.devices.get(id);
+    }
+
 }

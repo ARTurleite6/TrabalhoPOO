@@ -1,8 +1,7 @@
 package smart_houses.smart_devices;
 
-import java.io.Serializable;
 
-public class SmartSpeaker extends SmartDevice implements Serializable {
+public class SmartSpeaker extends SmartDevice {
 
     private static final int MAX = 100;
 

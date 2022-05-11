@@ -9,10 +9,14 @@ import smart_houses.smart_devices.SmartBulb;
 import smart_houses.smart_devices.SmartCamera;
 import smart_houses.smart_devices.SmartDevice;
 import smart_houses.smart_devices.SmartSpeaker;
+import smart_houses.smart_devices.SmartBulb.Tones;
 
 import java.io.IOException;
+import java.lang.reflect.InaccessibleObjectException;
 import java.time.LocalDate;
 import java.util.*;
+
+import javax.sound.sampled.SourceDataLine;
 
 public class Programa {
 
@@ -49,8 +53,8 @@ public class Programa {
         System.out.println("Pretende ligar o dispositivo? True/False");
         boolean ligado = scan.nextBoolean();
         scan.nextLine();
-        System.out.println("Insira o custo de instalacao do dispostivo");
-        double custoInstalacao = scan.nextDouble();
+        System.out.println("Insira o consumo base do dispostivo");
+        double consumoBase = scan.nextDouble();
         scan.nextLine();
         System.out.println("Insira a dimensao dos ficheiros em bytes");
         int dimensao = scan.nextInt();
@@ -61,7 +65,7 @@ public class Programa {
         System.out.println("Insira a resolucao width da camera");
         int resolucaoY = scan.nextInt();
         scan.nextLine();
-        return new SmartCamera(ligado, custoInstalacao, resolucaoX, resolucaoY, dimensao);
+        return new SmartCamera(ligado, consumoBase, resolucaoX, resolucaoY, dimensao);
     }
 
     private SmartDevice criacaoSmartBulb(){
@@ -155,6 +159,141 @@ public class Programa {
         }
     }
 
+    public void edicaoSmartBulb(String nif, int id) {
+      System.out.println("Qual tonalidade deseja que a SmartBulb tenha? (0 - WARM, 1 - COLD, 2 - NEUTRAL");  
+      int valor = this.scan.nextInt();
+      this.scan.nextLine();
+      switch(valor){
+        case 0 -> {
+          this.log.addPedido(estado -> {
+            try {
+              estado.alteraInfoBulbCasa(nif, id, device -> device.setTone(Tones.WARM));
+            } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
+              System.out.println(e.getMessage());
+            }
+          });
+        }
+        case 1 -> {
+          this.log.addPedido(estado -> {
+            try {
+              estado.alteraInfoBulbCasa(nif, id, device -> device.setTone(Tones.COLD));
+            } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
+              System.out.println(e.getMessage());
+            }
+          });
+        }
+        case 2 -> {
+          this.log.addPedido(estado -> {
+            try {
+              estado.alteraInfoBulbCasa(nif, id, device -> device.setTone(Tones.NEUTRAL));
+            } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
+              System.out.println(e.getMessage());
+            }
+          });
+        }
+        default -> {
+          System.out.println("Valor inserido inválido");
+        }
+      }
+    }
+
+    public void edicaoSmartCamera(String nif, int id) {
+      System.out.println("O que pretende editar? (width, height, tamanhoFicheiro");      
+      String opcao = this.scan.nextLine();
+      switch (opcao) {
+        case "width" -> {
+          System.out.println("Insira o novo width");
+          int width = this.scan.nextInt();
+          this.scan.nextLine();
+          this.log.addPedido(estado -> {
+            try {
+              estado.alteraInfoCameraCasa(nif, id, device -> device.setResolutionX(width));
+            } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
+              System.out.println(e.getMessage());
+            }
+          });
+        }
+        case "height" -> {
+          System.out.println("Insira a nova heigth");
+          int height = this.scan.nextInt();
+          this.scan.nextLine();
+          this.log.addPedido(estado -> {
+            try {
+              estado.alteraInfoCameraCasa(nif, id, device -> device.setResolutionY(height));
+            } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
+              System.out.println(e.getMessage());
+            }
+          });
+        }
+
+        case "tamanhoFicheiro" -> {
+          System.out.println("Insira o novo tamanho dos ficheiros gerados");
+          int tam = this.scan.nextInt();
+          this.scan.nextLine();
+          this.log.addPedido(estado -> {
+            try {
+              estado.alteraInfoCameraCasa(nif, id, device -> device.setFileDim(tam));
+            } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
+              System.out.println(e.getMessage());
+            }
+          });
+        }
+
+        default -> System.out.println("Opção inválida");
+
+      }
+    }
+
+    public void edicaoSmartSpeaker(String nif, int id){
+        System.out.println("Insira o que pretende alterar no speaker (Volume, Estacao de Radio");
+        String opcao = this.scan.nextLine();
+        switch (opcao){
+            case "Volume" -> {
+                System.out.println("Insira o volume para o qual quer mudar");
+                int volume = this.scan.nextInt();
+                this.scan.nextLine();
+                this.log.addPedido(estadoPrograma -> {
+                    try {
+                        estadoPrograma.alteraInfoSpeakerCasa(nif, id, device -> device.setVolume(volume));
+                    } catch (DeviceInexistenteException | TipoDeviceErradoException | CasaInexistenteException e) {
+                        System.out.println(e.getMessage());
+                    }
+                });
+            }
+            case "Estacao de Radio" -> {
+                System.out.println("Insira o nome da estacao de radio para o qual quer mudar");
+                String estacao = this.scan.nextLine();
+                this.log.addPedido(estado -> {
+                    try {
+                        estado.alteraInfoSpeakerCasa(nif, id, device -> device.setRadioStation(estacao));
+                    } catch (DeviceInexistenteException | CasaInexistenteException | TipoDeviceErradoException e) {
+                        System.out.println(e.getMessage());
+                    }
+                });
+            }
+        }
+    }
+
+    public void edicaoDispositivos(){
+      System.out.println("Lista de NIFs disponiveis no programa " + this.log.setNIFs());
+      String nif = this.scan.nextLine();
+      try {
+        Casa c = this.log.getCasa(nif);
+        System.out.println("Dispositivos da casa selecionada: " + c.getListDevices());
+        System.out.println("Insira o id do dispositivo que pretende editar");
+        int id = this.scan.nextInt();
+        this.scan.nextLine();
+        SmartDevice device = c.getDevice(id);
+        switch(device.getClass().getSimpleName()){
+          case "SmartBulb" -> edicaoSmartBulb(nif, id);
+          case "SmartCamera" -> edicaoSmartCamera(nif, id);
+          case "SmartSpeaker" -> edicaoSmartSpeaker(nif, id);
+        }
+      } catch (CasaInexistenteException | DeviceInexistenteException e) {
+        System.out.println(e.getMessage());
+      }
+    }
+
     public void gestaoDispositivos(){
         Menu menuDispositivos = new Menu(List.of("MENU GESTÃO DISPOSITIVOS", "1. Criar Dispositivo", "2. Ligar/Desligar Dispositivo", "3. Editar Dispositivo", "0. Sair"));
         do{
@@ -187,6 +326,9 @@ public class Programa {
                 }
                 case 2 -> {
                     this.ligaDesDispositivo();
+                }
+                case 3 -> {
+                  this.edicaoDispositivos();
                 }
             }
         } while(menuDispositivos.getOpcao() != 0);

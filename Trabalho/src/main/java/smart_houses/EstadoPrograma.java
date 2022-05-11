@@ -3,7 +3,10 @@ package smart_houses;
 import smart_houses.exceptions.*;
 import smart_houses.modulo_casas.Casa;
 import smart_houses.modulo_fornecedores.Fornecedor;
+import smart_houses.smart_devices.SmartBulb;
+import smart_houses.smart_devices.SmartCamera;
 import smart_houses.smart_devices.SmartDevice;
+import smart_houses.smart_devices.SmartSpeaker;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,6 +17,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class EstadoPrograma implements Serializable {
@@ -338,5 +342,25 @@ public class EstadoPrograma implements Serializable {
                 .collect(Collectors.groupingBy(d  -> d, Collectors.counting()))
                 .entrySet().stream()
                 .sorted((e1, e2) -> (int) (e2.getValue() - e1.getValue())).map(Map.Entry::getKey).limit(3).collect(Collectors.toList());
+    }
+
+    public void alteraInfoBulbCasa(String nif, int id, Consumer<SmartBulb> mapperBulb) throws CasaInexistenteException, DeviceInexistenteException, TipoDeviceErradoException{
+      if(!this.casas.containsKey(nif)) throw new CasaInexistenteException("Não existe casa com o nif de " + nif);
+
+      this.casas.get(nif).alteraInfoBulb(id, mapperBulb);
+
+    }
+
+    public void alteraInfoSpeakerCasa(String nif, int id, Consumer<SmartSpeaker> mapperSpeaker) throws DeviceInexistenteException, TipoDeviceErradoException, CasaInexistenteException{
+
+      if(!this.casas.containsKey(nif)) throw new CasaInexistenteException("Não existe casa com o nif de " + nif);
+
+      this.casas.get(nif).alteraInfoSpeaker(id, mapperSpeaker);
+    }
+
+    public void alteraInfoCameraCasa(String nif, int id, Consumer<SmartCamera> mapperCamera) throws CasaInexistenteException, DeviceInexistenteException, TipoDeviceErradoException{
+      if(!this.casas.containsKey(nif)) throw new CasaInexistenteException("Não existe casa com o nif de " + nif);
+
+      this.casas.get(nif).alteraInfoCamera(id, mapperCamera);
     }
 }
