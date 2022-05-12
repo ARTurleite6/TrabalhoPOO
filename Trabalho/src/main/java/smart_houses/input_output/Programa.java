@@ -23,7 +23,7 @@ public class Programa {
     private EstadoPrograma log;
     private Scanner scan;
 
-    public Programa(){
+    public Programa() throws AlreadyExistDeviceException {
         try {
             this.log = EstadoPrograma.carregaDados();
         } catch (IOException | ClassNotFoundException e) {
@@ -119,7 +119,8 @@ public class Programa {
             switch (decisao) {
                 case "Casa" -> this.log.addPedido(estado -> {
                     try {
-                        estado.setAllDevicesHouseOn(nif, on_off);
+                        //estado.setAllDevicesHouseOn(nif, on_off);
+                        estado.alteraInfoCasa(nif, casa -> casa.setAllDevicesState(on_off));
                     } catch (CasaInexistenteException e) {
                         System.out.println("Casa nao existe");
                     }
@@ -131,9 +132,14 @@ public class Programa {
                     scan.nextLine();
                     this.log.addPedido(estado -> {
                         try {
-                            estado.setDeviceHouseOn(nif, id, on_off);
-                        } catch (DeviceInexistenteException e) {
-                            System.out.println("Nao existe o dispositivo na casa");
+                            //estado.setDeviceHouseOn(nif, id, on_off);
+                            estado.alteraInfoCasa(nif, casa -> {
+                                try {
+                                    casa.setDeviceState(id, on_off);
+                                } catch (DeviceInexistenteException e) {
+                                    System.out.println(e.getMessage());
+                                }
+                            });
                         } catch (CasaInexistenteException e) {
                             System.out.println("Nao existe a casa inserida");
                         }
@@ -145,9 +151,14 @@ public class Programa {
                     String room = scan.nextLine();
                     this.log.addPedido(estado -> {
                         try {
-                            estado.setAllDevicesHouseOnRoom(nif, room, on_off);
-                        } catch (RoomInexistenteException e) {
-                            System.out.println("Nao existe a divisao na casa");
+                            //estado.setAllDevicesHouseOnRoom(nif, room, on_off);
+                            estado.alteraInfoCasa(nif, casa -> {
+                                try {
+                                    casa.setAllDevicesStateRoom(room, on_off);
+                                } catch (RoomInexistenteException e) {
+                                    System.out.println(e.getMessage());
+                                }
+                            });
                         } catch (CasaInexistenteException e) {
                             System.out.println("Nao existe a casa inserida");
                         }
@@ -307,7 +318,13 @@ public class Programa {
                             System.out.println("Lista de NIFs disponíveis: " + this.log.setNIFs());
                             System.out.println("Insira o nif onde quer adicionar o dispositivo");
                             String nif = this.scan.nextLine();
-                            this.log.addDeviceToCasa(nif, device);
+                            this.log.alteraInfoCasa(nif, casa -> {
+                                try {
+                                    casa.addDevice(device);
+                                } catch (AlreadyExistDeviceException e) {
+                                    System.out.println(e.getMessage());
+                                }
+                            });
 
                             System.out.println("Deseja inserir o device em alguma divisao?(S/N)");
                             String opcao = this.scan.nextLine();
@@ -315,12 +332,16 @@ public class Programa {
                                 System.out.println("Lista de divisões disponíveis na casa: " + this.log.getCasa(nif).getListRooms());
                                 System.out.println("Insira o nome da divisao a inserir o dispositivo");
                                 String divisao = this.scan.nextLine();
-                                this.log.addDeviceToCasaOnRoom(nif, divisao, device.getId());
+                                this.log.alteraInfoCasa(nif, casa -> {
+                                    try {
+                                        casa.addDeviceOnRoom(divisao, device.getId());
+                                    } catch (RoomInexistenteException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                });
                             }
                         } catch (CasaInexistenteException exc) {
                             System.out.println("Nao existe nenhuma casa com um proprietario com o nif inserido");
-                        } catch (RoomInexistenteException exc) {
-                            System.out.println("Nao existe a divisao inserida na casa pretendida");
                         }
                     }
                 }
@@ -375,11 +396,17 @@ public class Programa {
                         String divisao;
                         do {
                             divisao = this.scan.nextLine();
-                            try {
-                                this.log.addDivisaoToCasa(nif, divisao);
-                                System.out.println("Divisão adicionada com sucesso");
-                            } catch (RoomAlreadyExistsException e) {
-                                System.out.println("Já existe a divisão " + divisao + " nesta casa");
+                            //this.log.addDivisaoToCasa(nif, divisao);
+                            String finalDivisao = divisao;
+                            if(!divisao.equals("sair")) {
+                                this.log.alteraInfoCasa(nif, casa -> {
+                                    try {
+                                        casa.addRoom(finalDivisao);
+                                        System.out.println("Divisão adicionada com sucesso");
+                                    } catch (RoomAlreadyExistsException e) {
+                                        System.out.println(e.getMessage());
+                                    }
+                                });
                             }
                         }
                         while (!divisao.equals("sair"));
@@ -388,7 +415,7 @@ public class Programa {
                     }
                 }
                 case 2 -> {
-                    System.out.println("Insira o NIF associado à casa que pretende remover");
+                    System.out.println("Insira o NIF associado à casa que pretende editar");
                     System.out.println("NIFs inscritos no programa: " + this.log.setNIFs());
                     String nif = this.scan.nextLine();
                     try {
@@ -399,42 +426,45 @@ public class Programa {
                         System.out.println("Insira a divisão onde pretende colocar(Digita \"Nenhuma\" se nao quiser por em nenhum sítio)");
                         String divisao = scan.nextLine();
                         if (!divisao.equals("Nenhuma")) {
-                            try {
-                                this.log.mudaDeviceRoom(nif, device, divisao);
-                                System.out.println("Mudança bem sucedida");
-                            } catch (DeviceInexistenteException e) {
-                                System.out.println("Não existe o dispositivo com o código inserido: " + device + " na casa de nif: " + nif);
-                            } catch (RoomInexistenteException e) {
-                                System.out.println("Não existe a divisão " + divisao + " na casa de nif " + nif);
-                            }
+                            this.log.alteraInfoCasa(nif, casa -> {
+                                try {
+                                    casa.mudaDeviceDeRoom(divisao, device);
+                                } catch (DeviceInexistenteException | RoomInexistenteException e) {
+                                    System.out.println(e.getMessage());
+                                }
+                            });
+                            System.out.println("Mudança bem sucedida");
                         } else {
-                            try {
-                                this.log.removeDeviceRoom(nif, device);
-                                System.out.println("O device foi removido da divisão com sucesso");
-                            } catch (DeviceInexistenteException e) {
-                                System.out.println("Não existe o dispositivo de código " + device);
-                            }
+                            //this.log.removeDeviceRoom(nif, device);
+                            this.log.alteraInfoCasa(nif, casa -> {
+                                try {
+                                    casa.removeDeviceOnRoom(device);
+                                } catch (DeviceInexistenteException e) {
+                                    System.out.println(e.getMessage());
+                                }
+                            });
+                            System.out.println("O device foi removido da divisão com sucesso");
                         }
                     } catch (CasaInexistenteException e) {
                         System.out.println("Não existe a casa com o nif: " + nif);
                     }
                 }
                 case 3 -> {
-                    System.out.println("Insira o NIF associado à casa que pretende remover");
+                    System.out.println("Insira o NIF associado à casa que pretende editar");
                     System.out.println("NIFs inscritos no programa: " + this.log.setNIFs());
                     String nif = this.scan.nextLine();
                     try {
                         System.out.println("Casa a editar : " + this.log.getCasa(nif));
                         System.out.println("Insira a divisão que pretende remover");
                         String divisao = scan.nextLine();
-                        this.log.removeRoomCasa(nif, divisao);
+                        this.log.alteraInfoCasa(nif, casa -> casa.removeRoom(divisao));
                         System.out.println("Divisão removida com sucesso");
                     } catch (CasaInexistenteException exc) {
                         System.out.println("Não existe casa com o nif " + nif);
                     }
                 }
                 case 4 -> {
-                    System.out.println("Insira o NIF associado à casa que pretende remover");
+                    System.out.println("Insira o NIF associado à casa que pretende editar");
                     System.out.println("NIFs inscritos no programa: " + this.log.setNIFs());
                     String nif = this.scan.nextLine();
                     try {
@@ -445,11 +475,15 @@ public class Programa {
                         String divisao2 = scan.nextLine();
                         System.out.println("Insira o nome da nova divisão");
                         String nova = scan.nextLine();
-                        this.log.juntaRoomsHouse(nif, divisao, divisao2, nova);
+                        this.log.alteraInfoCasa(nif, casa -> {
+                            try {
+                                casa.juntaRooms(divisao, divisao2, nova);
+                            } catch (RoomAlreadyExistsException e) {
+                                System.out.println(e.getMessage());
+                            }
+                        });
                     } catch (CasaInexistenteException exc) {
                         System.out.println("Não existe casa com o nif " + nif);
-                    } catch (RoomAlreadyExistsException e) {
-                        e.printStackTrace();
                     }
                 }
             }
@@ -697,7 +731,11 @@ public class Programa {
     }
 
     public static void main(String[] args) {
-        new Programa().run();
+        try {
+            new Programa().run();
+        } catch (AlreadyExistDeviceException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
 }

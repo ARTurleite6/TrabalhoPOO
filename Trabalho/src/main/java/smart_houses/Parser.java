@@ -17,7 +17,7 @@ import java.util.Random;
 
 public class Parser {
 
-    public EstadoPrograma parse() {
+    public EstadoPrograma parse() throws AlreadyExistDeviceException {
         List<String> linhas = lerFicheiro("./src/main/resources/log.txt");
         String[] linhaPartida;
         String divisao = null;

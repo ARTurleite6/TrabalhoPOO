@@ -185,7 +185,7 @@ public class EstadoPrograma implements Serializable {
         return this.casas.containsKey(code);
     }
 
-    public void addDeviceToCasa(String nif, SmartDevice device) throws CasaInexistenteException {
+    public void addDeviceToCasa(String nif, SmartDevice device) throws CasaInexistenteException, AlreadyExistDeviceException {
         Casa c = this.casas.get(nif);
         if(c == null) throw new CasaInexistenteException("Casa inexistente");
         this.casas.get(nif).addDevice(device);
@@ -293,36 +293,6 @@ public class EstadoPrograma implements Serializable {
         return this.fornecedores.values().stream().map(Fornecedor::clone).collect(Collectors.toSet());
     }
 
-    public void addDivisaoToCasa(String nif, String room) throws RoomAlreadyExistsException, CasaInexistenteException {
-        Casa c = this.casas.get(nif);
-        if(c == null) throw new CasaInexistenteException("nao existe a casa com o nif: " + nif);
-        c.addRoom(room);
-    }
-
-    public void mudaDeviceRoom(String nif, int device, String room) throws CasaInexistenteException, DeviceInexistenteException, RoomInexistenteException {
-        Casa c = this.casas.get(nif);
-        if(c == null) throw new CasaInexistenteException("Não existe casa com nif de " + nif);
-        c.mudaDeviceDeRoom(room, device);
-    }
-
-    public void removeDeviceRoom(String nif, int device) throws CasaInexistenteException, DeviceInexistenteException{
-        Casa c = this.casas.get(nif);
-        if(c == null) throw new CasaInexistenteException("Não existe casa com nif " + nif);
-        c.removeDeviceOnRoom(device);
-    }
-
-    public void removeRoomCasa(String nif, String divisao) throws CasaInexistenteException {
-        Casa c = this.casas.get(nif);
-        if(c == null) throw new CasaInexistenteException("Não existe casa com o nif de " + nif);
-        c.removeRoom(divisao);
-    }
-
-    public void juntaRoomsHouse(String nif, String room1, String room2, String nova) throws CasaInexistenteException, RoomAlreadyExistsException {
-        Casa c = this.casas.get(nif);
-        if(c == null) throw new CasaInexistenteException("Nao existe device com o nif " + nif);
-        c.juntaRooms(room1, room2, nova);
-    }
-
     public Fornecedor getFornecedor(String nome) throws FornecedorInexistenteException{
         Fornecedor f = this.fornecedores.get(nome);
         if(f == null) throw new FornecedorInexistenteException("Não existe nenhum fornecedor com o nome: " + nome);
@@ -362,5 +332,11 @@ public class EstadoPrograma implements Serializable {
       if(!this.casas.containsKey(nif)) throw new CasaInexistenteException("Não existe casa com o nif de " + nif);
 
       this.casas.get(nif).alteraInfoCamera(id, mapperCamera);
+    }
+
+    public void alteraInfoCasa(String nif, Consumer<Casa> mapperCasa) throws CasaInexistenteException{
+        if(!this.casas.containsKey(nif)) throw new CasaInexistenteException("Não existe nenhuma casa com este nif: " + nif);
+
+        mapperCasa.accept(this.casas.get(nif));
     }
 }

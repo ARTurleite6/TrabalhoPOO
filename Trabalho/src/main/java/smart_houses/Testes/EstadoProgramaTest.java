@@ -39,7 +39,9 @@ class EstadoProgramaTest {
         } catch (FornecedorErradoException e) {
             e.printStackTrace();
         }
+        assert fatura1 != null;
         c.adicionaFatura(fatura1);
+        assert fatura2 != null;
         c2.adicionaFatura(fatura2);
         System.out.println(c);
         System.out.println(c2);
@@ -55,16 +57,12 @@ class EstadoProgramaTest {
         }
         try {
             estado.adicionaCasa(c);
-        } catch (ExisteCasaException e) {
-            e.printStackTrace();
-        } catch (FornecedorInexistenteException e) {
+        } catch (ExisteCasaException | FornecedorInexistenteException e) {
             e.printStackTrace();
         }
         try {
             estado.adicionaCasa(c2);
-        } catch (ExisteCasaException e) {
-            e.printStackTrace();
-        } catch (FornecedorInexistenteException e) {
+        } catch (ExisteCasaException | FornecedorInexistenteException e) {
             e.printStackTrace();
         }
 
@@ -85,13 +83,21 @@ class EstadoProgramaTest {
     }
 
     @Test
-    void getCasaMaisGastadora() throws ExisteFornecedorException, FornecedorInexistenteException, ExisteCasaException, DataInvalidaException, FornecedorErradoException {
+    void getCasaMaisGastadora() throws ExisteFornecedorException, FornecedorInexistenteException, ExisteCasaException, FornecedorErradoException {
         EstadoPrograma e = new EstadoPrograma();
         Fornecedor f = new Fornecedor("EDP");
         Casa c1 = new Casa("Artur", "256250278", "EDP");
         Casa c2 = new Casa("Artur", "256250", "EDP");
-        c1.addDevice(new SmartBulb(true, 10, SmartBulb.Tones.NEUTRAL, 10));
-        c2.addDevice(new SmartBulb(true, 10, SmartBulb.Tones.NEUTRAL, 5));
+        try {
+            c1.addDevice(new SmartBulb(true, 10, SmartBulb.Tones.NEUTRAL, 10));
+        } catch (AlreadyExistDeviceException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            c2.addDevice(new SmartBulb(true, 10, SmartBulb.Tones.NEUTRAL, 5));
+        } catch (AlreadyExistDeviceException ex) {
+            ex.printStackTrace();
+        }
         Fatura fatura = f.criaFatura(c1, LocalDate.now().minusDays(10), LocalDate.now());
         Fatura fatura2 = f.criaFatura(c2, LocalDate.now().minusDays(10), LocalDate.now());
         c1.adicionaFatura(fatura);
@@ -127,12 +133,36 @@ class EstadoProgramaTest {
         SmartDevice sm4 = new SmartSpeaker();
         SmartDevice sm5 = new SmartSpeaker();
         SmartDevice sm6 = new SmartCamera();
-        c.addDevice(sm1);
-        c.addDevice(sm2);
-        c2.addDevice(sm3);
-        c2.addDevice(sm4);
-        c.addDevice(sm5);
-        c.addDevice(sm6);
+        try {
+            c.addDevice(sm1);
+        } catch (AlreadyExistDeviceException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            c.addDevice(sm2);
+        } catch (AlreadyExistDeviceException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            c2.addDevice(sm3);
+        } catch (AlreadyExistDeviceException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            c2.addDevice(sm4);
+        } catch (AlreadyExistDeviceException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            c.addDevice(sm5);
+        } catch (AlreadyExistDeviceException ex) {
+            ex.printStackTrace();
+        }
+        try {
+            c.addDevice(sm6);
+        } catch (AlreadyExistDeviceException ex) {
+            ex.printStackTrace();
+        }
         try {
             e.addFornecedor(f);
         } catch (ExisteFornecedorException ex) {
@@ -140,16 +170,12 @@ class EstadoProgramaTest {
         }
         try {
             e.adicionaCasa(c);
-        } catch (ExisteCasaException ex) {
-            ex.printStackTrace();
-        } catch (FornecedorInexistenteException ex) {
+        } catch (ExisteCasaException | FornecedorInexistenteException ex) {
             ex.printStackTrace();
         }
         try {
             e.adicionaCasa(c2);
-        } catch (ExisteCasaException ex) {
-            ex.printStackTrace();
-        } catch (FornecedorInexistenteException ex) {
+        } catch (ExisteCasaException | FornecedorInexistenteException ex) {
             ex.printStackTrace();
         }
         List<String> podium = List.of("SmartBulb", "SmartSpeaker", "SmartCamera");

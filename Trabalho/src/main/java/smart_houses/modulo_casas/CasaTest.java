@@ -2,10 +2,7 @@ package smart_houses.modulo_casas;
 
 import org.junit.jupiter.api.Test;
 import smart_houses.Fatura;
-import smart_houses.exceptions.DeviceInexistenteException;
-import smart_houses.exceptions.FornecedorErradoException;
-import smart_houses.exceptions.RoomAlreadyExistsException;
-import smart_houses.exceptions.RoomInexistenteException;
+import smart_houses.exceptions.*;
 import smart_houses.modulo_fornecedores.Fornecedor;
 import smart_houses.smart_devices.SmartBulb;
 import smart_houses.smart_devices.SmartDevice;
@@ -71,7 +68,11 @@ class CasaTest {
         }
 
         SmartDevice sm = new SmartBulb();
-        c.addDevice(sm);
+        try {
+            c.addDevice(sm);
+        } catch (AlreadyExistDeviceException e) {
+            e.printStackTrace();
+        }
         try {
             c.addDeviceOnRoom("Quarto", sm.getId());
         } catch (RoomInexistenteException e) {

@@ -1,14 +1,11 @@
 package smart_houses.modulo_casas;
 
 import smart_houses.Fatura;
-import smart_houses.exceptions.RoomAlreadyExistsException;
-import smart_houses.exceptions.RoomInexistenteException;
-import smart_houses.exceptions.TipoDeviceErradoException;
+import smart_houses.exceptions.*;
 import smart_houses.smart_devices.SmartBulb;
 import smart_houses.smart_devices.SmartCamera;
 import smart_houses.smart_devices.SmartDevice;
 import smart_houses.smart_devices.SmartSpeaker;
-import smart_houses.exceptions.DeviceInexistenteException;
 
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -205,7 +202,8 @@ public class Casa implements Serializable {
         return this.devices.containsKey(id);
     }
 
-    public void addDevice(SmartDevice device){
+    public void addDevice(SmartDevice device) throws AlreadyExistDeviceException {
+        if(this.devices.containsKey(device.getId())) throw new AlreadyExistDeviceException("Já existe um device com o código " + device.getId());
         this.devices.put(device.getId(), device.clone());
     }
 
