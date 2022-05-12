@@ -185,12 +185,6 @@ public class EstadoPrograma implements Serializable {
         return this.casas.containsKey(code);
     }
 
-    public void addDeviceToCasa(String nif, SmartDevice device) throws CasaInexistenteException, AlreadyExistDeviceException {
-        Casa c = this.casas.get(nif);
-        if(c == null) throw new CasaInexistenteException("Casa inexistente");
-        this.casas.get(nif).addDevice(device);
-    }
-
     public EstadoPrograma clone() {
         return new EstadoPrograma(this);
     }
@@ -210,33 +204,31 @@ public class EstadoPrograma implements Serializable {
         }
     }
 
-    public void addDeviceToCasaOnRoom(String nif, String room, int id) throws CasaInexistenteException, RoomInexistenteException {
-      Casa casa = this.casas.get(nif);
-      if(casa == null) throw new CasaInexistenteException("Esta casa não existe");
-        this.casas.get(nif).addDeviceOnRoom(room, id);
-    }
-
     public List<String> getRoomsHouse(String nif) throws CasaInexistenteException {
       Casa casa = this.casas.get(nif);
       if(casa == null) throw new CasaInexistenteException("Esta casa com nif : " + nif);
         return casa.getListRooms();
     }
 
+    /*
     public void setAllDevicesHouseOn(String nif, boolean ligar) throws CasaInexistenteException {
       Casa casa = this.casas.get(nif);
       if(casa == null) throw new CasaInexistenteException("Esta casa com nif : " + nif);
       casa.setAllDevicesState(ligar);
     }
+     */
 
     public List<SmartDevice> getSetDevicesHouse(String nif) {
         return this.casas.get(nif).getListDevices();
     }
 
+    /*
     public void setDeviceHouseOn(String nif, int id, boolean ligar) throws DeviceInexistenteException, CasaInexistenteException {
         Casa c = this.casas.get(nif);
         if(c == null) throw new CasaInexistenteException("Nao existe a casas com o nif " + nif);
         c.setDeviceState(id, ligar);
     }
+     */
 
     public void addFornecedor(Fornecedor f) throws ExisteFornecedorException {
         if (this.fornecedores.containsKey(f.getName()))
@@ -244,11 +236,13 @@ public class EstadoPrograma implements Serializable {
         this.fornecedores.put(f.getName(), f.clone());
     }
 
+    /*
     public void setAllDevicesHouseOnRoom(String nif, String room, boolean on) throws RoomInexistenteException, CasaInexistenteException {
         Casa c = this.casas.get(nif);
         if(c == null) throw new CasaInexistenteException("Nao existe a casa com nif" + nif);
         c.setAllDevicesStateRoom(room, on);
     }
+     */
 
     public List<String> getNomeFornecedores(){
         return new ArrayList<>(this.fornecedores.keySet());
@@ -271,7 +265,7 @@ public class EstadoPrograma implements Serializable {
         if(this.casas.remove(nif) == null) throw new CasaInexistenteException("Nao existe casa com o nif de " + nif);
     }
 
-    public Set<String> setNIFs(){
+    public Set<String> getSetNIFs(){
         return new TreeSet<>(this.casas.keySet());
     }
 

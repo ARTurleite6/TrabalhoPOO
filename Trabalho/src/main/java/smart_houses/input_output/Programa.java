@@ -12,11 +12,8 @@ import smart_houses.smart_devices.SmartSpeaker;
 import smart_houses.smart_devices.SmartBulb.Tones;
 
 import java.io.IOException;
-import java.lang.reflect.InaccessibleObjectException;
 import java.time.LocalDate;
 import java.util.*;
-
-import javax.sound.sampled.SourceDataLine;
 
 public class Programa {
 
@@ -106,7 +103,7 @@ public class Programa {
     }
 
     public void ligaDesDispositivo(){
-        System.out.println("Lista de NIFs disponiíveis: " + this.log.setNIFs());
+        System.out.println("Lista de NIFs disponiíveis: " + this.log.getSetNIFs());
         System.out.println("Insira o nif da casa onde deseja ligar/desligar dispositivos");
         String nif = scan.nextLine();
         try {
@@ -175,36 +172,28 @@ public class Programa {
       int valor = this.scan.nextInt();
       this.scan.nextLine();
       switch(valor){
-        case 0 -> {
-          this.log.addPedido(estado -> {
-            try {
-              estado.alteraInfoBulbCasa(nif, id, device -> device.setTone(Tones.WARM));
-            } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
-              System.out.println(e.getMessage());
-            }
-          });
-        }
-        case 1 -> {
-          this.log.addPedido(estado -> {
-            try {
-              estado.alteraInfoBulbCasa(nif, id, device -> device.setTone(Tones.COLD));
-            } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
-              System.out.println(e.getMessage());
-            }
-          });
-        }
-        case 2 -> {
-          this.log.addPedido(estado -> {
-            try {
-              estado.alteraInfoBulbCasa(nif, id, device -> device.setTone(Tones.NEUTRAL));
-            } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
-              System.out.println(e.getMessage());
-            }
-          });
-        }
-        default -> {
-          System.out.println("Valor inserido inválido");
-        }
+        case 0 -> this.log.addPedido(estado -> {
+          try {
+            estado.alteraInfoBulbCasa(nif, id, device -> device.setTone(Tones.WARM));
+          } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
+            System.out.println(e.getMessage());
+          }
+        });
+        case 1 -> this.log.addPedido(estado -> {
+          try {
+            estado.alteraInfoBulbCasa(nif, id, device -> device.setTone(Tones.COLD));
+          } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
+            System.out.println(e.getMessage());
+          }
+        });
+        case 2 -> this.log.addPedido(estado -> {
+          try {
+            estado.alteraInfoBulbCasa(nif, id, device -> device.setTone(Tones.NEUTRAL));
+          } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
+            System.out.println(e.getMessage());
+          }
+        });
+        default -> System.out.println("Valor inserido inválido");
       }
     }
 
@@ -286,7 +275,7 @@ public class Programa {
     }
 
     public void edicaoDispositivos(){
-      System.out.println("Lista de NIFs disponiveis no programa " + this.log.setNIFs());
+      System.out.println("Lista de NIFs disponiveis no programa " + this.log.getSetNIFs());
       String nif = this.scan.nextLine();
       try {
         Casa c = this.log.getCasa(nif);
@@ -306,7 +295,7 @@ public class Programa {
     }
 
     public void gestaoDispositivos(){
-        Menu menuDispositivos = new Menu(List.of("MENU GESTÃO DISPOSITIVOS", "1. Criar Dispositivo", "2. Ligar/Desligar Dispositivo", "3. Editar Dispositivo", "0. Sair"));
+        Menu menuDispositivos = new Menu(List.of("MENU GESTÃO DISPOSITIVOS", "1. Criar Dispositivo", "2. Ligar/Desligar Dispositivo", "3. Editar Dispositivo", "4. Remover dispositivo da Casa", "0. Sair"));
         do{
             menuDispositivos.run();
             switch (menuDispositivos.getOpcao()) {
@@ -315,7 +304,7 @@ public class Programa {
                     if (device == null) System.out.println("Ocorreu algum erro a criar o dispositivo");
                     else {
                         try {
-                            System.out.println("Lista de NIFs disponíveis: " + this.log.setNIFs());
+                            System.out.println("Lista de NIFs disponíveis: " + this.log.getSetNIFs());
                             System.out.println("Insira o nif onde quer adicionar o dispositivo");
                             String nif = this.scan.nextLine();
                             this.log.alteraInfoCasa(nif, casa -> {
@@ -345,12 +334,8 @@ public class Programa {
                         }
                     }
                 }
-                case 2 -> {
-                    this.ligaDesDispositivo();
-                }
-                case 3 -> {
-                  this.edicaoDispositivos();
-                }
+                case 2 -> this.ligaDesDispositivo();
+                case 3 -> this.edicaoDispositivos();
             }
         } while(menuDispositivos.getOpcao() != 0);
     }
@@ -388,7 +373,7 @@ public class Programa {
             switch (menu.getOpcao()) {
                 case 1 -> {
                     System.out.println("Insira o NIF associado à casa que pretende adicionar divisões");
-                    System.out.println("NIFs inscritos no programa: " + this.log.setNIFs());
+                    System.out.println("NIFs inscritos no programa: " + this.log.getSetNIFs());
                     String nif = scan.nextLine();
                     try {
                         System.out.println("Casa que vai editar: " + this.log.getCasa(nif));
@@ -416,7 +401,7 @@ public class Programa {
                 }
                 case 2 -> {
                     System.out.println("Insira o NIF associado à casa que pretende editar");
-                    System.out.println("NIFs inscritos no programa: " + this.log.setNIFs());
+                    System.out.println("NIFs inscritos no programa: " + this.log.getSetNIFs());
                     String nif = this.scan.nextLine();
                     try {
                         System.out.println("Casa a editar: " + this.log.getCasa(nif));
@@ -451,7 +436,7 @@ public class Programa {
                 }
                 case 3 -> {
                     System.out.println("Insira o NIF associado à casa que pretende editar");
-                    System.out.println("NIFs inscritos no programa: " + this.log.setNIFs());
+                    System.out.println("NIFs inscritos no programa: " + this.log.getSetNIFs());
                     String nif = this.scan.nextLine();
                     try {
                         System.out.println("Casa a editar : " + this.log.getCasa(nif));
@@ -465,7 +450,7 @@ public class Programa {
                 }
                 case 4 -> {
                     System.out.println("Insira o NIF associado à casa que pretende editar");
-                    System.out.println("NIFs inscritos no programa: " + this.log.setNIFs());
+                    System.out.println("NIFs inscritos no programa: " + this.log.getSetNIFs());
                     String nif = this.scan.nextLine();
                     try {
                         System.out.println("Casa a editar : " + this.log.getCasa(nif));
@@ -512,7 +497,7 @@ public class Programa {
                     System.out.println("Fornecedores disponiveis: " + this.log.getFornecedores().keySet());
                     String fornecedor = this.scan.nextLine();
                     System.out.println("Insira o nif do prorietário da casa onde quer mudar de fornecedor");
-                    System.out.println("Lista de NIFs no programa: " + this.log.setNIFs());
+                    System.out.println("Lista de NIFs no programa: " + this.log.getSetNIFs());
                     String casa = this.scan.nextLine();
                     this.log.addPedido(l -> {
                         try {
@@ -528,7 +513,7 @@ public class Programa {
                 }
                 case 3: {
                     System.out.println("Insira o nif associado à casa que pretende remover");
-                    System.out.println("NIFs inscritos no programa: " + this.log.setNIFs());
+                    System.out.println("NIFs inscritos no programa: " + this.log.getSetNIFs());
                     String nif = scan.nextLine();
                     try {
                         this.log.removeCasa(nif);
@@ -543,12 +528,12 @@ public class Programa {
                     break;
                 }
                 case 5: {
-                    System.out.println("Lista de NIFs inscritos no programa: " + this.log.setNIFs());
+                    System.out.println("Lista de NIFs inscritos no programa: " + this.log.getSetNIFs());
                     break;
                 }
                 case 6 : {
                     System.out.println("Insira o NIF do proprietário da casa que deseja visualizar: ");
-                    System.out.println("NIFs disponíveis no programa: " + this.log.setNIFs());
+                    System.out.println("NIFs disponíveis no programa: " + this.log.getSetNIFs());
                     String nif = scan.nextLine();
                     try{
                         System.out.println("Casa: " + this.log.getCasa(nif));
@@ -560,7 +545,7 @@ public class Programa {
                 }
                 case 7 : {
                     System.out.println("Insira o NIF do proprietário da casa: ");
-                    System.out.println("NIFs disponíveis no programa: " + this.log.setNIFs());
+                    System.out.println("NIFs disponíveis no programa: " + this.log.getSetNIFs());
                     String nif = scan.nextLine();
                     try {
                         System.out.println("Faturas da casa: " + this.log.faturasCasa(nif));
