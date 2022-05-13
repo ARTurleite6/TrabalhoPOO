@@ -7,7 +7,7 @@ public abstract class SmartDevice implements Serializable {
     public static int next_id = 1;
 
     private boolean on;
-    private int id;
+    private final int id;
     private double consume;
 
     public SmartDevice(){
@@ -38,10 +38,6 @@ public abstract class SmartDevice implements Serializable {
 
     public int getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public double getConsume() {

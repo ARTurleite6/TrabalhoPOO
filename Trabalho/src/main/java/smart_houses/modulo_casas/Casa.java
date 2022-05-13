@@ -15,8 +15,8 @@ import java.util.stream.Collectors;
 
 public class Casa implements Serializable {
 
-    private String nome;
-    private String nif;
+    private final String nome;
+    private final String nif;
     private Map<Integer, SmartDevice> devices;
     private Map<String, Set<Integer>> rooms;
     private List<Fatura> faturas;
@@ -100,10 +100,6 @@ public class Casa implements Serializable {
         return nome;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
     public String getNif() {
         return nif;
     }
@@ -144,10 +140,6 @@ public class Casa implements Serializable {
                 ", faturas=" + faturas +
                 ", fornecedor='" + fornecedor + '\'' +
                 '}';
-    }
-
-    public void setNif(String nif) {
-        this.nif = nif;
     }
 
     public Map<Integer, SmartDevice> getMapDevices() {
@@ -230,9 +222,9 @@ public class Casa implements Serializable {
         this.rooms.remove(room);
     }
 
-    public void addDeviceOnRoom(String room, int device) throws RoomInexistenteException {
-      Set<Integer> devices = this.rooms.get(room);
-      if(devices == null) throw new RoomInexistenteException("Esta room nao existe na casa");
+    public void addDeviceOnRoom(String room, int device) throws RoomInexistenteException, DeviceInexistenteException {
+        if(!this.rooms.containsKey(room)) throw new RoomInexistenteException("Esta room nao existe na casa");
+        if(!this.devices.containsKey(device)) throw new DeviceInexistenteException("Nao existe nenhum device com o id de " + device);
         this.rooms.get(room).add(device);
     }
 

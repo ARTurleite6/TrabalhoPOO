@@ -116,8 +116,8 @@ public class Programa {
             switch (decisao) {
                 case "Casa" -> this.log.addPedido(estado -> {
                     try {
-                        //estado.setAllDevicesHouseOn(nif, on_off);
-                        estado.alteraInfoCasa(nif, casa -> casa.setAllDevicesState(on_off));
+                        estado.setAllDevicesHouseOn(nif, on_off);
+                        //estado.alteraInfoCasa(nif, casa -> casa.setAllDevicesState(on_off));
                     } catch (CasaInexistenteException e) {
                         System.out.println("Casa nao existe");
                     }
@@ -129,7 +129,8 @@ public class Programa {
                     scan.nextLine();
                     this.log.addPedido(estado -> {
                         try {
-                            //estado.setDeviceHouseOn(nif, id, on_off);
+                            estado.setDeviceHouseOn(nif, id, on_off);
+                            /*
                             estado.alteraInfoCasa(nif, casa -> {
                                 try {
                                     casa.setDeviceState(id, on_off);
@@ -137,8 +138,11 @@ public class Programa {
                                     System.out.println(e.getMessage());
                                 }
                             });
+                             */
                         } catch (CasaInexistenteException e) {
                             System.out.println("Nao existe a casa inserida");
+                        } catch (DeviceInexistenteException e) {
+                            System.out.println(e.getMessage());
                         }
                     });
                 }
@@ -148,7 +152,8 @@ public class Programa {
                     String room = scan.nextLine();
                     this.log.addPedido(estado -> {
                         try {
-                            //estado.setAllDevicesHouseOnRoom(nif, room, on_off);
+                            estado.setAllDevicesHouseOnRoom(nif, room, on_off);
+                            /*
                             estado.alteraInfoCasa(nif, casa -> {
                                 try {
                                     casa.setAllDevicesStateRoom(room, on_off);
@@ -156,8 +161,11 @@ public class Programa {
                                     System.out.println(e.getMessage());
                                 }
                             });
+                             */
                         } catch (CasaInexistenteException e) {
                             System.out.println("Nao existe a casa inserida");
+                        } catch (RoomInexistenteException e) {
+                            System.out.println(e.getMessage());
                         }
                     });
                 }
@@ -173,35 +181,70 @@ public class Programa {
       this.scan.nextLine();
       switch(valor){
         case 0 -> this.log.addPedido(estado -> {
+            try {
+                estado.mudaTomSmartBulb(nif, id, Tones.WARM);
+            } catch (CasaInexistenteException | TipoDeviceErradoException | DeviceInexistenteException e) {
+                System.out.println(e.getMessage());
+            }
+            /*
           try {
             estado.alteraInfoBulbCasa(nif, id, device -> device.setTone(Tones.WARM));
           } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
             System.out.println(e.getMessage());
           }
+             */
         });
         case 1 -> this.log.addPedido(estado -> {
+            try {
+                estado.mudaTomSmartBulb(nif, id, Tones.COLD);
+            } catch (CasaInexistenteException | TipoDeviceErradoException | DeviceInexistenteException e) {
+                System.out.println(e.getMessage());
+            }
+            /*
           try {
             estado.alteraInfoBulbCasa(nif, id, device -> device.setTone(Tones.COLD));
           } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
             System.out.println(e.getMessage());
           }
+             */
         });
         case 2 -> this.log.addPedido(estado -> {
+            try {
+                estado.mudaTomSmartBulb(nif, id, Tones.NEUTRAL);
+            } catch (CasaInexistenteException | TipoDeviceErradoException | DeviceInexistenteException e) {
+                System.out.println(e.getMessage());
+            }
+            /*
           try {
             estado.alteraInfoBulbCasa(nif, id, device -> device.setTone(Tones.NEUTRAL));
           } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
             System.out.println(e.getMessage());
           }
+             */
         });
         default -> System.out.println("Valor inserido inválido");
       }
     }
 
     public void edicaoSmartCamera(String nif, int id) {
-      System.out.println("O que pretende editar? (width, height, tamanhoFicheiro");      
+      System.out.println("O que pretende editar? (resolucao, tamanhoFicheiro");
       String opcao = this.scan.nextLine();
       switch (opcao) {
-        case "width" -> {
+        case "resolucao" -> {
+            System.out.println("Insira o novo valor para width");
+            int width = this.scan.nextInt();
+            this.scan.nextLine();
+            System.out.println("Insira o novo valor para a height");
+            int height = this.scan.nextInt();
+            this.scan.nextLine();
+            this.log.addPedido(estado -> {
+                try {
+                    estado.mudaResolSmartCamera(nif, id, width, height);
+                } catch (CasaInexistenteException | TipoDeviceErradoException | DeviceInexistenteException e) {
+                    System.out.println(e.getMessage());
+                }
+            });
+            /*
           System.out.println("Insira o novo width");
           int width = this.scan.nextInt();
           this.scan.nextLine();
@@ -212,7 +255,9 @@ public class Programa {
               System.out.println(e.getMessage());
             }
           });
+             */
         }
+        /*
         case "height" -> {
           System.out.println("Insira a nova heigth");
           int height = this.scan.nextInt();
@@ -225,17 +270,26 @@ public class Programa {
             }
           });
         }
+         */
 
         case "tamanhoFicheiro" -> {
           System.out.println("Insira o novo tamanho dos ficheiros gerados");
           int tam = this.scan.nextInt();
           this.scan.nextLine();
           this.log.addPedido(estado -> {
+              try {
+                  estado.mudaTamFichSmartCamera(nif, id, tam);
+              } catch (CasaInexistenteException | TipoDeviceErradoException | DeviceInexistenteException e) {
+                  System.out.println(e.getMessage());
+              }
+              /*
             try {
               estado.alteraInfoCameraCasa(nif, id, device -> device.setFileDim(tam));
             } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
               System.out.println(e.getMessage());
             }
+
+               */
           });
         }
 
@@ -254,7 +308,7 @@ public class Programa {
                 this.scan.nextLine();
                 this.log.addPedido(estadoPrograma -> {
                     try {
-                        estadoPrograma.alteraInfoSpeakerCasa(nif, id, device -> device.setVolume(volume));
+                        estadoPrograma.mudaVolumeSmartSpeaker(nif, id, volume);
                     } catch (DeviceInexistenteException | TipoDeviceErradoException | CasaInexistenteException e) {
                         System.out.println(e.getMessage());
                     }
@@ -265,10 +319,17 @@ public class Programa {
                 String estacao = this.scan.nextLine();
                 this.log.addPedido(estado -> {
                     try {
+                        estado.mudaRadioStationSpeaker(nif, id, estacao);
+                    } catch (CasaInexistenteException | DeviceInexistenteException | TipoDeviceErradoException e) {
+                        System.out.println(e.getMessage());
+                    }
+                    /*
+                    try {
                         estado.alteraInfoSpeakerCasa(nif, id, device -> device.setRadioStation(estacao));
                     } catch (DeviceInexistenteException | CasaInexistenteException | TipoDeviceErradoException e) {
                         System.out.println(e.getMessage());
                     }
+                     */
                 });
             }
         }
@@ -307,6 +368,8 @@ public class Programa {
                             System.out.println("Lista de NIFs disponíveis: " + this.log.getSetNIFs());
                             System.out.println("Insira o nif onde quer adicionar o dispositivo");
                             String nif = this.scan.nextLine();
+                            this.log.addDevice(nif, device);
+                            /*
                             this.log.alteraInfoCasa(nif, casa -> {
                                 try {
                                     casa.addDevice(device);
@@ -314,6 +377,7 @@ public class Programa {
                                     System.out.println(e.getMessage());
                                 }
                             });
+                             */
 
                             System.out.println("Deseja inserir o device em alguma divisao?(S/N)");
                             String opcao = this.scan.nextLine();
@@ -321,6 +385,8 @@ public class Programa {
                                 System.out.println("Lista de divisões disponíveis na casa: " + this.log.getCasa(nif).getListRooms());
                                 System.out.println("Insira o nome da divisao a inserir o dispositivo");
                                 String divisao = this.scan.nextLine();
+                                this.log.addDeviceOnRoom(nif, divisao, device.getId());
+                                /*
                                 this.log.alteraInfoCasa(nif, casa -> {
                                     try {
                                         casa.addDeviceOnRoom(divisao, device.getId());
@@ -328,9 +394,10 @@ public class Programa {
                                         System.out.println(e.getMessage());
                                     }
                                 });
+                                 */
                             }
-                        } catch (CasaInexistenteException exc) {
-                            System.out.println("Nao existe nenhuma casa com um proprietario com o nif inserido");
+                        } catch (CasaInexistenteException | AlreadyExistDeviceException | RoomInexistenteException | DeviceInexistenteException exc) {
+                            System.out.println(exc.getMessage());
                         }
                     }
                 }
@@ -381,9 +448,11 @@ public class Programa {
                         String divisao;
                         do {
                             divisao = this.scan.nextLine();
-                            //this.log.addDivisaoToCasa(nif, divisao);
                             String finalDivisao = divisao;
+
                             if(!divisao.equals("sair")) {
+                                this.log.addDivisao(nif, divisao);
+                                /*
                                 this.log.alteraInfoCasa(nif, casa -> {
                                     try {
                                         casa.addRoom(finalDivisao);
@@ -392,11 +461,12 @@ public class Programa {
                                         System.out.println(e.getMessage());
                                     }
                                 });
+                                 */
                             }
                         }
                         while (!divisao.equals("sair"));
-                    } catch (CasaInexistenteException e) {
-                        System.out.println("Não existe uma casa com o nif inserido");
+                    } catch (CasaInexistenteException | RoomAlreadyExistsException e) {
+                        System.out.println(e.getMessage());
                     }
                 }
                 case 2 -> {
@@ -411,6 +481,8 @@ public class Programa {
                         System.out.println("Insira a divisão onde pretende colocar(Digita \"Nenhuma\" se nao quiser por em nenhum sítio)");
                         String divisao = scan.nextLine();
                         if (!divisao.equals("Nenhuma")) {
+                            this.log.mudaDeviceRoom(nif, divisao, device);
+                            /*
                             this.log.alteraInfoCasa(nif, casa -> {
                                 try {
                                     casa.mudaDeviceDeRoom(divisao, device);
@@ -418,9 +490,12 @@ public class Programa {
                                     System.out.println(e.getMessage());
                                 }
                             });
+
+                             */
                             System.out.println("Mudança bem sucedida");
                         } else {
-                            //this.log.removeDeviceRoom(nif, device);
+                            this.log.removeDeviceRoom(nif, device);
+                            /*
                             this.log.alteraInfoCasa(nif, casa -> {
                                 try {
                                     casa.removeDeviceOnRoom(device);
@@ -428,10 +503,12 @@ public class Programa {
                                     System.out.println(e.getMessage());
                                 }
                             });
+
+                             */
                             System.out.println("O device foi removido da divisão com sucesso");
                         }
-                    } catch (CasaInexistenteException e) {
-                        System.out.println("Não existe a casa com o nif: " + nif);
+                    } catch (CasaInexistenteException | RoomInexistenteException | DeviceInexistenteException e) {
+                        System.out.println(e.getMessage());
                     }
                 }
                 case 3 -> {
@@ -442,7 +519,8 @@ public class Programa {
                         System.out.println("Casa a editar : " + this.log.getCasa(nif));
                         System.out.println("Insira a divisão que pretende remover");
                         String divisao = scan.nextLine();
-                        this.log.alteraInfoCasa(nif, casa -> casa.removeRoom(divisao));
+                        this.log.removeRoom(nif, divisao);
+                        //this.log.alteraInfoCasa(nif, casa -> casa.removeRoom(divisao));
                         System.out.println("Divisão removida com sucesso");
                     } catch (CasaInexistenteException exc) {
                         System.out.println("Não existe casa com o nif " + nif);
@@ -460,6 +538,8 @@ public class Programa {
                         String divisao2 = scan.nextLine();
                         System.out.println("Insira o nome da nova divisão");
                         String nova = scan.nextLine();
+                        this.log.juntaDivisoes(nif, divisao, divisao2, nova);
+                        /*
                         this.log.alteraInfoCasa(nif, casa -> {
                             try {
                                 casa.juntaRooms(divisao, divisao2, nova);
@@ -467,8 +547,9 @@ public class Programa {
                                 System.out.println(e.getMessage());
                             }
                         });
-                    } catch (CasaInexistenteException exc) {
-                        System.out.println("Não existe casa com o nif " + nif);
+                         */
+                    } catch (CasaInexistenteException | RoomAlreadyExistsException exc) {
+                        System.out.println(exc.getMessage());
                     }
                 }
             }
