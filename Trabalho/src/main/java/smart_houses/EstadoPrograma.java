@@ -76,33 +76,44 @@ public class EstadoPrograma implements Serializable {
         for (Casa casa : this.casas.values()) {
             Fatura f = this.fornecedores.get(casa.getFornecedor()).criaFatura(casa.clone(), this.data_atual, fim);
             casa.adicionaFatura(f);
+            this.fornecedores.get(casa.getFornecedor()).adicionaFatura(f);
         }
     }
 
-    public List<Fatura> getFaturasFornecedor(String nome) {
-        return this.casas.values().stream().flatMap(c -> c.faturasFornecedor(nome).stream()).toList();
+    public List<Fatura> getFaturasFornecedor(String nome) throws FornecedorInexistenteException {
+        if(!this.fornecedores.containsKey(nome)) throw new FornecedorInexistenteException("Nao existe fornecedor: " + nome);
+        return this.fornecedores.get(nome).getFaturas().stream().map(Fatura::clone).collect(Collectors.toList());
     }
 
     public Optional<Casa> getCasaMaisGastadora() {
 
         return this.casas.values().stream().max(Comparator.comparingDouble(c -> {
             List<Fatura> faturas = c.getFaturas();
-            if(faturas.isEmpty()) return 0;
-            else return faturas.get(faturas.size() - 1).getConsumo();
-        }));
+            return faturas.stream().mapToDouble(Fatura::getConsumo).sum();
+        })).map(Casa::clone);
 
+    }
+
+    public List<String> maiorConsumidorPeriodo(int N) {
+        Comparator<Casa> comp = Comparator.comparingDouble(Casa::consumoPeriodo);
+        return this.casas.values()
+                .stream()
+                .sorted(comp.reversed())
+                .limit(N)
+                .map(Casa::getNif)
+                .collect(Collectors.toList());
     }
 
     public List<String> maiorConsumidorPeriodo(LocalDate inicio, LocalDate fim, int N) {
+        Comparator<Casa> comp = Comparator.comparingDouble(c -> c.consumoPeriodo(inicio, fim));
         return this.casas.values()
                 .stream()
-                .sorted(Comparator.comparingDouble(c -> c.consumoPeriodo(inicio, fim)))
+                .sorted(comp.reversed())
                 .limit(N)
                 .map(Casa::getNif)
-                .toList();
+                .collect(Collectors.toList());
     }
 
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -115,7 +126,6 @@ public class EstadoPrograma implements Serializable {
         return data_atual.equals(that.data_atual);
     }
 
-    @Override
     public int hashCode() {
         int result = getCasas().hashCode();
         result = 31 * result + getFornecedores().hashCode();
@@ -124,7 +134,6 @@ public class EstadoPrograma implements Serializable {
         return result;
     }
 
-    @Override
     public String toString() {
         return "EstadoPrograma{" +
                 "casas=" + casas +
@@ -134,16 +143,22 @@ public class EstadoPrograma implements Serializable {
                 '}';
     }
 
-    public double faturacaoFornecedor(String nome){
-        return this.getFaturasFornecedor(nome).stream().mapToDouble(Fatura::getCusto).sum();
+    public String getFornecedorMaiorFaturacao(){
+        Comparator<Map.Entry<String, Fornecedor>> comp = (f1, f2) -> {
+            double faturacao1 = f1.getValue().faturacao();
+            double faturacao2 = f2.getValue().faturacao();
+            return Double.compare(faturacao1, faturacao2);
+        };
+        return this.fornecedores.entrySet().stream().max(comp).map(Map.Entry::getKey).orElse("Nao existe nenhum fornecedor");
     }
-
+    /*
     public Optional<Fornecedor> getFornecedorMaiorFaturacao() {
 
         return this.fornecedores.values()
                 .stream()
                 .max(Comparator.comparingDouble(f -> this.faturacaoFornecedor(f.getName())));
     }
+     */
 
     public void avancaData(LocalDate date) throws DataInvalidaException, FornecedorErradoException {
         if(date.isBefore(this.data_atual)) throw new DataInvalidaException("Esta data é anterior à atual");
@@ -274,7 +289,8 @@ public class EstadoPrograma implements Serializable {
     }
 
     public List<Fatura> faturasCasa(String nif) throws CasaInexistenteException{
-        return this.getCasa(nif).getFaturas();
+        if(!this.casas.containsKey(nif)) throw new CasaInexistenteException("Nao existe casa com o nif de " + nif);
+        return this.casas.get(nif).getFaturas();
     }
 
     public Set<Fornecedor> getSetFornecedores(){

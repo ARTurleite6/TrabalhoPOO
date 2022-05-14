@@ -244,12 +244,13 @@ public class Casa implements Serializable {
         return this.devices.values().stream().mapToDouble(SmartDevice::comsumption).sum();
     }
 
-    public double consumoPeriodo(LocalDate inicio, LocalDate fim){
-        return this.faturas.stream().filter(f -> (f.getInicioPeriodo().isEqual(inicio) || f.getInicioPeriodo().isAfter(inicio)) && (f.getFimPeriodo().isEqual(fim) || f.getFimPeriodo().isBefore(fim))).mapToDouble(Fatura::getConsumo).sum();
+    public double consumoPeriodo(){
+        if(this.faturas.size() == 0) return 0;
+        else return this.faturas.get(this.faturas.size() - 1).getConsumo();
     }
 
-    public List<Fatura> faturasFornecedor(String fornecedor){
-        return this.faturas.stream().filter(f -> f.getFornecedor().equals(fornecedor)).toList();
+    public double consumoPeriodo(LocalDate inicio, LocalDate fim){
+        return this.faturas.stream().filter(f -> (f.getInicioPeriodo().isEqual(inicio) || f.getInicioPeriodo().isAfter(inicio)) && (f.getFimPeriodo().isEqual(fim) || f.getFimPeriodo().isBefore(fim))).mapToDouble(Fatura::getConsumo).sum();
     }
 
     public int quantos(){
@@ -277,7 +278,7 @@ public class Casa implements Serializable {
         if(!this.rooms.containsKey(room)) throw new RoomInexistenteException("Não existe a divisao " + room + " nesta casa");
 
         String divisao = this.divisaoDeDispositivo(device);
-        if(room != null){
+        if(divisao != null){
             this.rooms.get(divisao).remove(device);
         }
         this.rooms.get(room).add(device);

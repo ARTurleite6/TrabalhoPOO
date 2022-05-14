@@ -17,7 +17,7 @@ import java.util.Random;
 
 public class Parser {
 
-    public EstadoPrograma parse() throws AlreadyExistDeviceException {
+    public EstadoPrograma parse() throws AlreadyExistDeviceException, ExisteFornecedorException, FornecedorInexistenteException, ExisteCasaException, RoomAlreadyExistsException, DeviceInexistenteException, RoomInexistenteException {
         List<String> linhas = lerFicheiro("./src/main/resources/log.txt");
         String[] linhaPartida;
         String divisao = null;
@@ -28,67 +28,39 @@ public class Parser {
             switch (linhaPartida[0]) {
                 case "Fornecedor":
                     Fornecedor f = new Fornecedor(linhaPartida[1]);
-                    try {
                         estado.addFornecedor(f);
-                    } catch (ExisteFornecedorException e) {
-                        e.printStackTrace();
-                    }
                     break;
                 case "Casa":
                     if(casaMaisRecente != null) {
-                        try {
                             estado.adicionaCasa(casaMaisRecente);
-                        } catch (ExisteCasaException | FornecedorInexistenteException e) {
-                            e.printStackTrace();
-                        }
                     }
                     casaMaisRecente = parseCasa(linhaPartida[1]);
                     break;
                 case "Divisao":
                     if (casaMaisRecente == null) System.out.println("Linha inválida.");
                     if(divisao != null) {
-                        try {
                             casaMaisRecente.addRoom(divisao);
-                        } catch (RoomAlreadyExistsException e) {
-                            e.printStackTrace();
-                        }
                     }
                     divisao = linhaPartida[1];
-                    try {
                         casaMaisRecente.addRoom(divisao);
-                    } catch (RoomAlreadyExistsException e) {
-                        e.printStackTrace();
-                    }
                     break;
                 case "SmartBulb":
                     if (divisao == null) System.out.println("Linha inválida.");
                     SmartBulb sd = parseSmartBulb(linhaPartida[1]);
                     casaMaisRecente.addDevice(sd);
-                    try {
                         casaMaisRecente.addDeviceOnRoom(divisao, sd.getId());
-                    } catch (RoomInexistenteException e) {
-                        e.printStackTrace();
-                    }
                     break;
                 case "SmartCamera":
                     if (divisao == null) System.out.println("Linha inválida.");
                     SmartCamera sc = parseSmartCamera(linhaPartida[1]);
                     casaMaisRecente.addDevice(sc);
-                    try {
                         casaMaisRecente.addDeviceOnRoom(divisao, sc.getId());
-                    } catch (RoomInexistenteException e) {
-                        e.printStackTrace();
-                    }
                     break;
                 case "SmartSpeaker":
                     if(divisao == null) System.out.println("Linha Invalida.");
                     SmartSpeaker ss = parseSmartSpeaker(linhaPartida[1]);
                     casaMaisRecente.addDevice(ss);
-                    try {
                         casaMaisRecente.addDeviceOnRoom(divisao, ss.getId());
-                    } catch (RoomInexistenteException e) {
-                        e.printStackTrace();
-                    }
                     break;
                 default:
                     System.out.println("Linha inválida.");

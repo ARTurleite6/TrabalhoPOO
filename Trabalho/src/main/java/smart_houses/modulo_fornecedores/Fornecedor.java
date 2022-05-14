@@ -7,6 +7,11 @@ import smart_houses.modulo_casas.Casa;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -14,25 +19,38 @@ public class Fornecedor implements Serializable {
 
     private String name;
     private double desconto;
+    private List<Fatura> faturas;
 
     public Fornecedor() {
         this.desconto = 0.1;
         this.name = "n/a";
+        this.faturas = new ArrayList<>();
     }
 
     public Fornecedor(String name){
         this.name = name;
         this.desconto = 0.1;
+        this.faturas = new ArrayList<>();
     }
 
     public Fornecedor(String name, double desconto){
         this.name = name;
         this.desconto = desconto;
+        this.faturas = new ArrayList<>();
     }
 
     public Fornecedor(Fornecedor fornecedor){
         this.desconto = fornecedor.getDesconto();
         this.name=fornecedor.getName();
+        this.faturas = fornecedor.getFaturas();
+    }
+
+    public List<Fatura> getFaturas() {
+        return this.faturas.stream().map(Fatura::clone).collect(Collectors.toList());
+    }
+
+    public void setFaturas(List<Fatura> faturas) {
+        this.faturas = faturas.stream().map(Fatura::clone).collect(Collectors.toList());
     }
 
     public Fatura criaFatura(Casa casa, LocalDate inicio, LocalDate fim) throws FornecedorErradoException {
@@ -62,7 +80,8 @@ public class Fornecedor implements Serializable {
     public String toString() {
         return "Fornecedor{" +
                 "name='" + name + '\'' +
-                "desconto=" + desconto + '\'' +
+                ", desconto=" + desconto + '\'' +
+                ", faturas=" + this.faturas +
                 '}';
     }
 
@@ -73,12 +92,15 @@ public class Fornecedor implements Serializable {
 
         Fornecedor that = (Fornecedor) o;
 
-        return this.getName().equals(that.getName()) && this.desconto == that.getDesconto();
+        return this.getName().equals(that.getName()) && this.desconto == that.getDesconto() && this.faturas.equals(that.getFaturas());
     }
 
-    @Override
     public int hashCode() {
-        return getName().hashCode();
+        int r = 7;
+        r = r * 31 + this.name.hashCode();
+        r = r * 31 + Double.hashCode(this.desconto);
+        r = r * 31 + this.faturas.hashCode();
+        return r;
     }
 
     public double precoDia(double consumo, int n_devices){
@@ -89,6 +111,14 @@ public class Fornecedor implements Serializable {
 
     public Fornecedor clone(){
         return new Fornecedor(this);
+    }
+
+    public void adicionaFatura(Fatura f){
+        this.faturas.add(f.clone());
+    }
+
+    public double faturacao(){
+        return this.faturas.stream().mapToDouble(Fatura::getCusto).sum();
     }
 
 }

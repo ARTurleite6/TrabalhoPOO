@@ -24,7 +24,11 @@ public class Programa {
         try {
             this.log = EstadoPrograma.carregaDados();
         } catch (IOException | ClassNotFoundException e) {
-            this.log = new Parser().parse();
+            try {
+                this.log = new Parser().parse();
+            } catch (ExisteFornecedorException | FornecedorInexistenteException | ExisteCasaException | RoomInexistenteException | DeviceInexistenteException | RoomAlreadyExistsException ex) {
+                System.out.println("Ocorreu algum problema a carregar os dados de memória do ficheiro txt");
+            }
         }
         this.scan = new Scanner(System.in);
     }
@@ -39,7 +43,7 @@ public class Programa {
         int volume = scan.nextInt();
         scan.nextLine();
         System.out.println("Insira a estacao de radio a ligar");
-        String estacao = scan.next();
+        String estacao = scan.nextLine();
         System.out.println("Insira o consumo base do dispositivo");
         double baseConsumption = scan.nextDouble();
         scan.nextLine();
@@ -675,27 +679,31 @@ public class Programa {
     }
 
     public void estatisticasPrograma(){
-        Menu menu = new Menu(List.of("Menu Estatisticas:", "1. Casa que mais consumiu no último avanço", "2. Comercializador com maior Faturaração", "3. Maior Consumidor de um Periodo", "4. Top de tipo de Dispositivo mais utilizado", "0. Voltar"));
+        Menu menu = new Menu(List.of("Menu Estatisticas:", "1. Casa que mais consumiu até agora", "2. Comercializador com maior Faturaração", "3. Maior Consumidor de um Periodo", "4. Top de tipo de Dispositivo mais utilizado", "0. Voltar"));
         do{
             menu.run();
             switch (menu.getOpcao()) {
                 case 1 -> this.log.getCasaMaisGastadora().ifPresentOrElse(
-                        c -> System.out.println("A casa que mais gastou no ultimo periodo : " + c),
+                        c -> System.out.println("A casa que mais gastou até agora foi : " + c),
                         () -> System.out.println("Nao existe nenhuma casa ainda")
                 );
-                case 2 -> this.log.getFornecedorMaiorFaturacao().ifPresentOrElse(
-                        c -> System.out.println("O fornecedor que mais faturou foi : " + c),
-                        () -> System.out.println("Nao existe nenhuma casa ainda")
-                );
+                case 2 -> System.out.println("O fornecedor que mais faturação teve até agora foi " + this.log.getFornecedorMaiorFaturacao());
                 case 3 -> {
-                    System.out.println("Insira a data inicial do periodo AAAA-MM-DD");
-                    LocalDate dataInicial = LocalDate.parse(this.scan.nextLine());
-                    System.out.println("Insira a data final do periodo AAAA-MM-DD");
-                    LocalDate dataFinal = LocalDate.parse(this.scan.nextLine());
                     System.out.println("Insira o numero de casas que quer recolher informação");
                     int N = this.scan.nextInt();
-                    this.scan.nextLine();
-                    System.out.println("Top " + N + " de casas mais gastadoras neste periodo: " + this.log.maiorConsumidorPeriodo(dataInicial, dataFinal, N));
+                    System.out.println("Pretende inserir um periodo S/N? (Caso não queira irá ser usado o ultimo avanço do programa");
+                    String opcao = this.scan.nextLine();
+                    if(opcao.equals("S")) {
+                        System.out.println("Insira a data inicial do periodo AAAA-MM-DD");
+                        LocalDate dataInicial = LocalDate.parse(this.scan.nextLine());
+                        System.out.println("Insira a data final do periodo AAAA-MM-DD");
+                        LocalDate dataFinal = LocalDate.parse(this.scan.nextLine());
+                        this.scan.nextLine();
+                        System.out.println("Top " + N + " de casas mais gastadoras neste periodo: " + this.log.maiorConsumidorPeriodo(dataInicial, dataFinal, N));
+                    }
+                    else {
+                        System.out.println("Top " + N + " de casas mais gastadoras neste periodo: " + this.log.maiorConsumidorPeriodo(N));
+                    }
                 }
                 case 4 -> {
                     System.out.println("Top tipo dispositivos:");
@@ -744,7 +752,11 @@ public class Programa {
                 case 2 -> {
                     System.out.println("Insira o nome do fornecedor");
                     String fornecedor = this.scan.nextLine();
-                    System.out.println("Lista de faturas : " + this.log.getFaturasFornecedor(fornecedor));
+                    try {
+                        System.out.println("Lista de faturas : " + this.log.getFaturasFornecedor(fornecedor));
+                    } catch (FornecedorInexistenteException e) {
+                        System.out.println(e.getMessage());
+                    }
                 }
                 case 3 -> System.out.println("Lista de fornecedores: " + this.log.getSetFornecedores());
                 case 4 -> {
