@@ -9,6 +9,9 @@ public class SmartSpeaker extends SmartDevice {
     private String radioStation;
     private String brand;
 
+    /**
+     *
+     */
     public SmartSpeaker(){
         super();
         this.volume=0;
@@ -16,6 +19,13 @@ public class SmartSpeaker extends SmartDevice {
         this.brand="n/a";
     }
 
+    /**
+     * @param on
+     * @param consume
+     * @param volume
+     * @param radioStation
+     * @param brand
+     */
     public SmartSpeaker(boolean on, double consume, int volume, String radioStation, String brand){
         super(on, consume);
         this.volume=volume;
@@ -23,6 +33,9 @@ public class SmartSpeaker extends SmartDevice {
         this.brand=brand;
     }
 
+    /**
+     * @param device
+     */
     public SmartSpeaker(SmartSpeaker device){
         super(device);
         this.volume= device.getVolume();
@@ -30,40 +43,67 @@ public class SmartSpeaker extends SmartDevice {
         this.brand=device.getBrand();
     }
 
+    /**
+     * @return
+     */
     public int getVolume() {
         return volume;
     }
 
+    /**
+     * @param volume
+     */
     public void setVolume(int volume) {
         if(volume > 100) volume = SmartSpeaker.MAX;
         else if(volume < 0) volume = 0;
         this.volume = volume;
     }
 
+    /**
+     *
+     */
     public void volumeUp(){
         this.volume += (this.volume < SmartSpeaker.MAX) ? 1 : 0;
     }
 
+    /**
+     *
+     */
     public void volumeDown(){
         this.volume -= (this.volume > 0) ? 1 : 0;
     }
 
+    /**
+     * @return
+     */
     public String getRadioStation() {
         return radioStation;
     }
 
+    /**
+     * @param radioStation
+     */
     public void setRadioStation(String radioStation) {
         this.radioStation = radioStation;
     }
 
+    /**
+     * @return
+     */
     public String getBrand() {
         return brand;
     }
 
+    /**
+     * @param brand
+     */
     public void setBrand(String brand) {
         this.brand = brand;
     }
 
+    /**
+     * @return
+     */
     public String toString() {
         return "SmartSpeaker{" +
                 "id = " + this.getId() +
@@ -74,7 +114,10 @@ public class SmartSpeaker extends SmartDevice {
                 '}';
     }
 
-    @Override
+    /**
+     * @param o
+     * @return
+     */
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -87,7 +130,9 @@ public class SmartSpeaker extends SmartDevice {
         return getBrand().equals(that.getBrand());
     }
 
-    @Override
+    /**
+     * @return
+     */
     public int hashCode() {
         int result = super.hashCode();
         result = 31 * result + getVolume();
@@ -96,10 +141,16 @@ public class SmartSpeaker extends SmartDevice {
         return result;
     }
 
+    /**
+     * @return
+     */
     public SmartSpeaker clone(){
         return new SmartSpeaker(this);
     }
 
+    /**
+     * @return
+     */
     public double comsumption(){
         return (this.isOn() ? 1 : 0) * (this.getConsume() + this.volume * 0.0001);
     }
