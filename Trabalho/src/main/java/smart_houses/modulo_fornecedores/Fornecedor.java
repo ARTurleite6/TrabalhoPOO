@@ -14,16 +14,22 @@ import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
+/**
+ * Classe Fornecedor que representa o fornecedor das casas
+ */
 public class Fornecedor implements Serializable {
 
+    // Nome do fornecedor
     private String name;
-    private double desconto;
-    private List<Fatura> faturas;
-    private Function<Casa, Double> formula;
 
-    /**
-     *
-     */
+    // percentagem que o fornecedor tem como desconto
+    private double desconto;
+
+    // lista com as faturas que o fornecedor criou
+    private List<Fatura> faturas;
+
+
+    //Construtor de omissão de Fornecedor
     public Fornecedor() {
         this.desconto = 0.1;
         this.name = "n/a";
@@ -31,7 +37,8 @@ public class Fornecedor implements Serializable {
     }
 
     /**
-     * @param name
+     * Contrutor parametrizado do fornecedor
+     * @param name nome do fornecedor
      */
     public Fornecedor(String name){
         this.name = name;
@@ -40,8 +47,9 @@ public class Fornecedor implements Serializable {
     }
 
     /**
-     * @param name
-     * @param desconto
+     * contrutor parametrizado do fornecedor
+     * @param name nome do fornecedor
+     * @param desconto valor do desconto do fornecedor
      */
     public Fornecedor(String name, double desconto){
         this.name = name;
@@ -50,7 +58,8 @@ public class Fornecedor implements Serializable {
     }
 
     /**
-     * @param fornecedor
+     * Contrutor de cópia
+     * @param fornecedor fornecedor que pretende copiar
      */
     public Fornecedor(Fornecedor fornecedor){
         this.desconto = fornecedor.getDesconto();
@@ -59,25 +68,27 @@ public class Fornecedor implements Serializable {
     }
 
     /**
-     * @return
+     * @return lista com cópia das faturas do fornecedor
      */
     public List<Fatura> getFaturas() {
         return this.faturas.stream().map(Fatura::clone).collect(Collectors.toList());
     }
 
-    /**
-     * @param faturas
-     */
+/**
+ * Método que copia todas as faturas existentes no fornecedor, guardando-as numa lista e retornando-a
+ * @param faturas lista com a cópia das faturas do fornecedor
+ */
     public void setFaturas(List<Fatura> faturas) {
         this.faturas = faturas.stream().map(Fatura::clone).collect(Collectors.toList());
     }
 
     /**
-     * @param casa
-     * @param inicio
-     * @param fim
-     * @return
-     * @throws FornecedorErradoException
+     * Metodo que cria a fatura para uma casa dado periodo e manda uma excecao caso o fornecedor nao corresponda ao fornecedor da casa
+     * @param casa casa da qual se quer emitir a fatura
+     * @param inicio periodo inicial da fatura
+     * @param fim periodo final da fatura
+     * @return fatura gerada
+     * @throws FornecedorErradoException caso o fornecedor da casa nao corresponda ao fornecedor desta instancia
      */
     public Fatura criaFatura(Casa casa, LocalDate inicio, LocalDate fim) throws FornecedorErradoException {
         if(!casa.getFornecedor().equals(this.name)) throw new FornecedorErradoException("Este nao é o fornecedor desta casa, casa = " + casa);
@@ -88,35 +99,40 @@ public class Fornecedor implements Serializable {
     }
 
     /**
-     * @return
+     * Metodo que retorna o valor da variavel de instancia desconto
+     * @return valor da variavel de instancia desconto
      */
     public double getDesconto() {
         return desconto;
     }
 
     /**
-     * @param desconto
+     * Método que coloca um valor novo de desconto na variavel de instancia desconto
+     * @param desconto valor novo de desconto a colocar na variavel de instancia desconto
      */
     public void setDesconto(double desconto) {
         this.desconto = desconto;
     }
 
     /**
-     * @return
+     * Metodo que retorna o valor que se encontra na variavel de instancia nome
+     * @return valor da variavel de instancia nome
      */
     public String getName() {
         return name;
     }
 
     /**
-     * @param name
+     * Metodo que coloca o valor da variavel de instancia nome, dado um nome
+     * @param name valor a colocar na variavel de instancia nome
      */
     public void setName(String name) {
         this.name = name;
     }
 
     /**
-     * @return
+     * Metodo que calcula uma string com a representacao do objeto
+     * @return string que representa o objeto
      */
     public String toString() {
         return "Fornecedor{" +
@@ -127,8 +143,9 @@ public class Fornecedor implements Serializable {
     }
 
     /**
-     * @param o
-     * @return
+     * Metodo que compara o objeto com um outro objeto
+     * @param o objeto com o qual se vai comparar
+     * @return true se o objeto for igual, false caso contrario
      */
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -140,7 +157,8 @@ public class Fornecedor implements Serializable {
     }
 
     /**
-     * @return
+     * Metodo que calcula o valor de hash do objeto
+     * @return valor de hash do objeto
      */
     public int hashCode() {
         int r = 7;
@@ -151,9 +169,10 @@ public class Fornecedor implements Serializable {
     }
 
     /**
-     * @param consumo
-     * @param n_devices
-     * @return
+     * Metodo que retorna o custo para um dado consumo e numero de dispositivos
+     * @param consumo valor de um consumo kWh
+     * @param n_devices numero de devices
+     * @return valor do custo
      */
     public double precoDia(double consumo, int n_devices){
         double precoSDesc = EstadoPrograma.custoEnergia * consumo * (1 + EstadoPrograma.imposto) * 0.9;
@@ -162,21 +181,24 @@ public class Fornecedor implements Serializable {
     }
 
     /**
-     * @return
+     * Metodo que retorna uma copia do objeto
+     * @return copia do objeto
      */
     public Fornecedor clone(){
         return new Fornecedor(this);
     }
 
     /**
-     * @param f
+     * Metodo que adiciona a copia de uma fatura à collection de faturas
+     * @param f fatura a adicionar
      */
     public void adicionaFatura(Fatura f){
         this.faturas.add(f.clone());
     }
 
     /**
-     * @return
+     * Metodo que calcula a faturacao total do fornecedor atraves de todas as suas faturas
+     * @return faturacao total do fornecedor
      */
     public double faturacao(){
         return this.faturas.stream().mapToDouble(Fatura::getCusto).sum();

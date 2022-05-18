@@ -15,39 +15,25 @@ import java.util.stream.Collectors;
 
 public class Casa implements Serializable {
 
-    /**
-     * nome do proprietário da casa
-     */
+     // nome do proprietário da casa
     private final String nome;
 
-    /**
-     * nif do proprietário da casa
-     */
+     // nif do proprietário da casa
     private final String nif;
 
-    /**
-     * coleçao de devices, Map de codigo de device para o proprio device
-     */
+     // coleçao de devices, Map de codigo de device para o proprio device
     private Map<Integer, SmartDevice> devices;
 
-    /**
-     * Map de nome da divisão para a coleção de codigos dos devices que se encontram na divisão
-     */
+    // Map de nome da divisão para a coleção de codigos dos devices que se encontram na divisão
     private Map<String, Set<Integer>> rooms;
 
-    /**
-     * Lista de faturas da casa
-     */
+     // Lista de faturas da casa
     private final List<Fatura> faturas;
 
-    /**
-     * Nome do fornecedor da casa
-     */
+     // Nome do fornecedor da casa
     private String fornecedor;
 
-    /**
-     * Construtor por omissão de parametros
-     */
+     // Construtor por omissão de parametros
     public Casa(){
         this.nome = "";
         this.nif = "";
@@ -211,6 +197,7 @@ public class Casa implements Serializable {
     }
 
     /**
+     * Metodo que calcula a String com o estado do objeto
      * @return String que representa o estado do objeto do tipo casa
      */
     public String toString() {
@@ -251,7 +238,7 @@ public class Casa implements Serializable {
 
     /**
      * Setter para devices da casa
-     * @param devices - devices a colocar na casa
+     * @param devices devices a colocar na casa
      */
     public void setDevices(Map<Integer, SmartDevice> devices) {
         this.devices = devices.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().clone()));
@@ -259,7 +246,7 @@ public class Casa implements Serializable {
 
     /**
      * Getter para as divisões da casa
-     * @return colecao - relativa a rooms
+     * @return colecao relativa a rooms
      */
     public Map<String, Set<Integer>> getRooms() {
         return this.rooms.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new TreeSet<>(e.getValue())));
@@ -267,7 +254,7 @@ public class Casa implements Serializable {
 
     /**
      * Setter para divisões da casa
-     * @param rooms - divisões a colocar na casa
+     * @param rooms divisões a colocar na casa
      */
     public void setRooms(Map<String, Set<Integer>> rooms) {
         this.rooms = rooms.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new TreeSet<>(e.getValue())));
@@ -275,7 +262,7 @@ public class Casa implements Serializable {
 
     /**
      * Método que recebe uma colecao com os nomes das divisões e adiciona na casa
-     * @param rooms - divisoes a colocar na casa
+     * @param rooms divisoes a colocar na casa
      */
     public void setRooms(Set<String> rooms) {
         this.rooms = rooms.stream().collect(Collectors.toMap(r -> r, r -> new TreeSet<>()));
@@ -283,8 +270,8 @@ public class Casa implements Serializable {
 
     /**
      * Método que coloca todos os devices de uma divisão ligados ou desligados
-     * @param room - divisão onde desejo alterar os devices
-     * @param on - ligar ou desligar o dispositivo
+     * @param room divisão onde desejo alterar os devices
+     * @param on ligar ou desligar o dispositivo
      * @throws RoomInexistenteException não existe a divisão passada
      */
     public void setAllDevicesStateRoom(String room, boolean on) throws RoomInexistenteException {
@@ -332,8 +319,8 @@ public class Casa implements Serializable {
 
     /**
      * Método que remove um dispositivo da casa
-     * @param id - codigo do dispositivo a remover
-     * @throws DeviceInexistenteException - caso nao exista o device
+     * @param id codigo do dispositivo a remover
+     * @throws DeviceInexistenteException caso nao exista o device
      */
     public void removeDevice(int id) throws DeviceInexistenteException {
         if(!this.devices.containsKey(id)) throw new DeviceInexistenteException("Nao existe dispositivo de id " + id);
@@ -348,8 +335,8 @@ public class Casa implements Serializable {
 
     /**
      * Método que adiciona uma divisão à casa
-     * @param room - nome da divisão a adicionar na casa
-     * @throws RoomAlreadyExistsException - Caso já exista uma divisão com o nome inserido
+     * @param room nome da divisão a adicionar na casa
+     * @throws RoomAlreadyExistsException Caso já exista uma divisão com o nome inserido
      */
     public void addRoom(String room) throws RoomAlreadyExistsException{
         if(this.rooms.containsKey(room)) throw new RoomAlreadyExistsException("A divisao: " + room + " já existe nesta casa");
@@ -358,7 +345,7 @@ public class Casa implements Serializable {
 
     /**
      * Método que remove uma divisão da casa
-     * @param room - divisão que se pretende remover
+     * @param room divisão que se pretende remover
      */
     public void removeRoom(String room){
         this.rooms.remove(room);
@@ -373,7 +360,7 @@ public class Casa implements Serializable {
     /**
      * Método que remove o dispositivo da divisão onde se encontra
      * @param device dispositivo a remover da divisão
-     * @throws DeviceInexistenteException - caso o dispositivo nao exista na casa
+     * @throws DeviceInexistenteException caso o dispositivo nao exista na casa
      */
     public void removeDeviceOnRoom(int device) throws DeviceInexistenteException {
         if(!this.devices.containsKey(device)) throw new DeviceInexistenteException("Não existe dispositivo com código " + device);
@@ -402,8 +389,8 @@ public class Casa implements Serializable {
 
     /**
      * Método qeu calcula o periodo de uma casa entre duas datas
-     * @param inicio - data inicial do periodo
-     * @param fim - data final do periodo
+     * @param inicio data inicial do periodo
+     * @param fim data final do periodo
      * @return consumo no periodo indicado
      */
     public double consumoPeriodo(LocalDate inicio, LocalDate fim){
@@ -412,7 +399,7 @@ public class Casa implements Serializable {
 
     /**
      * Método que calcula a divisão onde um device existe
-     * @param device - device que se pretende procurar
+     * @param device device que se pretende procurar
      * @return divisão onde se encontra o dispositivo
      */
     private String divisaoDeDispositivo (int device){
@@ -433,10 +420,10 @@ public class Casa implements Serializable {
 
     /**
      * Método que muda o dispositivo para uma divisão, removendo-o das divisões onde se encotrava
-     * @param room - divisão onde se pretende colocar o device
-     * @param device - device que se pretende mudar de divisão
-     * @throws DeviceInexistenteException - caso nao exista o dispositvo com o codigo recebido como parametro
-     * @throws RoomInexistenteException - caso nao exista a divisão para onde se quer colocar o dispositivo
+     * @param room divisão onde se pretende colocar o device
+     * @param device device que se pretende mudar de divisão
+     * @throws DeviceInexistenteException caso nao exista o dispositvo com o codigo recebido como parametro
+     * @throws RoomInexistenteException caso nao exista a divisão para onde se quer colocar o dispositivo
      */
     public void mudaDeviceDeRoom(String room, int device) throws DeviceInexistenteException, RoomInexistenteException {
         if(!this.devices.containsKey(device)) throw new DeviceInexistenteException("Não existe o device de código : " + device);
@@ -451,10 +438,10 @@ public class Casa implements Serializable {
 
     /**
      * Método que dado um codigo do dispositivo e o comportamento que se pretende realizar aplica esse mesmo comportamento no device
-     * @param room1 - 1ª room que se pretende juntar
-     * @param room2 - 2ª room que se pretende juntar
-     * @param nova - divisão que se pretende criar a partir da junçao das outras duas
-     * @throws RoomAlreadyExistsException - Caso a divisão que se vai criar já existe
+     * @param room1 1ª room que se pretende juntar
+     * @param room2 2ª room que se pretende juntar
+     * @param nova divisão que se pretende criar a partir da junçao das outras duas
+     * @throws RoomAlreadyExistsException Caso a divisão que se vai criar já existe
      */
     public void juntaRooms(String room1, String room2, String nova) throws RoomAlreadyExistsException {
         if(this.rooms.containsKey(nova)) throw new RoomAlreadyExistsException("Esta room ja existe na casa");
@@ -472,10 +459,10 @@ public class Casa implements Serializable {
 
     /**
      * Método que dado um codigo do dispositivo e o comportamento que se pretende realizar aplica esse mesmo comportamento no device
-     * @param id - id do SmartBulb que se pretende alterar
-     * @param mapperBulb - comportamente que se pretende realizar no SmartBulb
-     * @throws DeviceInexistenteException - caso o dispositivo não exista na casa
-     * @throws TipoDeviceErradoException - caso o dispositivo que se pretenda alterar não seja um SmartBulb
+     * @param id id do SmartBulb que se pretende alterar
+     * @param mapperBulb comportamente que se pretende realizar no SmartBulb
+     * @throws DeviceInexistenteException caso o dispositivo não exista na casa
+     * @throws TipoDeviceErradoException caso o dispositivo que se pretenda alterar não seja um SmartBulb
      */
     public void alteraInfoBulb(int id, Consumer<SmartBulb> mapperBulb) throws DeviceInexistenteException, TipoDeviceErradoException {
       SmartDevice device = this.devices.get(id);
@@ -489,10 +476,10 @@ public class Casa implements Serializable {
 
     /**
      * Método que dado um codigo do dispositivo e o comportamento que se pretende realizar aplica esse mesmo comportamento no device
-     * @param id - id do SmartCamera que se pretende alterar
-     * @param mapperCamera - comportamente que se pretende realizar no SmartCamera
-     * @throws DeviceInexistenteException - caso o dispositivo não exista na casa
-     * @throws TipoDeviceErradoException - caso o dispositivo que se pretenda alterar não seja um SmartCamera
+     * @param id id do SmartCamera que se pretende alterar
+     * @param mapperCamera comportamente que se pretende realizar no SmartCamera
+     * @throws DeviceInexistenteException caso o dispositivo não exista na casa
+     * @throws TipoDeviceErradoException caso o dispositivo que se pretenda alterar não seja um SmartCamera
      */
     public void alteraInfoCamera(int id, Consumer<SmartCamera> mapperCamera) throws DeviceInexistenteException, TipoDeviceErradoException {
       SmartDevice device = this.devices.get(id);
@@ -506,10 +493,10 @@ public class Casa implements Serializable {
 
     /**
      * Método que dado um codigo do dispositivo e o comportamento que se pretende realizar aplica esse mesmo comportamento no device
-     * @param id - id do SmartSpeaker que se pretende alterar
-     * @param mapperSpeaker - comportamente que se pretende realizar no SmartSpeaker
-     * @throws DeviceInexistenteException - caso o dispositivo não exista na casa
-     * @throws TipoDeviceErradoException - caso o dispositivo que se pretenda alterar não seja um SmartSpeaker
+     * @param id id do SmartSpeaker que se pretende alterar
+     * @param mapperSpeaker comportamente que se pretende realizar no SmartSpeaker
+     * @throws DeviceInexistenteException caso o dispositivo não exista na casa
+     * @throws TipoDeviceErradoException caso o dispositivo que se pretenda alterar não seja um SmartSpeaker
      */
     public void alteraInfoSpeaker(int id, Consumer<SmartSpeaker> mapperSpeaker) throws DeviceInexistenteException, TipoDeviceErradoException {
       SmartDevice device = this.devices.get(id);
@@ -523,9 +510,9 @@ public class Casa implements Serializable {
 
     /**
      * Método que dado um codigo retorna a cópia do device
-     * @param id - codigo do device
+     * @param id codigo do device
      * @return cópia do device
-     * @throws DeviceInexistenteException - caso o device nao exista na casa
+     * @throws DeviceInexistenteException caso o device nao exista na casa
      */
     public SmartDevice getDevice(int id) throws DeviceInexistenteException {
       if(!this.devices.containsKey(id)) throw new DeviceInexistenteException("Não existe o device de id " + id + " na casa de nif " + this.nif);

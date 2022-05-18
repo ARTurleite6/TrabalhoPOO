@@ -1,0 +1,7 @@
+{
+  "docwriter.language": "English",
+  "docwriter.progress.trackMethods": true,
+  "docwriter.progress.trackClasses": false,
+  "docwriter.progress.trackTypes": true,
+  "docwriter.progress.trackFunctions": false
+}
