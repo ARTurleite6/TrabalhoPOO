@@ -1,6 +1,12 @@
 package smart_houses;
 
-import smart_houses.exceptions.*;
+import smart_houses.exceptions.AlreadyExistDeviceException;
+import smart_houses.exceptions.DeviceInexistenteException;
+import smart_houses.exceptions.ExisteCasaException;
+import smart_houses.exceptions.ExisteFornecedorException;
+import smart_houses.exceptions.FornecedorInexistenteException;
+import smart_houses.exceptions.RoomAlreadyExistsException;
+import smart_houses.exceptions.RoomInexistenteException;
 import smart_houses.modulo_casas.Casa;
 import smart_houses.modulo_fornecedores.Fornecedor;
 import smart_houses.smart_devices.SmartBulb;
@@ -17,7 +23,7 @@ import java.util.Random;
 
 public class Parser {
 
-    public EstadoPrograma parse() throws AlreadyExistDeviceException, ExisteFornecedorException, FornecedorInexistenteException, ExisteCasaException, RoomAlreadyExistsException, DeviceInexistenteException, RoomInexistenteException {
+    public EstadoPrograma parse(){
         List<String> linhas = lerFicheiro("./src/main/resources/log.txt");
         String[] linhaPartida;
         String divisao = null;
@@ -26,48 +32,94 @@ public class Parser {
         for (String linha : linhas) {
             linhaPartida = linha.split(":", 2);
             switch (linhaPartida[0]) {
-                case "Fornecedor":
+                case "Fornecedor" -> {
                     Fornecedor f = new Fornecedor(linhaPartida[1]);
+                    try {
                         estado.addFornecedor(f);
-                    break;
-                case "Casa":
-                    if(casaMaisRecente != null) {
+                    } catch (ExisteFornecedorException e) {
+                        e.printStackTrace();
+                    }
+                }
+                case "Casa" -> {
+                    if (casaMaisRecente != null) {
+                        try {
                             estado.adicionaCasa(casaMaisRecente);
+                        } catch (ExisteCasaException | FornecedorInexistenteException e) {
+                            e.printStackTrace();
+                        }
                     }
                     casaMaisRecente = parseCasa(linhaPartida[1]);
-                    break;
-                case "Divisao":
+                }
+                case "Divisao" -> {
                     if (casaMaisRecente == null) System.out.println("Linha inválida.");
-                    if(divisao != null) {
-                            casaMaisRecente.addRoom(divisao);
-                    }
                     divisao = linhaPartida[1];
+                    System.out.println(divisao);
+                    try {
                         casaMaisRecente.addRoom(divisao);
-                    break;
-                case "SmartBulb":
+                    } catch (RoomAlreadyExistsException e) {
+                        e.printStackTrace();
+                    }
+                }
+                case "SmartBulb" -> {
                     if (divisao == null) System.out.println("Linha inválida.");
                     SmartBulb sd = parseSmartBulb(linhaPartida[1]);
-                    casaMaisRecente.addDevice(sd);
+                    try {
+                        casaMaisRecente.addDevice(sd);
+                    } catch (AlreadyExistDeviceException e) {
+                        e.printStackTrace();
+                    }
+                    try {
                         casaMaisRecente.addDeviceOnRoom(divisao, sd.getId());
-                    break;
-                case "SmartCamera":
+                    } catch (RoomInexistenteException e) {
+                        e.printStackTrace();
+                    } catch (DeviceInexistenteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                case "SmartCamera" -> {
                     if (divisao == null) System.out.println("Linha inválida.");
                     SmartCamera sc = parseSmartCamera(linhaPartida[1]);
-                    casaMaisRecente.addDevice(sc);
+                    try {
+                        casaMaisRecente.addDevice(sc);
+                    } catch (AlreadyExistDeviceException e) {
+                        e.printStackTrace();
+                    }
+                    try {
                         casaMaisRecente.addDeviceOnRoom(divisao, sc.getId());
-                    break;
-                case "SmartSpeaker":
-                    if(divisao == null) System.out.println("Linha Invalida.");
+                    } catch (RoomInexistenteException e) {
+                        e.printStackTrace();
+                    } catch (DeviceInexistenteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                case "SmartSpeaker" -> {
+                    if (divisao == null) System.out.println("Linha Invalida.");
                     SmartSpeaker ss = parseSmartSpeaker(linhaPartida[1]);
-                    casaMaisRecente.addDevice(ss);
+                    try {
+                        casaMaisRecente.addDevice(ss);
+                    } catch (AlreadyExistDeviceException e) {
+                        e.printStackTrace();
+                    }
+                    try {
                         casaMaisRecente.addDeviceOnRoom(divisao, ss.getId());
-                    break;
-                default:
-                    System.out.println("Linha inválida.");
-                    break;
+                    } catch (RoomInexistenteException e) {
+                        e.printStackTrace();
+                    } catch (DeviceInexistenteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                default -> System.out.println("Linha inválida.");
             }
         }
-        System.out.println("done!");
+        if(casaMaisRecente != null) {
+            try {
+                estado.adicionaCasa(casaMaisRecente);
+            } catch (ExisteCasaException e) {
+                e.printStackTrace();
+            } catch (FornecedorInexistenteException e) {
+                e.printStackTrace();
+            }
+        }
         return estado;
     }
 

@@ -24,11 +24,7 @@ public class Programa {
         try {
             this.log = EstadoPrograma.carregaDados();
         } catch (IOException | ClassNotFoundException e) {
-            try {
-                this.log = new Parser().parse();
-            } catch (ExisteFornecedorException | FornecedorInexistenteException | ExisteCasaException | RoomInexistenteException | DeviceInexistenteException | RoomAlreadyExistsException ex) {
-                System.out.println("Ocorreu algum problema a carregar os dados de memória do ficheiro txt");
-            }
+            this.log = new Parser().parse();
         }
         this.scan = new Scanner(System.in);
     }
@@ -330,8 +326,29 @@ public class Programa {
                 }
                 case 2 -> this.ligaDesDispositivo();
                 case 3 -> this.edicaoDispositivos();
+                case 4 -> this.remocaoDispositivos();
             }
         } while(menuDispositivos.getOpcao() != 0);
+    }
+
+    public void remocaoDispositivos(){
+        System.out.println("Lista de NIFs disponiveis " + this.log.getListNIFs());
+        String nif = this.scan.nextLine();
+        try {
+            System.out.println("Casa selecionada " + this.log.getCasa(nif));
+            System.out.println("Insira o codigo do dispositivo a remover");
+            int codigo = this.scan.nextInt();
+            this.scan.nextLine();
+            this.log.alteraInfoCasa(nif, casa -> {
+                try {
+                    casa.removeDevice(codigo);
+                } catch (DeviceInexistenteException e) {
+                    System.out.println(e.getMessage());
+                }
+            });
+        } catch (CasaInexistenteException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     public Casa criacaoCasa() {
@@ -713,7 +730,12 @@ public class Programa {
                 case 4 -> gestaoPrograma();
             }
         } while(menuPrincipal.getOpcao() != 0);
-        this.log.guardaDados();
+        System.out.println("Saindo...");
+        try {
+            this.log.guardaDados();
+        } catch (IOException e) {
+            System.out.println("Erro a carregar dados");
+        }
     }
 
     public static void main(String[] args) {

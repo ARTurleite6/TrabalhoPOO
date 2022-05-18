@@ -290,19 +290,13 @@ public class EstadoPrograma implements Serializable {
     /**
      *
      */
-    public void guardaDados() {
-        try {
+    public void guardaDados() throws IOException {
             FileOutputStream file = new FileOutputStream("./src/main/resources/data.obj");
             ObjectOutputStream oos = new ObjectOutputStream(file);
             oos.writeInt(SmartDevice.next_id);
             oos.writeInt(Fatura.next_codigoFatura);
             oos.writeObject(this);
             oos.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("Este ficheiro nao existe");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
