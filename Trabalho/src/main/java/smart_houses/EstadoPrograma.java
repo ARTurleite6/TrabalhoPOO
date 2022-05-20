@@ -123,7 +123,7 @@ public class EstadoPrograma implements Serializable {
 
         return this.casas.values().stream().max(Comparator.comparingDouble(c -> {
             List<Fatura> faturas = c.getFaturas();
-            return faturas.stream().mapToDouble(Fatura::getConsumo).sum();
+            return faturas.stream().mapToDouble(Fatura::getCusto).sum();
         })).map(Casa::clone);
 
     }
@@ -133,13 +133,13 @@ public class EstadoPrograma implements Serializable {
      * @param N Numero de nifs a serem colocados no ‘top’
      * @return lista de nifs ordenadas por consumo
      */
-    public List<String> maiorConsumidorPeriodo(int N) {
+    public List<Casa> maiorConsumidorPeriodo(int N) {
         Comparator<Casa> comp = Comparator.comparingDouble(Casa::consumoPeriodo);
         return this.casas.values()
                 .stream()
                 .sorted(comp.reversed())
                 .limit(N)
-                .map(Casa::getNif)
+                .map(Casa::clone)
                 .collect(Collectors.toList());
     }
 
@@ -150,13 +150,13 @@ public class EstadoPrograma implements Serializable {
      * @param N numero de casas a serem consideradas
      * @return lista com o Top N
      */
-    public List<String> maiorConsumidorPeriodo(LocalDate inicio, LocalDate fim, int N) {
+    public List<Casa> maiorConsumidorPeriodo(LocalDate inicio, LocalDate fim, int N) {
         Comparator<Casa> comp = Comparator.comparingDouble(c -> c.consumoPeriodo(inicio, fim));
         return this.casas.values()
                 .stream()
                 .sorted(comp.reversed())
                 .limit(N)
-                .map(Casa::getNif)
+                .map(Casa::clone)
                 .collect(Collectors.toList());
     }
 
@@ -206,13 +206,13 @@ public class EstadoPrograma implements Serializable {
      * Metodo que calcula o fornecedor que mais faturou ate agora
      * @return nome do fornecedor que mais faturou
      */
-    public String getFornecedorMaiorFaturacao(){
+    public Fornecedor getFornecedorMaiorFaturacao() throws FornecedorInexistenteException {
         Comparator<Map.Entry<String, Fornecedor>> comp = (f1, f2) -> {
             double faturacao1 = f1.getValue().faturacao();
             double faturacao2 = f2.getValue().faturacao();
             return Double.compare(faturacao1, faturacao2);
         };
-        return this.fornecedores.entrySet().stream().max(comp).map(Map.Entry::getKey).orElse("Nao existe nenhum fornecedor");
+        return this.fornecedores.entrySet().stream().max(comp).map(Map.Entry::getValue).orElseThrow(() -> new FornecedorInexistenteException("Nao existe fornecedores para ver o maximo"));
     }
 
     /**

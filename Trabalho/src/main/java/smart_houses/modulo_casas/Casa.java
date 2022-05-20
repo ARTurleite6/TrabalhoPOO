@@ -519,4 +519,12 @@ public class Casa implements Serializable {
       return this.devices.get(id);
     }
 
+    /**
+     * metodo que calcula o consumo total que uma casa gastou no programa no total
+     * @return consumo da casa
+     */
+    public double consumoTotal(){
+        return this.faturas.stream().mapToDouble(Fatura::getCusto).sum();
+    }
+
 }

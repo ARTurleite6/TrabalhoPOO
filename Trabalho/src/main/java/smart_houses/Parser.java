@@ -53,7 +53,6 @@ public class Parser {
                 case "Divisao" -> {
                     if (casaMaisRecente == null) System.out.println("Linha inválida.");
                     divisao = linhaPartida[1];
-                    System.out.println(divisao);
                     try {
                         casaMaisRecente.addRoom(divisao);
                     } catch (RoomAlreadyExistsException e) {

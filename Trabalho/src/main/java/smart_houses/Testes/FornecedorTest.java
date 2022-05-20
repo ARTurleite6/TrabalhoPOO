@@ -1,10 +1,11 @@
-package smart_houses.modulo_fornecedores;
+package smart_houses.Testes;
 
 import org.junit.jupiter.api.Test;
 import smart_houses.Fatura;
 import smart_houses.exceptions.AlreadyExistDeviceException;
 import smart_houses.exceptions.FornecedorErradoException;
 import smart_houses.modulo_casas.Casa;
+import smart_houses.modulo_fornecedores.Fornecedor;
 import smart_houses.smart_devices.SmartBulb;
 import smart_houses.smart_devices.SmartDevice;
 

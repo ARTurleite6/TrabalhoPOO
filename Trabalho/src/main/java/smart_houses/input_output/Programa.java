@@ -17,10 +17,13 @@ import java.util.*;
 
 public class Programa {
 
+    // classe com o model do programa
     private EstadoPrograma log;
+    // Scanner para receber input
     private final Scanner scan;
 
-    public Programa() throws AlreadyExistDeviceException {
+    // Contrutor por omissao que inicializa a classe com os dados do programa
+    public Programa() {
         try {
             this.log = EstadoPrograma.carregaDados();
         } catch (IOException | ClassNotFoundException e) {
@@ -29,6 +32,10 @@ public class Programa {
         this.scan = new Scanner(System.in);
     }
 
+    /**
+     * Metodo que lida com a criacao de SmartSpeaker
+     * @return SmartSpeaker que foi criado
+     */
     private SmartDevice criacaoSmartSpeaker(){
         System.out.println("Pretende ligar o dispositivo? True/False");
         boolean ligado = scan.nextBoolean();
@@ -46,6 +53,10 @@ public class Programa {
         return new SmartSpeaker(ligado, baseConsumption, volume, estacao, brand);
     }
 
+    /**
+     * Metodo que lida com a criacao de SmartCamera
+     * @return SmartCamera que foi criado
+     */
     private SmartDevice criacaoSmartCamera(){
         System.out.println("Pretende ligar o dispositivo? True/False");
         boolean ligado = scan.nextBoolean();
@@ -65,6 +76,10 @@ public class Programa {
         return new SmartCamera(ligado, consumoBase, resolucaoX, resolucaoY, dimensao);
     }
 
+    /**
+     * Metodo que lida com a criacao de SmartBulb
+     * @return SmartBulb que foi criado
+     */
     private SmartDevice criacaoSmartBulb(){
         System.out.println("Pretende ligar o dispositivo? True/False");
         boolean ligado = scan.nextBoolean();
@@ -84,6 +99,10 @@ public class Programa {
         return new SmartBulb(ligado, consumoBase, tone, dimensao);
     }
 
+    /**
+     * Metodo que lida com a criacao de dispositivos
+     * @return dispositivo criado
+     */
     public SmartDevice criaDispositivo() {
         System.out.println("Que tipo de Dispositivo pretende criar: \n1 : SmartBulb;\n2 : SmartCamera;\n3 : SmartSpeaker");
         Integer tipoDispositivo;
@@ -102,6 +121,9 @@ public class Programa {
         };
     }
 
+    /**
+     * Metodo que lida com ligar ou desligar dipositivos do programa
+     */
     public void ligaDesDispositivo(){
         System.out.println("Lista de NIFs disponiíveis: " + this.log.getListNIFs());
         System.out.println("Insira o nif da casa onde deseja ligar/desligar dispositivos");
@@ -164,6 +186,11 @@ public class Programa {
         }
     }
 
+    /**
+     * Metodo que lida com edicoes no estado de dispositivos SmartBulb
+     * @param nif nif da casa onde se deseja fazer a edicao
+     * @param id id do dispositivo para fazer a edicao
+     */
     public void edicaoSmartBulb(String nif, int id) {
       System.out.println("Qual tonalidade deseja que a SmartBulb tenha? (0 - WARM, 1 - COLD, 2 - NEUTRAL");  
       int valor = this.scan.nextInt();
@@ -194,6 +221,11 @@ public class Programa {
       }
     }
 
+    /**
+     * Metodo que lida com edicoes no estado de dispositivos SmartCamera
+     * @param nif nif da casa onde se deseja fazer a edicao
+     * @param id id do dispositivo para fazer a edicao
+     */
     public void edicaoSmartCamera(String nif, int id) {
       System.out.println("O que pretende editar? (resolucao, tamanhoFicheiro");
       String opcao = this.scan.nextLine();
@@ -233,6 +265,11 @@ public class Programa {
       }
     }
 
+    /**
+     * Metodo que lida com edicoes no estado de dispositivos SmartSpeaker
+     * @param nif nif da casa onde se deseja fazer a edicao
+     * @param id id do dispositivo para fazer a edicao
+     */
     public void edicaoSmartSpeaker(String nif, int id){
         System.out.println("Insira o que pretende alterar no speaker (Volume, Estacao de Radio");
         String opcao = this.scan.nextLine();
@@ -264,6 +301,9 @@ public class Programa {
         }
     }
 
+    /**
+     * Metodo que lida com a edicao do estado de dispositivos
+     */
     public void edicaoDispositivos(){
       System.out.println("Lista de NIFs disponiveis no programa " + this.log.getListNIFs());
       String nif = this.scan.nextLine();
@@ -284,6 +324,9 @@ public class Programa {
       }
     }
 
+    /**
+     * Metodo que lida com a parte de gestao de dispositivos do menu
+     */
     public void gestaoDispositivos(){
         Menu menuDispositivos = new Menu(List.of("MENU GESTÃO DISPOSITIVOS", "1. Criar Dispositivo", "2. Ligar/Desligar Dispositivo", "3. Editar Dispositivo", "4. Remover dispositivo da Casa", "0. Sair"));
         do{
@@ -331,6 +374,9 @@ public class Programa {
         } while(menuDispositivos.getOpcao() != 0);
     }
 
+    /**
+     * Metodo que lida com a remocao de dispositivos do programa
+     */
     public void remocaoDispositivos(){
         System.out.println("Lista de NIFs disponiveis " + this.log.getListNIFs());
         String nif = this.scan.nextLine();
@@ -351,6 +397,10 @@ public class Programa {
         }
     }
 
+    /**
+     * Metodo que lida com a criacao de casas
+     * @return Casa criada no metodo
+     */
     public Casa criacaoCasa() {
 
         System.out.println("Insira o nome do proprietário da casa");
@@ -377,6 +427,9 @@ public class Programa {
         else return new Casa(nome, nif, empresa);
     }
 
+    /**
+     * Metodo que lida com processos de edicao de estados das casas
+     */
     public void edicaoCasas(){
         Menu menu = new Menu(List.of("MENU EDICÃO CASA: ", "1. Adicionar divisões", "2. Adicionar/Mudar device de divisão", "3. Remover divisão", "4. Juntar duas divisões", "0. Sair"));
         do{
@@ -485,6 +538,9 @@ public class Programa {
         } while(menu.getOpcao() != 0);
     }
 
+    /**
+     * Metodo que lida com a parte de gestao de casas do menu
+     */
     public void gestaoCasas(){
         Menu menu = new Menu(List.of("MENU GESTÃO CASAS:", "1. Criar Casa", "2. Mudar Fornecedor Casa", "3. Remover Casa", "4. Listar Casas", "5. Listar NIFs inscritos no programa", "6. Visualizar o conteúdo de uma casa", "7. Ver Faturas de uma Casa", "8. Editar Casa", "0. Voltar"));
 
@@ -573,6 +629,9 @@ public class Programa {
         } while(menu.getOpcao() != 0);
     }
 
+    /**
+     * Metodo que lida com a parte do menu relativa a fazer avancos na data do programa
+     */
     public void gestaoData(){
         Menu data = new Menu(List.of("AVANCAR DATA: ", "1. Avancar 1 dia", "2. Avancar x dias", "3. Avancar para uma data", "0. Voltar"));
         LocalDate date = null;
@@ -603,19 +662,31 @@ public class Programa {
         }
     }
 
+    /**
+     * Metodo que lida com a parte de estatisticas do programa
+     */
     public void estatisticasPrograma(){
-        Menu menu = new Menu(List.of("Menu Estatisticas:", "1. Casa que mais consumiu até agora", "2. Comercializador com maior Faturaração", "3. Maior Consumidor de um Periodo", "4. Top de tipo de Dispositivo mais utilizado", "0. Voltar"));
+        Menu menu = new Menu(List.of("Menu Estatisticas:", "1. Casa que mais consumiu até agora", "2. Comercializador com maior Faturação", "3. Maior Consumidor de um Periodo", "4. Top de tipo de Dispositivo mais utilizado", "0. Voltar"));
         do{
             menu.run();
             switch (menu.getOpcao()) {
                 case 1 -> this.log.getCasaMaisGastadora().ifPresentOrElse(
-                        c -> System.out.println("A casa que mais gastou até agora foi : " + c),
+                        c -> System.out.println("A casa que mais gastou até agora foi a casa de nif " + c.getNif() + " e nome: " + c.getNome() + " com consumo: " + c.consumoTotal()),
                         () -> System.out.println("Nao existe nenhuma casa ainda")
                 );
-                case 2 -> System.out.println("O fornecedor que mais faturação teve até agora foi " + this.log.getFornecedorMaiorFaturacao());
+                case 2 -> {
+                    Fornecedor f = null;
+                    try {
+                        f = this.log.getFornecedorMaiorFaturacao();
+                        System.out.println("O fornecedor que mais faturação teve até agora foi " + f.getName() + " com faturacao de " + f.faturacao());
+                    } catch (FornecedorInexistenteException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
                 case 3 -> {
                     System.out.println("Insira o numero de casas que quer recolher informação");
                     int N = this.scan.nextInt();
+                    this.scan.nextLine();
                     System.out.println("Pretende inserir um periodo S/N? (Caso não queira irá ser usado o ultimo avanço do programa");
                     String opcao = this.scan.nextLine();
                     if(opcao.equals("S")) {
@@ -623,11 +694,14 @@ public class Programa {
                         LocalDate dataInicial = LocalDate.parse(this.scan.nextLine());
                         System.out.println("Insira a data final do periodo AAAA-MM-DD");
                         LocalDate dataFinal = LocalDate.parse(this.scan.nextLine());
-                        this.scan.nextLine();
-                        System.out.println("Top " + N + " de casas mais gastadoras neste periodo: " + this.log.maiorConsumidorPeriodo(dataInicial, dataFinal, N));
+                        List<Casa> casas = this.log.maiorConsumidorPeriodo(dataInicial, dataFinal, N);
+                        System.out.println("Top + " + "casas: ");
+                        casas.forEach(c -> System.out.println("Nif: " + c.getNif() + " Nome: " + c.getNome() + " Consumo: " + c.consumoPeriodo(dataInicial, dataFinal) + " kW"));
                     }
                     else {
-                        System.out.println("Top " + N + " de casas mais gastadoras neste periodo: " + this.log.maiorConsumidorPeriodo(N));
+                        List<Casa> casas = this.log.maiorConsumidorPeriodo(N);
+                        System.out.println("Top " + N + " de Casas: ");
+                        casas.forEach(casa-> System.out.println("Casa-> nif: " + casa.getNif() + " nome: " + casa.getNome() + " consumo: " +casa.consumoPeriodo()));
                     }
                 }
                 case 4 -> {
@@ -644,6 +718,9 @@ public class Programa {
         }while(menu.getOpcao() != 0);
     }
 
+    /**
+     * Metodo que lida com a parte de gestao do programa
+     */
     public void gestaoPrograma(){
         Menu menuP = new Menu(List.of("MENU ESTADO PROGRAMA", "1. Apresentar estado", "2. Apresentar Estatísticas", "3. Avancar data", "0. Voltar"));
         do{
@@ -656,6 +733,9 @@ public class Programa {
         } while(menuP.getOpcao() != 0);
     }
 
+    /**
+     * Metodo que lida com a parte do menu de gestao de fornecedores
+     */
     public void gestaoFornecedor(){
         Menu menuF = new Menu(List.of("MENU GESTAO FORNECEDORES", "1: Criar Fornecedores","2. Faturas de um fornecedor", "3. Lista de Fornecedores", "4. Visualizar dados Fornecedor", "5. Mudar valor desconto Fornecedor", "0. Voltar"));
         do{
@@ -719,6 +799,9 @@ public class Programa {
         }while(menuF.getOpcao() != 0);
     }
 
+    /**
+     * Metodo que faz o run do programa
+     */
     public void run(){
         Menu menuPrincipal = new Menu(List.of("MENU PRINCIPAL", "1. Gerir Casas", "2. Gerir Dispositivos", "3. Gerir Fornecedores", "4. Estado Programa", "0. Sair"));
         do{
@@ -739,11 +822,7 @@ public class Programa {
     }
 
     public static void main(String[] args) {
-        try {
-            new Programa().run();
-        } catch (AlreadyExistDeviceException e) {
-            System.out.println(e.getMessage());
-        }
+        new Programa().run();
     }
 
 }
