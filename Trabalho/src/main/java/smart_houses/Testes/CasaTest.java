@@ -37,7 +37,7 @@ class CasaTest {
         Casa c = new Casa("Artur", "23", "EDP");
         Casa c2 = new Casa("Artur", "23", "EDP");
 
-        assertTrue(c.equals(c2));
+        assertEquals(c, c2);
     }
 
     @Test
@@ -64,7 +64,7 @@ class CasaTest {
     }
 
     @Test
-    void setAllDevicesState() throws AlreadyExistDeviceException, RoomInexistenteException {
+    void setAllDevicesState() throws AlreadyExistDeviceException {
         Casa c = new Casa("Artur", "23", "EDP");
 
         SmartDevice d = new SmartCamera();
@@ -110,8 +110,8 @@ class CasaTest {
     @Test
     void consumoPeriodo() {
         Casa c = new Casa("Artur", "23", "EDP");
-        Fatura f = new Fatura("EDP", "23", 20, 10, LocalDate.of(2010, 1, 1), LocalDate.of(2012, 01, 01));
-        Fatura f2 = new Fatura("EDP", "23", 20, 40, LocalDate.of(2012, 1, 1), LocalDate.of(2014, 01, 01));
+        Fatura f = new Fatura("EDP", "23", 20, 10, LocalDate.of(2010, 1, 1), LocalDate.of(2012, 1, 1));
+        Fatura f2 = new Fatura("EDP", "23", 20, 40, LocalDate.of(2012, 1, 1), LocalDate.of(2014, 1, 1));
         c.adicionaFatura(f);
         c.adicionaFatura(f2);
         assertEquals(40, c.consumoPeriodo());
@@ -121,8 +121,8 @@ class CasaTest {
     void testConsumoPeriodo() {
         Casa c = new Casa("Artur", "23", "EDP");
         Fatura f = new Fatura("EDP", "23", 20, 10, LocalDate.of(2010, 1, 1), LocalDate.of(2012, 1, 1));
-        Fatura f2 = new Fatura("EDP", "23", 20, 40, LocalDate.of(2012, 1, 1), LocalDate.of(2014, 01, 01));
-        Fatura f3 = new Fatura("EDP", "23", 20, 40, LocalDate.of(2008, 1, 1), LocalDate.of(2010, 01, 01));
+        Fatura f2 = new Fatura("EDP", "23", 20, 40, LocalDate.of(2012, 1, 1), LocalDate.of(2014, 1, 1));
+        Fatura f3 = new Fatura("EDP", "23", 20, 40, LocalDate.of(2008, 1, 1), LocalDate.of(2010, 1, 1));
         c.adicionaFatura(f);
         c.adicionaFatura(f2);
         c.adicionaFatura(f3);
@@ -130,22 +130,38 @@ class CasaTest {
     }
 
     @Test
-    void mudaDeviceDeRoom() {
+    void mudaDeviceDeRoom() throws RoomAlreadyExistsException, AlreadyExistDeviceException, DeviceInexistenteException, RoomInexistenteException {
+        Casa c = new Casa();
+        SmartDevice sm = new SmartBulb();
+        c.addRoom("Quarto");
+        c.addRoom("Sala");
+        c.addDevice(sm);
+        c.addDeviceOnRoom("Quarto", sm.getId());
+        assertTrue(c.getRooms().get("Quarto").contains(sm.getId()));
+
+        c.mudaDeviceDeRoom("Sala", sm.getId());
+        assertTrue(c.getRooms().get("Sala").contains(sm.getId()));
     }
 
     @Test
-    void juntaRooms() {
-    }
+    void juntaRooms() throws DeviceInexistenteException, RoomInexistenteException, AlreadyExistDeviceException, RoomAlreadyExistsException {
+        Casa c = new Casa();
+        SmartDevice sm = new SmartBulb();
+        SmartDevice sm2 = new SmartBulb();
+        c.addRoom("Quarto");
+        c.addRoom("Sala");
+        c.addDevice(sm);
+        c.addDeviceOnRoom("Quarto", sm.getId());
+        c.addDevice(sm2);
+        c.addDeviceOnRoom("Sala", sm2.getId());
+        c.mudaDeviceDeRoom("Sala", sm.getId());
 
-    @Test
-    void alteraInfoBulb() {
-    }
+        c.juntaRooms("Quarto", "Sala", "Cozinha");
+        assertFalse(c.getRooms().containsKey("Quarto"));
+        assertFalse(c.getRooms().containsKey("Sala"));
+        assertTrue(c.getRooms().containsKey("Cozinha"));
+        assertTrue(c.getRooms().get("Cozinha").contains(sm.getId()));
+        assertTrue(c.getRooms().get("Cozinha").contains(sm2.getId()));
 
-    @Test
-    void alteraInfoCamera() {
-    }
-
-    @Test
-    void alteraInfoSpeaker() {
     }
 }

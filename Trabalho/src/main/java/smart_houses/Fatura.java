@@ -12,25 +12,25 @@ public class Fatura implements Comparable<Fatura>, Serializable {
     public static int next_codigoFatura = 1;
 
     // codigo da fatura
-    private int codigoFatura;
+    private final int codigoFatura;
 
     // nome do fornecedor que gerou a fatura
-    private String fornecedor;
+    private final String fornecedor;
 
     // nif do cliente da fatura
-    private String nifCliente;
+    private final String nifCliente;
   
     // Custo associado à fatura
-    private double custo;
+    private final double custo;
 
     // Consumo associado à fatura
-    private double consumo;
+    private final double consumo;
     
     // Inicio do periodo da fatura
-    private LocalDate inicioPeriodo;
+    private final LocalDate inicioPeriodo;
 
     // Fim do periodo da fatura
-    private LocalDate fimPeriodo;
+    private final LocalDate fimPeriodo;
 
     //Contrutor por omissao da fatura
     public Fatura(){
@@ -88,15 +88,6 @@ public class Fatura implements Comparable<Fatura>, Serializable {
     }
 
     /**
-     * Metodo que coloca o valor do parametro do fornecedor na variavel de instancia fornecedor
-     * 
-     * @param fornecedor valor da variavel de instancia fornecedor
-     */
-    public void setFornecedor(String fornecedor) {
-        this.fornecedor = fornecedor;
-    }
-
-    /**
      * Metodo que retorna o valor da variavel do nif do cliente 
      * 
      * @return Valor do nif do cliente
@@ -106,90 +97,45 @@ public class Fatura implements Comparable<Fatura>, Serializable {
     }
 
     /**
-     * This function sets the nifCliente variable to the value of the parameter nifCliente
+     * Metodo que retorna o custo associado na fatura
      * 
-     * @param nifCliente The NIF of the client.
-     */
-    public void setNifCliente(String nifCliente) {
-        this.nifCliente = nifCliente;
-    }
-
-    /**
-     * This function returns the value of the variable custo
-     * 
-     * @return The cost of the item.
+     * @return O custo de energia referente na fatura
      */
     public double getCusto() {
         return custo;
     }
 
     /**
-     * This function sets the value of the custo variable to the value of the custo parameter.
-     * 
-     * @param custo The cost of the item.
-     */
-    public void setCusto(double custo) {
-        this.custo = custo;
-    }
-
-    /**
-     * This function returns the value of the variable consumo
-     * 
-     * @return The value of the variable consumo.
+     * Metodo que retorna o consumo associado na fatura
+     *
+     * @return O consumo de energia referente na fatura
      */
     public double getConsumo() {
         return consumo;
     }
 
     /**
-     * This function sets the value of the variable consumo to the value of the parameter consumo
-     * 
-     * @param consumo the amount of energy consumed by the appliance
-     */
-    public void setConsumo(double consumo) {
-        this.consumo = consumo;
-    }
-
-    /**
-     * This function returns the start date of the period
-     * 
-     * @return The value of the variable inicioPeriodo.
+     * Metodo que retorna a data do inicio do periodo da fatura
+     *
+     * @return valor do inicio do periodo da fatura
      */
     public LocalDate getInicioPeriodo() {
         return inicioPeriodo;
     }
 
     /**
-     * This function sets the value of the inicioPeriodo attribute
-     * 
-     * @param inicioPeriodo The start date of the period.
-     */
-    public void setInicioPeriodo(LocalDate inicioPeriodo) {
-        this.inicioPeriodo = inicioPeriodo;
-    }
-
-    /**
-     * This function returns the end date of the period
-     * 
-     * @return The end date of the period.
+     * Metodo que retorna a data do fim do periodo da fatura
+     *
+     * @return valor do fim do periodo da fatura
      */
     public LocalDate getFimPeriodo() {
         return fimPeriodo;
     }
 
     /**
-     * This function sets the end date of the period
+     * Metodo que calcula a representacao do objeto numa string
      * 
-     * @param fimPeriodo The end date of the period.
-     */
-    public void setFimPeriodo(LocalDate fimPeriodo) {
-        this.fimPeriodo = fimPeriodo;
-    }
-
-    /**
-     * The toString() method returns a string representation of the object
-     * 
-     * @return The toString method is being returned.
+     * @return String com a representacao do objeto
      */
     public String toString() {
         return "Fatura{" +
@@ -204,12 +150,9 @@ public class Fatura implements Comparable<Fatura>, Serializable {
     }
 
     /**
-     * If the object is the same object, return true. If the object is null or of a different class,
-     * return false. If the object is of the same class, compare the fields and return true if they are
-     * all equal, false otherwise
-     * 
-     * @param o The object to be compared.
-     * @return The hashCode of the object.
+     * Metodo que compara os dois objetos
+     * @param o Objeto a ser comparado
+     * @return retorna o valor de se sao iguais ou nao
      */
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -227,9 +170,9 @@ public class Fatura implements Comparable<Fatura>, Serializable {
     }
 
     /**
-     * The hashCode() method returns a hash code value for the object
+     * Metodo que calcula o codigo hash do objeto
      * 
-     * @return The hashCode of the object.
+     * @return Codigo hash do objeto
      */
     public int hashCode() {
         int result;
@@ -247,21 +190,19 @@ public class Fatura implements Comparable<Fatura>, Serializable {
     }
 
     /**
-     * The compareTo() method compares two objects of the same class and returns a negative integer,
-     * zero, or a positive integer if the object is less than, equal to, or greater than the specified
-     * object
-     * 
-     * @param f the object to be compared.
-     * @return The difference between the dates of the invoices.
+     * Metodo de ordenacao natural da fatura, sendo este pelo periodo inicial da mesma
+     *
+     * @param f objeto a ser comparado
+     * @return diferenca entre as duas datas
      */
     public int compareTo(Fatura f){
         return this.inicioPeriodo.compareTo(f.getInicioPeriodo());
     }
 
     /**
-     * This function returns a new object that is a copy of the object that called it.
+     * Metodo que copia o objeto
      * 
-     * @return A new Fatura object with the same values as the original.
+     * @return Copia do objeto
      */
     public Fatura clone(){
         return new Fatura(this);

@@ -3,14 +3,18 @@ package smart_houses.smart_devices;
 
 public class SmartSpeaker extends SmartDevice {
 
+    // Valor maximo para o volume dos SmartSpeakers
     private static final int MAX = 100;
 
+    // Volume do speaker
     private int volume;
+    // Estacao de radio do speaker
     private String radioStation;
+    // Marca do speaker
     private String brand;
 
     /**
-     *
+     * Contrutor por omissao
      */
     public SmartSpeaker(){
         super();
@@ -20,11 +24,12 @@ public class SmartSpeaker extends SmartDevice {
     }
 
     /**
-     * @param on
-     * @param consume
-     * @param volume
-     * @param radioStation
-     * @param brand
+     * Construtor parametrizado
+     * @param on estado do dispositivo
+     * @param consume consumo do dispositivo
+     * @param volume volume do dispositivo
+     * @param radioStation estacao de radio
+     * @param brand marca do dispositivo
      */
     public SmartSpeaker(boolean on, double consume, int volume, String radioStation, String brand){
         super(on, consume);
@@ -34,7 +39,8 @@ public class SmartSpeaker extends SmartDevice {
     }
 
     /**
-     * @param device
+     * Contrutor de copia
+     * @param device dispositivo a ser copiado
      */
     public SmartSpeaker(SmartSpeaker device){
         super(device);
@@ -44,14 +50,16 @@ public class SmartSpeaker extends SmartDevice {
     }
 
     /**
-     * @return
+     * Metodo getter para o volume
+     * @return valor do volume
      */
     public int getVolume() {
         return volume;
     }
 
     /**
-     * @param volume
+     * Metodo setter para o volume
+     * @param volume valor do volume a ser colocado
      */
     public void setVolume(int volume) {
         if(volume > 100) volume = SmartSpeaker.MAX;
@@ -60,49 +68,32 @@ public class SmartSpeaker extends SmartDevice {
     }
 
     /**
-     *
-     */
-    public void volumeUp(){
-        this.volume += (this.volume < SmartSpeaker.MAX) ? 1 : 0;
-    }
-
-    /**
-     *
-     */
-    public void volumeDown(){
-        this.volume -= (this.volume > 0) ? 1 : 0;
-    }
-
-    /**
-     * @return
+     * Metodo getter da estacao de radio
+     * @return valor da estacao de radio
      */
     public String getRadioStation() {
         return radioStation;
     }
 
     /**
-     * @param radioStation
+     * metodo setter para a estacao de radio
+     * @param radioStation valor da nova estacao de radio a ser colocada
      */
     public void setRadioStation(String radioStation) {
         this.radioStation = radioStation;
     }
 
     /**
-     * @return
+     * Metodo getter da marca do dispositivo
+     * @return valor da marca do dispositivo
      */
     public String getBrand() {
         return brand;
     }
 
     /**
-     * @param brand
-     */
-    public void setBrand(String brand) {
-        this.brand = brand;
-    }
-
-    /**
-     * @return
+     * Metodo que calcula string que representa o objeto
+     * @return string com a representacao do objeto
      */
     public String toString() {
         return "SmartSpeaker{" +
@@ -115,8 +106,9 @@ public class SmartSpeaker extends SmartDevice {
     }
 
     /**
-     * @param o
-     * @return
+     * Metodo que compara dois objetos
+     * @param o objeto a ser comparado
+     * @return true se forem iguais, false caso contrario
      */
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -131,7 +123,8 @@ public class SmartSpeaker extends SmartDevice {
     }
 
     /**
-     * @return
+     * Metodo que calcula o codigo hash do objeto
+     * @return valor do codigo de hash do objeto
      */
     public int hashCode() {
         int result = super.hashCode();
@@ -142,14 +135,16 @@ public class SmartSpeaker extends SmartDevice {
     }
 
     /**
-     * @return
+     * Metodo que cria copia do objeto
+     * @return Copia do objeto
      */
     public SmartSpeaker clone(){
         return new SmartSpeaker(this);
     }
 
     /**
-     * @return
+     * Metodo que calcula o consumo do dispositivo em funcao do volume
+     * @return valor do consumo diario
      */
     public double comsumption(){
         return (this.isOn() ? 1 : 0) * (this.getConsume() + this.volume * 0.0001);

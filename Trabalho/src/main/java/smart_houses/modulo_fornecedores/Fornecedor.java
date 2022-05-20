@@ -93,8 +93,9 @@ public class Fornecedor implements Serializable {
     public Fatura criaFatura(Casa casa, LocalDate inicio, LocalDate fim) throws FornecedorErradoException {
         if(!casa.getFornecedor().equals(this.name)) throw new FornecedorErradoException("Este nao é o fornecedor desta casa, casa = " + casa);
         long days = DAYS.between(inicio, fim);
-        double consumo = casa.consumoDispositivos() * days;
+        double consumo = casa.consumoDispositivos();
         double preco = this.precoDia(consumo, casa.getMapDevices().size()) * days;
+        consumo *= days;
         return new Fatura(this.name, casa.getNif(), preco, consumo, inicio, fim);
     }
 
@@ -174,8 +175,8 @@ public class Fornecedor implements Serializable {
      * @param n_devices numero de devices
      * @return valor do custo
      */
-    public double precoDia(double consumo, int n_devices){
-        double precoSDesc = EstadoPrograma.custoEnergia * consumo * (1 + EstadoPrograma.imposto) * 0.9;
+    private double precoDia(double consumo, int n_devices){
+        double precoSDesc = (n_devices < 7) ? EstadoPrograma.custoEnergia * consumo * (1 + EstadoPrograma.imposto) * 0.9 : EstadoPrograma.custoEnergia * consumo * (1 + EstadoPrograma.imposto) * 0.6;
         double desc = precoSDesc * this.desconto;
         return precoSDesc - desc;
     }
