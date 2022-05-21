@@ -384,7 +384,7 @@ public class Casa implements Serializable {
      */
     public double consumoPeriodo(){
         if(this.faturas.size() == 0) return 0;
-        else return this.faturas.get(this.faturas.size() - 1).getConsumo();
+        else return this.faturas.get(this.faturas.size() - 1).getCusto();
     }
 
     /**
@@ -394,7 +394,7 @@ public class Casa implements Serializable {
      * @return consumo no periodo indicado
      */
     public double consumoPeriodo(LocalDate inicio, LocalDate fim){
-        return this.faturas.stream().filter(f -> (f.getInicioPeriodo().isEqual(inicio) || f.getInicioPeriodo().isAfter(inicio)) && (f.getFimPeriodo().isEqual(fim) || f.getFimPeriodo().isBefore(fim))).mapToDouble(Fatura::getConsumo).sum();
+        return this.faturas.stream().filter(f -> (f.getInicioPeriodo().isEqual(inicio) || f.getInicioPeriodo().isAfter(inicio)) && (f.getFimPeriodo().isEqual(fim) || f.getFimPeriodo().isBefore(fim))).mapToDouble(Fatura::getCusto).sum();
     }
 
     /**
