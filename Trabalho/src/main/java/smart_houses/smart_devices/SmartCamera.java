@@ -146,6 +146,6 @@ public class SmartCamera extends SmartDevice {
      * @return valor do consumo do dispositivo
      */
     public double comsumption(){
-        return this.getConsume()  + (this.resolutionX * 0.001 * this.resolutionY * 0.001 * this.fileDim * 0.0001);
+        return this.getConsume()  + (this.resolutionX * 0.001 * this.resolutionY * 0.001 + this.fileDim * 0.001);
     }
 }

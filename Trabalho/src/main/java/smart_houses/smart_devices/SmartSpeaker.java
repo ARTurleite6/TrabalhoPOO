@@ -147,6 +147,6 @@ public class SmartSpeaker extends SmartDevice {
      * @return valor do consumo diario
      */
     public double comsumption(){
-        return (this.isOn() ? 1 : 0) * (this.getConsume() + this.volume * 0.0001);
+        return (this.isOn() ? 1 : 0) * (this.getConsume() + this.volume * 0.001);
     }
 }
